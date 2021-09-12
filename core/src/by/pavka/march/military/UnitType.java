@@ -1,34 +1,55 @@
 package by.pavka.march.military;
 
+import static by.pavka.march.military.Force.*;
+
 public enum UnitType {
 
-    INFANTRY(1),
-    LIGHT_INFANTRY(1),
-    GRENADIER(1),
-    GUARD_INFANTRY(1),
-    ENGINEER(2),
-    MILITIA(2),
+    REGIMENT_HQ(3, CAV),
+    BRIGADE_HQ(3, CAV),
+    DIVISION_HQ(3, CAV),
+    CORPS_HQ(3, CAV),
+    ARMY_HQ(3, CAV),
 
-    CAVALRY(1),
-    HEAVY_CAVALRY(1),
-    LIGHT_CAVALRY(2),
-    IRREGULAR_CAVALRY(2),
-    GUARD_CAVALRY(1),
+    INFANTRY(1, INF),
+    LIGHT_INFANTRY(1, INF),
+    GRENADIER(1, INF),
+    GUARD_INFANTRY(1, INF),
+    MILITIA(2, INF),
+    MILITIA_COMPANY(2, INF),
+    MARCH_COMPANY(2, INF),
 
-    ARTILLERY(1),
-    HORSE_ARTILLERY(1),
-    HEAVY_ARTILLERY(1),
-    GUARD_ARTILLERY(1),
+    ENGINEER(2, ENG),
+    ENGINEER_COMPANY(2, ENG),
 
-    SUPPLY(3);
+    CAVALRY(1, CAV),
+    HEAVY_CAVALRY(1, CAV),
+    LIGHT_CAVALRY(2, CAV),
+    IRREGULAR_CAVALRY(2, CAV),
+    GUARD_CAVALRY(1, CAV),
+
+    ARTILLERY(1, ART),
+    LIGHT_ARTILLERY_PLATOON(1, ART),
+    HORSE_ARTILLERY(1, ART),
+    HEAVY_ARTILLERY(1, ART),
+    GUARD_ARTILLERY(1, ART),
+
+    SUPPLY(3,SUP);
+
+    public static final double GUNNER_PER_CANNON = 15.0;
+    public static final double SOLDIER_PER_WAGON = 2.0;
 
     private int fightRank;
+    private String type;
 
-    UnitType(int rank) {
+    UnitType(int rank, String type) {
         fightRank = rank;
+        this.type = type;
     }
 
     public int fightRank() {
         return fightRank;
+    }
+    public String type() {
+        return type;
     }
 }
