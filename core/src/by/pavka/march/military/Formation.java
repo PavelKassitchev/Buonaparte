@@ -1,138 +1,23 @@
 package by.pavka.march.military;
 
-import static by.pavka.march.military.UnitType.GUNNER_PER_CANNON;
-import static by.pavka.march.military.UnitType.SOLDIER_PER_WAGON;
-
 import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.characteristic.Spirit;
+import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
+import by.pavka.march.configuration.FormationValidator;
 
 public class Formation extends Force {
 
     General commander;
+    HQ hq;
     Array<Force> subForces;
-    Array<General> generals;
+    FormationValidator validator;
 
-//    int infantry;
-//    int engineer;
-//    int cavalry;
-//    int gunner;
-//    int cannon;
-//    int wagon;
-//
-//    public Formation attach(Force force) {
-//        force.superForce = this;
-//        subForces.add(force);
-//        if (speed > force.speed) {
-//            speed = force.speed;
-//        }
-//        length += force.length;
-//        recon += force.recon;
-//        capacity += force.capacity;
-//        food += force.food;
-//        ammo += force.ammo;
-//        foodConsumption += force.foodConsumption;
-//        ammoConsumption += force.ammoConsumption;
-//        if(force.isUnit()) {
-//            Unit unit = (Unit) force;
-//            int strength = unit.strength;
-//            switch (unit.quality.unitType.type()) {
-//                case INF:
-//                    infantry += strength;
-//                    break;
-//                case CAV:
-//                    cavalry += strength;
-//                    break;
-//                case ART:
-//                    gunner += strength;
-//                    cannon += Math.ceil(strength / GUNNER_PER_CANNON);
-//                    break;
-//                case ENG:
-//                    engineer += strength;
-//                    break;
-//                case SUP:
-//                    wagon += Math.ceil(strength / SOLDIER_PER_WAGON);
-//                    break;
-//                default:
-//            }
-//        } else {
-//            Formation formation = (Formation) force;
-//            infantry += formation.infantry;
-//            cavalry += formation.cavalry;
-//            engineer += formation.engineer;
-//            gunner += formation.gunner;
-//            cannon += formation.cannon;
-//            wagon += formation.wagon;
-//        }
-//        return this;
-//    }
-//
-//    public void changeInfantryStrength(int delta, double lengthDelta, double reconDelta,
-//                                       double capacityDelta,double foodConsumptionDelta, double ammoConsumptionDelta) {
-//        infantry += delta;
-//        changeAttributes(lengthDelta, reconDelta, capacityDelta, foodConsumptionDelta, ammoConsumptionDelta);
-//        if (superForce != null) {
-//            superForce.changeInfantryStrength(delta, lengthDelta, reconDelta,
-//                    capacityDelta, ammoConsumptionDelta, foodConsumptionDelta);
-//        }
-//    }
-//
-//    public void changeCavalryStrength(int delta, double lengthDelta, double reconDelta,
-//                                      double capacityDelta,double foodConsumptionDelta, double ammoConsumptionDelta) {
-//        cavalry += delta;
-//        changeAttributes(lengthDelta, reconDelta, capacityDelta, foodConsumptionDelta, ammoConsumptionDelta);
-//        if (superForce != null) {
-//            superForce.changeCavalryStrength(delta, lengthDelta, reconDelta,
-//                    capacityDelta, ammoConsumptionDelta, foodConsumptionDelta);
-//        }
-//    }
-//
-//    public void changeArtilleryStrength(int delta, double lengthDelta, double reconDelta,
-//                                        double capacityDelta,double foodConsumptionDelta, double ammoConsumptionDelta) {
-//        gunner += delta;
-//        cannon += Math.ceil(delta / GUNNER_PER_CANNON);
-//        changeAttributes(lengthDelta, reconDelta, capacityDelta, foodConsumptionDelta, ammoConsumptionDelta);
-//        if (superForce != null) {
-//            superForce.changeCavalryStrength(delta, lengthDelta, reconDelta,
-//                    capacityDelta, ammoConsumptionDelta, foodConsumptionDelta);
-//        }
-//    }
-//
-//    public void changeSupplyStrength(int delta, double lengthDelta, double reconDelta,
-//                                     double capacityDelta,double foodConsumptionDelta, double ammoConsumptionDelta) {
-//        wagon += Math.ceil(delta / UnitType.SOLDIER_PER_WAGON);
-//        changeAttributes(lengthDelta, reconDelta, capacityDelta, foodConsumptionDelta, ammoConsumptionDelta);
-//        if (superForce != null) {
-//            superForce.changeCavalryStrength(delta, lengthDelta, reconDelta,
-//                    capacityDelta, ammoConsumptionDelta, foodConsumptionDelta);
-//        }
-//    }
-//
-//
-//    public void changeEngineerStrength(int delta, double lengthDelta, double reconDelta,
-//                                       double capacityDelta, double foodConsumptionDelta, double ammoConsumptionDelta) {
-//        engineer += delta;
-//        changeAttributes(lengthDelta, reconDelta, capacityDelta, foodConsumptionDelta, ammoConsumptionDelta);
-//        if (superForce != null) {
-//            superForce.changeEngineerStrength(delta, lengthDelta, reconDelta,
-//                    capacityDelta, ammoConsumptionDelta, foodConsumptionDelta);
-//        }
-//    }
-//
-//    private void changeAttributes(double lengthDelta, double reconDelta,
-//                                  double capacityDelta,double foodConsumptionDelta, double ammoConsumptionDelta) {
-//        length += lengthDelta;
-//        recon += reconDelta;
-//        capacity += capacityDelta;
-//        foodConsumption += foodConsumptionDelta;
-//        ammoConsumption += ammoConsumptionDelta;
-//    }
-//
     @Override
     public double findSpeed() {
         double speed = MAX_SPEED;
-        for (Force force: subForces) {
+        for (Force force : subForces) {
             if (force.findSpeed() < speed) {
                 speed = force.findSpeed();
             }
@@ -157,8 +42,61 @@ public class Formation extends Force {
         return new Spirit(totalXp / soldiers, totalMorale / soldiers, totalFatigue / soldiers);
     }
 
+    public void changeStockAscending(Stock stock) {
+        strength.food += strength.food;
+        ;
+        strength.ammo += strength.ammo;
+        if (superForce != null) {
+            superForce.changeStockAscending(stock);
+        }
+    }
+
+    @Override
+    public Stock changeStockDescending(Stock stock, int mode) {
+        //TODO
+        return null;
+    }
+
+    @Override
+    protected Stock emptyStock() {
+        Stock stock = new Stock(strength.food, strength.ammo);
+        strength.food = 0;
+        strength.ammo = 0;
+        for (Force force : subForces) {
+            force.emptyStock();
+        }
+        return stock;
+    }
+
+    @Override
+    protected int getLevel() {
+        switch (hq.quality.unitType) {
+            case INFANTRY_REGIMENT_HQ:
+            case CAVALRY_REGIMENT_HQ:
+                return 1;
+            case INFANTRY_BRIGADE_HQ:
+            case CAVALRY_BRIGADE_HQ:
+                return 2;
+            case DIVISION_HQ:
+            case CAVALRY_DIVISION_HQ:
+                return 3;
+            case CORPS_HQ:
+            case CAVALRY_CORPS_HQ:
+            case TROOP:
+                return 4;
+            case ARMY_HQ:
+                return 5;
+            default:
+                return 0;
+        }
+    }
+
     public boolean remove(Force force) {
         return subForces.removeValue(force, true);
+    }
+
+    public void add(Force force) {
+        subForces.add(force);
     }
 
     public void changeStrength(Strength strength) {
@@ -168,5 +106,15 @@ public class Formation extends Force {
         if (superForce != null) {
             superForce.changeStrength(strength);
         }
+    }
+
+    public Formation attach(Force force) {
+        if (validator.canAttch(force)) {
+            add(force);
+            force.superForce = this;
+            Strength s = force.strength;
+            changeStrength(s);
+        }
+        return this;
     }
 }

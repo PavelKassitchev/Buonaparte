@@ -1,4 +1,4 @@
-package by.pavka.march.configuration;
+package by.pavka.march.characteristic;
 
 import by.pavka.march.military.UnitType;
 
