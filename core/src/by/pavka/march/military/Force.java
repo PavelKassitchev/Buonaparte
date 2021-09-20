@@ -34,8 +34,8 @@ public abstract class Force {
     public abstract Stock emptyStock();
 
     public Stock flattenEmptiedStock(Stock stock, int mode) {
-        double foodRequest = findFoodNeed() * NORMAL_FOOD_STOCK_DAYS;
-        double ammoRequest = findAmmoNeed()  * mode;
+        double foodRequest = strength.foodConsumption * NORMAL_FOOD_STOCK_DAYS;
+        double ammoRequest = strength.ammoConsumption  * mode;
         double ratio = strength.capacity / (ammoRequest + foodRequest);
         double foodToLoad = foodRequest * ratio;
         double ammoToLoad = ammoRequest * ratio;
@@ -56,13 +56,13 @@ public abstract class Force {
         strength.food = foodToLoad;
         strength.ammo = ammoToLoad;
         Stock remaining = new Stock(stock.food - foodToLoad, stock.ammo - ammoToLoad);
-        double foodPortion = foodToLoad / findFoodNeed();
-        double ammoPortion = ammoToLoad / findAmmoNeed();
-        flatten(foodPortion, ammoPortion);
+        double foodRatio = foodToLoad / strength.capacity;
+        double ammoRatio = ammoToLoad / strength.capacity;
+        flatten(foodRatio, ammoRatio);
         return remaining;
     }
 
-    public abstract void flatten(double foodPortion, double ammoPortion);
+    public abstract void flatten(double foodRatio, double ammoRatio);
 
     public abstract double findAmmoNeed();
 

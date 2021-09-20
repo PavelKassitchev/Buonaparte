@@ -1,5 +1,8 @@
 package by.pavka.march.military;
 
+import static by.pavka.march.characteristic.Stock.AMMO_HIGHEST;
+import static by.pavka.march.characteristic.Stock.AMMO_LOW;
+import static by.pavka.march.characteristic.Stock.AMMO_LOWEST;
 import static by.pavka.march.characteristic.Stock.AMMO_NORMAL;
 
 import com.badlogic.gdx.utils.Array;
@@ -40,23 +43,23 @@ public class MainTest {
         u1.name = "u1";
         u1.speed = 10;
         u1.strength = new Strength();
-        u1.strength.food = 20;
+        u1.strength.food = 2;
         u1.strength.ammo = 10;
         u1.spirit = new Spirit(0, 0, 0);
         u1.strength.ammoConsumption = 0.5;
         u1.strength.foodConsumption = 1;
-        u1.strength.capacity = 25;
+        u1.strength.capacity = 12;
         f.attach(u1);
         Unit u2 = new Unit();
         u2.name = "u2";
         u2.speed = 12;
         u2.spirit = new Spirit(0, 0, 0);
         u2.strength = new Strength();
-        u2.strength.food = 30;
+        u2.strength.food = 15;
         u2.strength.ammo = 0;
         u2.strength.ammoConsumption = 0.7;
         u2.strength.foodConsumption = 2;
-        u2.strength.capacity = 25;
+        u2.strength.capacity = 19.2;
         formation.attach(u2);
         formation.attach(f);
         WagonTrain wagon = new WagonTrain();
@@ -83,13 +86,15 @@ public class MainTest {
         f.attach(wagon);
         System.out.println("Wagon food need = " + wagon.findFoodNeed() + ", ammo need = " + wagon.findAmmoNeed());
         System.out.println("Total loaded: " + formation.strength.food + ", " + formation.strength.ammo);
+        System.out.println("Capacity = " + formation.strength.capacity);
         Stock stock = formation.emptyStock();
+        stock = stock.plus(new Stock(100, 100));
         System.out.println("Total unloaded: " + stock.food + " " + stock.ammo + ", " +
                 "U2 stock: " + u2.strength.food + " " + u2.strength.ammo + ", U1 stock: " + u1.strength.food + " " + u1.strength.ammo
         + ", f stock: " + f.strength.food + " " + f.strength.ammo + ", wagon food " + wagon.strength.food + ", " + wagon1.strength.food);
         System.out.println("Ammo need: " + formation.findAmmoNeed() + " Wagon need = " + wagon.findAmmoNeed() + ", Wagon1 need = " + wagon1.findAmmoNeed());
         System.out.println("Speed: " + formation.speed);
-        stock = formation.flattenEmptiedStock(stock, AMMO_NORMAL);
+        stock = formation.flattenEmptiedStock(stock, AMMO_HIGHEST);
         System.out.println("FLATTED: " + formation.strength.food + ", " + formation.strength.ammo);
         System.out.println("FLATTED1: " + f.strength.food + ", " + f.strength.ammo);
         System.out.println("FLATTED U2: " + u2.strength.food + ", " + u2.strength.ammo);
@@ -98,6 +103,7 @@ public class MainTest {
         System.out.println("FLATTED WAGON1: " + wagon1.strength.food + ", " + wagon1.strength.ammo);
         System.out.println("F: foodConsumption " + f.strength.foodConsumption + ", ammoConsumption " + f.strength.ammoConsumption +
                 ". Wagon food need = " + wagon.findFoodNeed() + ", ammo need = " + wagon.findAmmoNeed());
+        System.out.println(stock.food + ", " + stock.ammo);
 
     }
 }

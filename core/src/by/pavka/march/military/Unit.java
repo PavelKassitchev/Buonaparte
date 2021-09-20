@@ -36,9 +36,9 @@ public class Unit extends Force {
     }
 
     @Override
-    public void flatten(double foodPortion, double ammoPortion) {
-        strength.food = foodPortion * findFoodNeed();
-        strength.ammo = ammoPortion * findAmmoNeed();
+    public void flatten(double foodRatio, double ammoRatio) {
+        strength.food = foodRatio * strength.capacity;
+        strength.ammo = ammoRatio * strength.capacity;
     }
 
     @Override
