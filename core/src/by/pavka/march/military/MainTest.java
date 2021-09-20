@@ -98,6 +98,6 @@ public class MainTest {
         System.out.println("FLATTED WAGON1: " + wagon1.strength.food + ", " + wagon1.strength.ammo);
         System.out.println("F: foodConsumption " + f.strength.foodConsumption + ", ammoConsumption " + f.strength.ammoConsumption +
                 ". Wagon food need = " + wagon.findFoodNeed() + ", ammo need = " + wagon.findAmmoNeed());
-        System.out.println(stock.food + " " + stock.ammo);
+
     }
 }
