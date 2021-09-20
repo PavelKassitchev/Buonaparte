@@ -1,5 +1,7 @@
 package by.pavka.march.military;
 
+import static by.pavka.march.characteristic.Stock.NORMAL_FOOD_STOCK_DAYS;
+
 import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
@@ -29,9 +31,44 @@ public abstract class Force {
 
     public abstract Stock changeStockDescending(Stock stock, int mode);
 
-    protected abstract Stock emptyStock();
+    public abstract Stock emptyStock();
 
-    protected abstract int getLevel();
+    public Stock flattenEmptiedStock(Stock stock, int mode) {
+        double foodRequest = findFoodNeed() * NORMAL_FOOD_STOCK_DAYS;
+        double ammoRequest = findAmmoNeed()  * mode;
+        double ratio = strength.capacity / (ammoRequest + foodRequest);
+        double foodToLoad = foodRequest * ratio;
+        double ammoToLoad = ammoRequest * ratio;
+        if (ammoToLoad > stock.ammo) {
+            ammoToLoad = stock.ammo;
+            foodToLoad = strength.capacity - ammoToLoad;
+        }
+        if (foodToLoad > stock.food) {
+            foodToLoad = stock.food;
+            if (ammoToLoad < stock.ammo) {
+                if (stock.ammo > strength.capacity - foodToLoad) {
+                    ammoToLoad = strength.capacity - foodToLoad;
+                } else {
+                    ammoToLoad = stock.ammo;
+                }
+            }
+        }
+        strength.food = foodToLoad;
+        strength.ammo = ammoToLoad;
+        Stock remaining = new Stock(stock.food - foodToLoad, stock.ammo - ammoToLoad);
+        double foodPortion = foodToLoad / findFoodNeed();
+        double ammoPortion = ammoToLoad / findAmmoNeed();
+        flatten(foodPortion, ammoPortion);
+        return remaining;
+    }
+
+    public abstract void flatten(double foodPortion, double ammoPortion);
+
+    public abstract double findAmmoNeed();
+
+    public abstract double findFoodNeed();
+
+    public abstract int getLevel();
 
     public boolean detach() {
         if (superForce == null) {

@@ -1,5 +1,7 @@
 package by.pavka.march.military;
 
+import static by.pavka.march.characteristic.Stock.NORMAL_FOOD_STOCK_DAYS;
+
 import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
@@ -25,7 +27,7 @@ public class Unit extends Force {
     }
 
     @Override
-    protected Stock emptyStock() {
+    public Stock emptyStock() {
         double food = strength.food;
         double ammo = strength.ammo;
         strength.food = 0;
@@ -34,8 +36,24 @@ public class Unit extends Force {
     }
 
     @Override
-    protected int getLevel() {
+    public void flatten(double foodPortion, double ammoPortion) {
+        strength.food = foodPortion * findFoodNeed();
+        strength.ammo = ammoPortion * findAmmoNeed();
+    }
+
+    @Override
+    public int getLevel() {
         return 0;
+    }
+
+    @Override
+    public double findAmmoNeed() {
+        return strength.ammoConsumption;
+    }
+
+    @Override
+    public double findFoodNeed() {
+        return strength.foodConsumption;
     }
 
     public Stock changeStockAscending(Stock stock, int mode) {

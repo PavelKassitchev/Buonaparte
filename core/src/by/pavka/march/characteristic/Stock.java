@@ -7,6 +7,7 @@ public class Stock {
     public static final int AMMO_NORMAL = 16;
     public static final int AMMO_HIGH = 22;
     public static final int AMMO_HIGHEST = 28;
+    public static final int NORMAL_FOOD_STOCK_DAYS = 4;
     public double food;
     public double ammo;
 

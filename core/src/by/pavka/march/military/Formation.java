@@ -1,5 +1,7 @@
 package by.pavka.march.military;
 
+import static by.pavka.march.characteristic.Stock.NORMAL_FOOD_STOCK_DAYS;
+
 import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.characteristic.Spirit;
@@ -58,7 +60,7 @@ public class Formation extends Force {
     }
 
     @Override
-    protected Stock emptyStock() {
+    public Stock emptyStock() {
         Stock stock = new Stock(strength.food, strength.ammo);
         strength.food = 0;
         strength.ammo = 0;
@@ -69,7 +71,16 @@ public class Formation extends Force {
     }
 
     @Override
-    protected int getLevel() {
+    public void flatten(double foodPortion, double ammoPortion) {
+        strength.food = foodPortion * findFoodNeed();
+        strength.ammo = ammoPortion * findAmmoNeed();
+        for (Force force : subForces) {
+            force.flatten(foodPortion, ammoPortion);
+        }
+    }
+
+    @Override
+    public int getLevel() {
         switch (hq.quality.unitType) {
             case INFANTRY_REGIMENT_HQ:
             case CAVALRY_REGIMENT_HQ:
@@ -89,6 +100,24 @@ public class Formation extends Force {
             default:
                 return 0;
         }
+    }
+
+    @Override
+    public double findAmmoNeed() {
+        double need = 0;
+        for (Force force : subForces) {
+            need += force.findAmmoNeed();
+        }
+        return need;
+    }
+
+    @Override
+    public double findFoodNeed() {
+        double need = 0;
+        for (Force force : subForces) {
+            need += force.findFoodNeed();
+        }
+        return need;
     }
 
     public boolean remove(Force force) {
