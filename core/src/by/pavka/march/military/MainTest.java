@@ -1,9 +1,6 @@
 package by.pavka.march.military;
 
 import static by.pavka.march.characteristic.Stock.AMMO_HIGHEST;
-import static by.pavka.march.characteristic.Stock.AMMO_LOW;
-import static by.pavka.march.characteristic.Stock.AMMO_LOWEST;
-import static by.pavka.march.characteristic.Stock.AMMO_NORMAL;
 
 import com.badlogic.gdx.utils.Array;
 
@@ -88,7 +85,7 @@ public class MainTest {
         System.out.println("Total loaded: " + formation.strength.food + ", " + formation.strength.ammo);
         System.out.println("Capacity = " + formation.strength.capacity);
         Stock stock = formation.emptyStock();
-        stock = stock.plus(new Stock(100, 100));
+        //stock = stock.plus(new Stock(100, 100));
         System.out.println("Total unloaded: " + stock.food + " " + stock.ammo + ", " +
                 "U2 stock: " + u2.strength.food + " " + u2.strength.ammo + ", U1 stock: " + u1.strength.food + " " + u1.strength.ammo
         + ", f stock: " + f.strength.food + " " + f.strength.ammo + ", wagon food " + wagon.strength.food + ", " + wagon1.strength.food);
@@ -104,6 +101,10 @@ public class MainTest {
         System.out.println("F: foodConsumption " + f.strength.foodConsumption + ", ammoConsumption " + f.strength.ammoConsumption +
                 ". Wagon food need = " + wagon.findFoodNeed() + ", ammo need = " + wagon.findAmmoNeed());
         System.out.println(stock.food + ", " + stock.ammo);
-
+        System.out.println(formation.strength.capacity);
+        System.out.println("Detaching wagons...");
+        Array<WagonTrain> train = formation.separateWagons();
+        System.out.println(train);
+        System.out.println(formation.strength.capacity);
     }
 }

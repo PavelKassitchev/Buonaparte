@@ -1,7 +1,5 @@
 package by.pavka.march.military;
 
-import static by.pavka.march.characteristic.Stock.NORMAL_FOOD_STOCK_DAYS;
-
 import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.characteristic.Spirit;
@@ -76,6 +74,13 @@ public class Formation extends Force {
         strength.ammo = ammoRatio * strength.capacity;
         for (Force force : subForces) {
             force.flatten(foodRatio, ammoRatio);
+        }
+    }
+
+    @Override
+    public void addWagonToTrain(Array<WagonTrain> train) {
+        for (int i = 0; i < subForces.size; i++) {
+            subForces.get(i).addWagonToTrain(train);
         }
     }
 

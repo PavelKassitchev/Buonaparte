@@ -3,10 +3,18 @@ package by.pavka.march.military;
 import static by.pavka.march.characteristic.Stock.AMMO_NORMAL;
 import static by.pavka.march.characteristic.Stock.NORMAL_FOOD_STOCK_DAYS;
 
+import com.badlogic.gdx.utils.Array;
+
 import by.pavka.march.characteristic.Stock;
 
 public class WagonTrain extends Unit {
     public static final int WAGON_FACTOR = 6;
+
+    @Override
+    public void addWagonToTrain(Array<WagonTrain> train) {
+        detach();
+        train.add(this);
+    }
 
     @Override
     public double findAmmoNeed() {

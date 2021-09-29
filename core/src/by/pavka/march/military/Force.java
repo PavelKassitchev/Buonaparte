@@ -2,6 +2,8 @@ package by.pavka.march.military;
 
 import static by.pavka.march.characteristic.Stock.NORMAL_FOOD_STOCK_DAYS;
 
+import com.badlogic.gdx.utils.Array;
+
 import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
@@ -63,6 +65,20 @@ public abstract class Force {
     }
 
     public abstract void flatten(double foodRatio, double ammoRatio);
+
+    public Stock absorbStock(Stock stock, int mode) {
+        Stock distribution = emptyStock();
+        distribution = distribution.plus(stock);
+        return flattenEmptiedStock(distribution, mode);
+    }
+
+    public Array<WagonTrain> separateWagons() {
+        Array<WagonTrain> train = new Array<>();
+        addWagonToTrain(train);
+        return train;
+    }
+
+    public abstract void addWagonToTrain(Array<WagonTrain> train);
 
     public abstract double findAmmoNeed();
 

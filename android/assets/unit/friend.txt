@@ -1,0 +1,124 @@
+friend.png
+size: 85, 958
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+fr_art
+  rotate: false
+  xy: 0, 0
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_cav
+  rotate: false
+  xy: 0, 54
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_eng
+  rotate: false
+  xy: 0, 108
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_grenad
+  rotate: false
+  xy: 0, 162
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_guard
+  rotate: false
+  xy: 0, 216
+  size: 85, 60
+  orig: 85, 60
+  offset: 0, 0
+  index: -1
+fr_guard_art
+  rotate: false
+  xy: 0, 276
+  size: 85, 60
+  orig: 85, 60
+  offset: 0, 0
+  index: -1
+fr_guard_cav
+  rotate: false
+  xy: 0, 336
+  size: 85, 60
+  orig: 85, 60
+  offset: 0, 0
+  index: -1
+fr_heavy_art
+  rotate: false
+  xy: 0, 396
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_heavy_cav
+  rotate: false
+  xy: 0, 450
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_horse_art
+  rotate: false
+  xy: 0, 504
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_inf
+  rotate: false
+  xy: 0, 558
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_irreg_cav
+  rotate: false
+  xy: 0, 612
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_light_art
+  rotate: false
+  xy: 0, 666
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_light_cav
+  rotate: false
+  xy: 0, 720
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_light_ing
+  rotate: false
+  xy: 0, 774
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+fr_mil
+  rotate: false
+  xy: 0, 828
+  size: 79, 54
+  orig: 79, 54
+  offset: 0, 0
+  index: -1
+hostile
+  rotate: false
+  xy: 0, 882
+  size: 76, 76
+  orig: 76, 76
+  offset: 0, 0
+  index: -1
