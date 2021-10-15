@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class MyGdxGame extends Game {
+public class BuonaparteGame extends Game {
 	SpriteBatch batch;
 	Texture img;
 	Camera camera;

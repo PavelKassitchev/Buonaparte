@@ -1,6 +1,7 @@
 package by.pavka.march;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -8,17 +9,26 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.HexagonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Timer;
 
 public class Play extends Stage implements Screen {
+    public static final float NORMAL_SPEED = 1.0f;
+    public static final float LOW_SPEED = NORMAL_SPEED / 2;
+    public static final float HIGH_SPEED = NORMAL_SPEED * 2;
+    public static final float LOWEST_SPEED = NORMAL_SPEED / 4;
+    public static final float HIGHEST_SPEED = NORMAL_SPEED * 4;
     public static final String MAP = "map/map4.tmx";
     public static TiledMap map = new TmxMapLoader().load(MAP);
+    public static MapLayer objectLayer = map.getLayers().get("ObjectLayer");
 
     ShapeRenderer shapeRenderer;
     private HexagonalTiledMapRenderer renderer;
@@ -28,6 +38,11 @@ public class Play extends Stage implements Screen {
     TextureAtlas textureAtlas;
     SpriteBatch batch;
     Sprite sprite;
+    TextureMapObject obj;
+
+    float speed;
+    Timer timer;
+    Timer.Task task;
 
     @Override
     public void show() {
@@ -37,38 +52,49 @@ public class Play extends Stage implements Screen {
         shapeRenderer = new ShapeRenderer();
         renderer = new MyInnerRenderer(map);
         camera = (OrthographicCamera) getCamera();
-        camera.setToOrtho(false, w, h);
+//        camera.setToOrtho(false, w, h);
+//        camera.position.set(0, 0,0);
+//        camera.update();
         Gdx.input.setInputProcessor(this);
         batch = new SpriteBatch();
         textureAtlas = new TextureAtlas("unit/friend.txt");
         TextureAtlas.AtlasRegion unit = textureAtlas.findRegion("hostile");
+        TextureAtlas.AtlasRegion unit1 = textureAtlas.findRegion("fr_art");
         sprite = new Sprite(unit);
+        obj = new TextureMapObject(unit1);
+        task = new ActionTask ();
+        timer = new Timer();
+        speed = NORMAL_SPEED;
+        startGame(speed);
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(0, 1, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        obj.setX(138);
+        obj.setY(208);
 
+        objectLayer.getObjects().add(obj);
         renderer.setView(camera);
         renderer.render();
-        draw();
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        camera.update();
-        sprite.setPosition(130, 130);
+//        draw();
+//        shapeRenderer.setProjectionMatrix(camera.combined);
+//        camera.update();
+        sprite.setPosition(320, 240);
         sprite.setSize(32, 32);
         batch.begin();
         sprite.draw(batch);
-        //batch.setColor(1, 0, 1, 1);
-        //batch.draw(textureFrance, 200, 200, 32, 32);
         batch.end();
     }
 
 
-
     @Override
     public void resize(int width, int height) {
-
+        camera.viewportWidth = width;
+        camera.viewportHeight = height;
+        camera.position.set(width / 2, height / 2, 0);
+        camera.update();
     }
 
     @Override
@@ -88,9 +114,39 @@ public class Play extends Stage implements Screen {
 
     @Override
     public void dispose() {
+        Gdx.input.setInputProcessor(null);
         map.dispose();
         renderer.dispose();
         shapeRenderer.dispose();
+    }
+
+    @Override
+    public boolean keyDown(int keyCode) {
+        switch (keyCode) {
+            case Input.Keys.NUM_1:
+                speed = LOWEST_SPEED;
+                break;
+            case Input.Keys.NUM_2:
+                speed = LOW_SPEED;
+                break;
+            default:
+                speed = NORMAL_SPEED;
+                break;
+        }
+        startGame(speed);
+        return true;
+    }
+
+    @Override
+    public void act() {
+        super.act();
+        System.out.println("Running");
+    }
+
+    private void startGame(float speed) {
+        timer.clear();
+        timer.scheduleTask(task, 1, 3 / speed);
+        timer.start();
     }
 
     class MyInnerRenderer extends HexagonalTiledMapRenderer {
@@ -106,15 +162,23 @@ public class Play extends Stage implements Screen {
 
         @Override
         public void renderObject(MapObject object) {
-            float width = 14;
-            float height = 14;
+            float width = 32;
+            float height = 32;
             if (object instanceof TextureMapObject) {
                 TextureMapObject textureObj = (TextureMapObject) object;
 
-                this.getBatch().draw(textureObj.getTextureRegion(), textureObj.getX(), textureObj.getY(),
+                this.getBatch().draw(textureObj.getTextureRegion(),
+                        textureObj.getX() - width/2, textureObj.getY() - height/2,
                         width, height);
             }
         }
 
+    }
+
+    private class ActionTask extends Timer.Task {
+        @Override
+        public void run() {
+            Play.this.act();
+        }
     }
 }

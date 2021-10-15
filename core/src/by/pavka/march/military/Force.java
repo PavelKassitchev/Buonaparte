@@ -2,6 +2,7 @@ package by.pavka.march.military;
 
 import static by.pavka.march.characteristic.Stock.NORMAL_FOOD_STOCK_DAYS;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.characteristic.Spirit;
@@ -9,7 +10,7 @@ import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
 import by.pavka.march.configuration.Nation;
 
-public abstract class Force {
+public abstract class Force extends Image {
     public static final String CAV = "cavalry";
     public static final String INF = "infantry";
     public static final String ENG = "engineer";

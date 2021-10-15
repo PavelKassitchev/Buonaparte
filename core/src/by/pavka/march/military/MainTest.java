@@ -8,6 +8,7 @@ import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
 import by.pavka.march.configuration.FormationValidator;
+import com.badlogic.gdx.utils.Timer;
 
 public class MainTest {
     public static void main(String[] args) {
@@ -106,5 +107,15 @@ public class MainTest {
         Array<WagonTrain> train = formation.separateWagons();
         System.out.println(train);
         System.out.println(formation.strength.capacity);
+
+//        Timer timer = new Timer();
+//        Timer.Task task = new Timer.Task() {
+//            @Override
+//            public void run() {
+//                System.out.println("Running");
+//            }
+//        };
+//        timer.scheduleTask(task, 1, 3);
+//        timer.start();
     }
 }
