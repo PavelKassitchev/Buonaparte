@@ -1,5 +1,6 @@
 package by.pavka.march;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -11,13 +12,17 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.HexagonalTiledMapRenderer;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Timer;
 
 public class Play extends Stage implements Screen {
@@ -27,8 +32,12 @@ public class Play extends Stage implements Screen {
     public static final float LOWEST_SPEED = NORMAL_SPEED / 4;
     public static final float HIGHEST_SPEED = NORMAL_SPEED * 4;
     public static final String MAP = "map/map4.tmx";
-    public static TiledMap map = new TmxMapLoader().load(MAP);
-    public static MapLayer objectLayer = map.getLayers().get("ObjectLayer");
+    public TiledMap map = new TmxMapLoader().load(MAP);
+    public MapLayer objectLayer = map.getLayers().get("ObjectLayer");
+
+    Game game;
+    private TextureAtlas atlas;
+    protected Skin skin;
 
     ShapeRenderer shapeRenderer;
     private HexagonalTiledMapRenderer renderer;
@@ -44,17 +53,36 @@ public class Play extends Stage implements Screen {
     Timer timer;
     Timer.Task task;
 
+    public Play(Game game) {
+        this.game = game;
+        atlas = new TextureAtlas("uiskin.atlas");
+        skin = new Skin(Gdx.files.internal("uiskin.json"), atlas);
+    }
+
     @Override
     public void show() {
+        setDebugAll(true);
+        Table table = new Table();
+        table.setFillParent(true);
+        TextButton textButton = new TextButton("Save", skin);
+        table.center().top();
+        table.add(textButton).prefHeight(64).prefWidth(82);
+        addActor(table);
+        textButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new MainMenu(game));
+            }
+        });
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
         shapeRenderer = new ShapeRenderer();
         renderer = new MyInnerRenderer(map);
         camera = (OrthographicCamera) getCamera();
-//        camera.setToOrtho(false, w, h);
-//        camera.position.set(0, 0,0);
-//        camera.update();
+        camera.setToOrtho(false, w, h);
+        camera.position.set(0, 0,0);
+        camera.update();
         Gdx.input.setInputProcessor(this);
         batch = new SpriteBatch();
         textureAtlas = new TextureAtlas("unit/friend.txt");
@@ -78,7 +106,7 @@ public class Play extends Stage implements Screen {
         objectLayer.getObjects().add(obj);
         renderer.setView(camera);
         renderer.render();
-//        draw();
+        draw();
 //        shapeRenderer.setProjectionMatrix(camera.combined);
 //        camera.update();
         sprite.setPosition(320, 240);

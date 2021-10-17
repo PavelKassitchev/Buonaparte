@@ -14,12 +14,12 @@ public class BuonaparteGame extends Game {
 	
 	@Override
 	public void create () {
-//		batch = new SpriteBatch();
-//		img = new Texture("badlogic.jpg");
+		batch = new SpriteBatch();
+		img = new Texture("default.png");
 //		camera = new OrthographicCamera();
 //		//camera.viewportHeight = 900;
 //		viewport = new FitViewport(900, 200);
-		setScreen(new Play());
+		setScreen(new MainMenu(this));
 	}
 
 	@Override
