@@ -19,7 +19,7 @@ public class BuonaparteGame extends Game {
 //		camera = new OrthographicCamera();
 //		//camera.viewportHeight = 900;
 //		viewport = new FitViewport(900, 200);
-		setScreen(new MainMenu(this));
+		setScreen(new MenuScreen(this));
 	}
 
 	@Override

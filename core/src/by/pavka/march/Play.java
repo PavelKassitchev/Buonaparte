@@ -24,6 +24,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class Play extends Stage implements Screen {
     public static final float NORMAL_SPEED = 1.0f;
@@ -42,6 +44,7 @@ public class Play extends Stage implements Screen {
     ShapeRenderer shapeRenderer;
     private HexagonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
+    Viewport viewport;
 
     Image image;
     TextureAtlas textureAtlas;
@@ -71,7 +74,7 @@ public class Play extends Stage implements Screen {
         textButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new MainMenu(game));
+                game.setScreen(new MenuScreen(game));
             }
         });
         float w = Gdx.graphics.getWidth();
@@ -80,8 +83,10 @@ public class Play extends Stage implements Screen {
         shapeRenderer = new ShapeRenderer();
         renderer = new MyInnerRenderer(map);
         camera = (OrthographicCamera) getCamera();
-        camera.setToOrtho(false, w, h);
-        camera.position.set(0, 0,0);
+        //viewport = new FitViewport(w, h, camera);
+        viewport = new ExtendViewport(w, h, camera);
+        //camera.setToOrtho(false, w, h);
+        //camera.position.set(0, 0,0);
         camera.update();
         Gdx.input.setInputProcessor(this);
         batch = new SpriteBatch();
@@ -119,10 +124,12 @@ public class Play extends Stage implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.viewportWidth = width;
-        camera.viewportHeight = height;
-        camera.position.set(width / 2, height / 2, 0);
+        viewport.update(width, height, true);
+//        camera.viewportWidth = width;
+//        camera.viewportHeight = height;
+//        camera.position.set(width / 2, height / 2, 0);
         camera.update();
+        setViewport(viewport);
     }
 
     @Override
@@ -146,6 +153,7 @@ public class Play extends Stage implements Screen {
         map.dispose();
         renderer.dispose();
         shapeRenderer.dispose();
+        timer.clear();
     }
 
     @Override

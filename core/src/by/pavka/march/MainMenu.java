@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainMenu extends Stage implements Screen {
@@ -25,22 +25,25 @@ public class MainMenu extends Stage implements Screen {
     protected Skin skin;
 
     public MainMenu(Game game) {
+        System.out.println("Constructor");
         this.game = game;
         atlas = new TextureAtlas("uiskin.atlas");
         skin = new Skin(Gdx.files.internal("uiskin.json"), atlas);
 
-        batch = new SpriteBatch();
+        //batch = new SpriteBatch();
         camera = new OrthographicCamera();
-        viewport = new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
-        viewport.apply();
+        //viewport = new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
+        viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
+        viewport.apply(true);
 
-        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+        //camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
         camera.update();
     }
 
 
     @Override
     public void show() {
+        System.out.println("Show");
         Gdx.input.setInputProcessor(this);
         //Create Table
         Table mainTable = new Table();
@@ -105,29 +108,38 @@ public class MainMenu extends Stage implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height);
-        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
         camera.update();
+        System.out.println("Resize");
+        //camera.viewportWidth = width;
+        //camera.viewportHeight = height;
+        viewport.update(width, height, true);
+        setViewport(viewport);
+        //camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+        //camera.update();
     }
 
     @Override
     public void pause() {
-
+        System.out.println("Pause");
     }
 
     @Override
     public void resume() {
-
+        System.out.println("Resume");
     }
 
     @Override
     public void hide() {
-
+        System.out.println("Hide");
+        dispose();
     }
 
     @Override
     public void dispose() {
+        System.out.println("Dispose");
         skin.dispose();
         atlas.dispose();
+        Gdx.input.setInputProcessor(null);
+        //batch.dispose();
     }
 }
