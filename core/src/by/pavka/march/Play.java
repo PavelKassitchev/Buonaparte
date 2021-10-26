@@ -14,8 +14,10 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.HexagonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -24,8 +26,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class Play extends Stage implements Screen {
     public static final float NORMAL_SPEED = 1.0f;
@@ -44,7 +44,9 @@ public class Play extends Stage implements Screen {
     ShapeRenderer shapeRenderer;
     private HexagonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
-    Viewport viewport;
+    //Viewport viewport;
+
+    Vector3 position;
 
     Image image;
     TextureAtlas textureAtlas;
@@ -60,7 +62,36 @@ public class Play extends Stage implements Screen {
         this.game = game;
         atlas = new TextureAtlas("uiskin.atlas");
         skin = new Skin(Gdx.files.internal("uiskin.json"), atlas);
+        renderer = new MyInnerRenderer(map);
+        for (MapLayer layer : map.getLayers()) {
+            if (layer instanceof TiledMapTileLayer) {
+                TiledMapTileLayer tiledLayer = (TiledMapTileLayer)layer;
+                createActorsForLayer(tiledLayer);
+            }
+        }
     }
+
+    private void createActorsForLayer(TiledMapTileLayer tiledLayer) {
+        System.out.println(tiledLayer.getWidth() + " " + tiledLayer.getTileWidth() + " " + tiledLayer.getTileHeight());
+        for (int x = 0; x < tiledLayer.getWidth(); x++) {
+            for (int y = 0; y < tiledLayer.getHeight(); y++) {
+                TiledMapTileLayer.Cell cell = tiledLayer.getCell(x, y);
+                Hex actor = new Hex(map, tiledLayer, cell, y, x);
+                float x0;
+                float y0;
+                if (x % 2 == 0) {
+                    y0 = tiledLayer.getTileHeight() * (y + 0.5f);
+                } else {
+                    y0 = tiledLayer.getTileHeight() * y;
+                }
+                x0 = (x + 0.2f) * tiledLayer.getTileWidth() * 0.75f;
+                actor.setBounds(x0, y0, tiledLayer.getTileWidth() * 0.75f, tiledLayer.getTileHeight());
+                addActor(actor);
+            }
+        }
+    }
+
+
 
     @Override
     public void show() {
@@ -74,18 +105,25 @@ public class Play extends Stage implements Screen {
         textButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new MenuScreen(game));
+                if (camera.zoom == 1) {
+                    camera.zoom = 2.65f;
+                } else {
+                    camera.zoom = 1;
+                }
+                camera.update();
+                //camera.unproject(position);
+                renderer.setView(camera);
             }
         });
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
         shapeRenderer = new ShapeRenderer();
-        renderer = new MyInnerRenderer(map);
+        //renderer = new MyInnerRenderer(map);
         camera = (OrthographicCamera) getCamera();
         //viewport = new FitViewport(w, h, camera);
-        viewport = new ExtendViewport(w, h, camera);
-        //camera.setToOrtho(false, w, h);
+        //viewport = new ExtendViewport(w, h, camera);
+        camera.setToOrtho(false, w, h);
         //camera.position.set(0, 0,0);
         camera.update();
         Gdx.input.setInputProcessor(this);
@@ -95,10 +133,11 @@ public class Play extends Stage implements Screen {
         TextureAtlas.AtlasRegion unit1 = textureAtlas.findRegion("fr_art");
         sprite = new Sprite(unit);
         obj = new TextureMapObject(unit1);
-        task = new ActionTask ();
-        timer = new Timer();
+//        task = new ActionTask ();
+//        timer = new Timer();
         speed = NORMAL_SPEED;
-        startGame(speed);
+        position = new Vector3(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+        //startGame(speed);
     }
 
     @Override
@@ -107,7 +146,7 @@ public class Play extends Stage implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         obj.setX(138);
         obj.setY(208);
-
+        camera.update();
         objectLayer.getObjects().add(obj);
         renderer.setView(camera);
         renderer.render();
@@ -124,12 +163,13 @@ public class Play extends Stage implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);
-//        camera.viewportWidth = width;
-//        camera.viewportHeight = height;
-//        camera.position.set(width / 2, height / 2, 0);
+
+        camera.viewportWidth = width;
+        camera.viewportHeight = height;
+        camera.position.set(width / 2, height / 2, 0);
+        camera.position.set(position);
         camera.update();
-        setViewport(viewport);
+
     }
 
     @Override
@@ -169,52 +209,74 @@ public class Play extends Stage implements Screen {
                 speed = NORMAL_SPEED;
                 break;
         }
-        startGame(speed);
+        //startGame(speed);
+        if (keyCode == Input.Keys.LEFT) {
+            camera.translate(-32 * camera.zoom, 0);
+        }
+        if (keyCode == Input.Keys.RIGHT) {
+            camera.translate(32 * camera.zoom, 0);
+        }
+        if (keyCode == Input.Keys.UP)
+            camera.translate(0, 32 * camera.zoom, 0);
+        if (keyCode == Input.Keys.DOWN) {
+            camera.translate(0, -32 * camera.zoom, 0);
+        }
+        //position = camera.position;
+        renderer.setView(camera);
         return true;
     }
+
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        System.out.println("Touch: " + screenX + " : " + screenY);
+        return super.touchDown(screenX, screenY, pointer, button);
+    }
+
 
     @Override
     public void act() {
         super.act();
         System.out.println("Running");
     }
-
-    private void startGame(float speed) {
-        timer.clear();
-        timer.scheduleTask(task, 1, 3 / speed);
-        timer.start();
-    }
-
-    class MyInnerRenderer extends HexagonalTiledMapRenderer {
-        public MyInnerRenderer(TiledMap map) {
-            super(map);
-        }
-
-        @Override
-        public void render() {
-            super.render();
-
-        }
-
-        @Override
-        public void renderObject(MapObject object) {
-            float width = 32;
-            float height = 32;
-            if (object instanceof TextureMapObject) {
-                TextureMapObject textureObj = (TextureMapObject) object;
-
-                this.getBatch().draw(textureObj.getTextureRegion(),
-                        textureObj.getX() - width/2, textureObj.getY() - height/2,
-                        width, height);
-            }
-        }
-
-    }
-
-    private class ActionTask extends Timer.Task {
-        @Override
-        public void run() {
-            Play.this.act();
-        }
-    }
 }
+
+//    private void startGame(float speed) {
+//        timer.clear();
+//        timer.scheduleTask(task, 1, 3 / speed);
+//        timer.start();
+//    }
+
+class MyInnerRenderer extends HexagonalTiledMapRenderer {
+    public MyInnerRenderer(TiledMap map) {
+        super(map);
+    }
+
+    @Override
+    public void render() {
+        super.render();
+
+    }
+
+    @Override
+    public void renderObject(MapObject object) {
+        float width = 32;
+        float height = 32;
+        if (object instanceof TextureMapObject) {
+            TextureMapObject textureObj = (TextureMapObject) object;
+
+            this.getBatch().draw(textureObj.getTextureRegion(),
+                    textureObj.getX() - width / 2, textureObj.getY() - height / 2,
+                    width, height);
+        }
+    }
+
+}
+
+//    private class ActionTask extends Timer.Task {
+//        @Override
+//        public void run() {
+//            Play.this.act();
+//        }
+//    }
+

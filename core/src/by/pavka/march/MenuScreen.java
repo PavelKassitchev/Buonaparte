@@ -37,7 +37,7 @@ public class MenuScreen implements Screen {
         play.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new PlayScreen(game));
+                game.setScreen(new PlayScenes(game));
             }
         });
         table.add(play).fillX().uniformX();
