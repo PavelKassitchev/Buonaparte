@@ -3,6 +3,7 @@ package by.pavka.march;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -22,39 +23,61 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class PlayScreen extends Stage implements Screen {
+public class PlayScreen implements Screen {
     public static final String MAP = "map/map4.tmx";
 
     private Game game;
     private Stage stage;
+    private Stage uiStage;
     private TextureAtlas atlas;
     private Skin skin;
     private TiledMap map;
     private HexagonalTiledMapRenderer hexagonalTiledMapRenderer;
     private OrthographicCamera camera;
     private OrthographicCamera uiCamera;
+    private InputMultiplexer inputMultiplexer;
 
     private Table group;
 
+    private boolean drugged;
+
     public PlayScreen(Game game) {
-        super(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         this.game = game;
         map = new TmxMapLoader().load(MAP);
         atlas = new TextureAtlas("skin/golden-ui-skin.atlas");
         skin = new Skin(Gdx.files.internal("skin/golden-ui-skin.json"), atlas);
         hexagonalTiledMapRenderer = new BattlefieldRenderer(map, 1);
         stage = new PlayStage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), map);
+        uiStage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight())) {
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                return !super.touchDown(screenX, screenY, pointer, button);
+            }
+
+            @Override
+            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                super.touchUp(screenX, screenY, pointer, button);
+                if (drugged) {
+                    drugged = false;
+                    return true;
+                }
+                return false;
+            }
+        };
         camera = (OrthographicCamera) stage.getCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        addListener(new PlayDragListener());
-        uiCamera = (OrthographicCamera) getCamera();
+        uiStage.addListener(new PlayDragListener());
+        uiCamera = (OrthographicCamera) uiStage.getCamera();
+        inputMultiplexer = new InputMultiplexer(uiStage, stage);
     }
+
+
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(this);
+        Gdx.input.setInputProcessor(inputMultiplexer);
         group = new Table();
-        addActor(group);
+        uiStage.addActor(group);
         TextButton back = new TextButton("Back", skin);
         back.addListener(new ClickListener() {
             @Override
@@ -88,15 +111,15 @@ public class PlayScreen extends Stage implements Screen {
         camera.update();
         uiCamera.update();
         stage.draw();
-        draw();
+        uiStage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, false);
         hexagonalTiledMapRenderer.setView(camera);
-        getViewport().update(width, height, true);
-        group.setBounds(0, getHeight() * 0.9f, getWidth(), getHeight() * .1f);
+        uiStage.getViewport().update(width, height, true);
+        group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
         group.left();
 
     }
@@ -125,27 +148,26 @@ public class PlayScreen extends Stage implements Screen {
         hexagonalTiledMapRenderer.dispose();
     }
 
-    @Override
-    public boolean keyDown(int keyCode) {
-        return stage.keyDown(keyCode);
-    }
-
     private class PlayStage extends Stage {
         private TiledMap map;
 
         public PlayStage(Viewport viewport, TiledMap map) {
             super(viewport);
+            System.out.println("Stage created");
             this.map = map;
             for (MapLayer layer : map.getLayers()) {
+                System.out.println("Layer!");
                 if (layer instanceof TiledMapTileLayer) {
-                    TiledMapTileLayer tiledLayer = (TiledMapTileLayer)layer;
+                    System.out.println("TiledMapTileLayer!");
+                    TiledMapTileLayer tiledLayer = (TiledMapTileLayer) layer;
                     createActorsForLayer(tiledLayer);
+                    System.out.println(getActors().size);
                 }
             }
         }
 
         private void createActorsForLayer(TiledMapTileLayer tiledLayer) {
-            System.out.println(tiledLayer.getWidth() + " " + tiledLayer.getTileWidth() + " " + tiledLayer.getTileHeight());
+            System.out.println("Method createActors");
             for (int x = 0; x < tiledLayer.getWidth(); x++) {
                 for (int y = 0; y < tiledLayer.getHeight(); y++) {
                     TiledMapTileLayer.Cell cell = tiledLayer.getCell(x, y);
@@ -181,12 +203,6 @@ public class PlayScreen extends Stage implements Screen {
             hexagonalTiledMapRenderer.setView(camera);
             return true;
         }
-
-        @Override
-        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-            System.out.println("Touch: " + screenX + " : " + screenY);
-            return super.touchDown(screenX, screenY, pointer, button);
-        }
     }
 
     private class PlayDragListener extends DragListener {
@@ -208,6 +224,7 @@ public class PlayScreen extends Stage implements Screen {
             camera.update();
             this.x = x;
             this.y = y;
+            drugged = true;
         }
     }
 
@@ -216,4 +233,5 @@ public class PlayScreen extends Stage implements Screen {
             super(map, scale);
         }
     }
+
 }
