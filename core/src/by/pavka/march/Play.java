@@ -76,7 +76,7 @@ public class Play extends Stage implements Screen {
         for (int x = 0; x < tiledLayer.getWidth(); x++) {
             for (int y = 0; y < tiledLayer.getHeight(); y++) {
                 TiledMapTileLayer.Cell cell = tiledLayer.getCell(x, y);
-                Hex actor = new Hex(map, tiledLayer, cell, y, x);
+                //Hex actor = new Hex(map, tiledLayer, cell, y, x, new PlayScreen(new Game));
                 float x0;
                 float y0;
                 if (x % 2 == 0) {
@@ -85,8 +85,8 @@ public class Play extends Stage implements Screen {
                     y0 = tiledLayer.getTileHeight() * y;
                 }
                 x0 = (x + 0.2f) * tiledLayer.getTileWidth() * 0.75f;
-                actor.setBounds(x0, y0, tiledLayer.getTileWidth() * 0.75f, tiledLayer.getTileHeight());
-                addActor(actor);
+//                actor.setBounds(x0, y0, tiledLayer.getTileWidth() * 0.75f, tiledLayer.getTileHeight());
+//                addActor(actor);
             }
         }
     }

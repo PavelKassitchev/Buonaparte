@@ -22,17 +22,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class PlayScreen implements Screen {
+public class PlayScreen1 implements Screen {
     public static final String MAP = "map/twolayers3.tmx";
 
     Game game;
-    Stage stage;
+    PlayStage stage;
     Skin skin;
     OrthographicCamera camera;
     HexagonalTiledMapRenderer hexagonalTiledMapRenderer;
-    Stage uiStage;
+    UiStage uiStage;
     Hex selectedHex;
-    boolean detailedUi;
 
     private TextureAtlas atlas;
     private TiledMap map;
@@ -40,128 +39,82 @@ public class PlayScreen implements Screen {
     private InputMultiplexer inputMultiplexer;
 
     private Table group;
+
     private boolean dragged;
 
-    public PlayScreen(Game game) {
+    public PlayScreen1(Game game) {
         this.game = game;
         map = new TmxMapLoader().load(MAP);
         atlas = new TextureAtlas("skin/golden-ui-skin.atlas");
         skin = new Skin(Gdx.files.internal("skin/golden-ui-skin.json"), atlas);
         hexagonalTiledMapRenderer = new BattlefieldRenderer(map, 1);
         stage = new PlayStage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), map);
-        uiStage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight())) {
-            @Override
-            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                return !super.touchDown(screenX, screenY, pointer, button);
-            }
-
-            @Override
-            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                super.touchUp(screenX, screenY, pointer, button);
-                if (dragged) {
-                    dragged = false;
-                    return true;
-                }
-                return false;
-            }
-        };
-
-
         camera = (OrthographicCamera) stage.getCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        setUiStage(new PlayUiStage(this));
+    }
+
+    public void setUiStage(UiStage uiStage) {
+        this.uiStage = uiStage;
         uiStage.addListener(new PlayDragListener());
         uiCamera = (OrthographicCamera) uiStage.getCamera();
         inputMultiplexer = new InputMultiplexer(uiStage, stage);
-    }
-
-//    public void setUiStage(UiStage uiStage) {
-//        this.uiStage = uiStage;
-//        uiStage.addListener(new PlayDragListener());
-//        uiCamera = (OrthographicCamera) uiStage.getCamera();
-//        inputMultiplexer = new InputMultiplexer(uiStage, stage);
 //        show();
 //        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-//    }
+        uiStage.resize();
+    }
 
-    public void setDetailedUi() {
-        if (group != null) {
+    public void setDetailedUi(boolean detailed) {
+        if (detailed) {
             group.remove();
-        }
-        group = new Table();
-        uiStage.addActor(group);
-        TextButton back = new TextButton("Terrain", skin);
-        back.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new MenuScreen(game));
-            }
-        });
-        group.add(back);
-        TextButton zoom = new TextButton("Units", skin);
-        zoom.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (camera.zoom == 1) {
-                    camera.zoom = 2.65f;
-                } else {
-                    camera.zoom = 1;
+            group = new Table();
+            uiStage.addActor(group);
+            TextButton back = new TextButton("Terrain", skin);
+            back.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    game.setScreen(new MenuScreen(game));
                 }
-                camera.update();
-                hexagonalTiledMapRenderer.setView(camera);
-            }
-        });
+            });
+            group.add(back);
+            TextButton zoom = new TextButton("Units", skin);
+            zoom.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (camera.zoom == 1) {
+                        camera.zoom = 2.65f;
+                    } else {
+                        camera.zoom = 1;
+                    }
+                    camera.update();
+                    hexagonalTiledMapRenderer.setView(camera);
+                }
+            });
 
-        group.add(zoom);
-        TextButton cancel = new TextButton("Cancel", skin);
-        cancel.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                detailedUi = false;
+            group.add(zoom);
+            TextButton cancel = new TextButton("Cancel", skin);
+            cancel.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    System.out.println("On Stage");
 //                    selectedHex.unselect();
 //                    selectedHex = null;
-                //setDetailedUi(false);
-                group.remove();
-                show();
-            }
-        });
-        group.add(cancel);
-        group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
-        group.left();
-        detailedUi = true;
+                    //setDetailedUi(false);
+                    group.remove();
+                    show();
+                }
+            });
+            group.add(cancel);
+        } else {
+            group.remove();
+            show();
+        }
+
+        group.setDebug(true, true);
+        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
-    public void setGeneralUi() {
-        if (group != null) {
-            group.remove();
-        }
-        group = new Table();
-        uiStage.addActor(group);
-        TextButton back = new TextButton("Back", skin);
-        back.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new MenuScreen(game));
-            }
-        });
-        group.add(back);
-        TextButton zoom = new TextButton("Zoom", skin);
-        zoom.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (camera.zoom == 1) {
-                    camera.zoom = 2.65f;
-                } else {
-                    camera.zoom = 1;
-                }
-                camera.update();
-                hexagonalTiledMapRenderer.setView(camera);
-            }
-        });
-        group.add(zoom);
-        group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
-        group.left();
-        detailedUi = false;
-    }
+
 
     @Override
     public void show() {
@@ -190,12 +143,8 @@ public class PlayScreen implements Screen {
 //            }
 //        });
 //        group.add(zoom);
-        if (!detailedUi) {
-            setGeneralUi();
-        } else {
-            setDetailedUi();
-        }
-        group.setDebug(true, true);
+//        group.setDebug(true, true);
+        uiStage.init();
     }
 
     @Override
@@ -213,9 +162,10 @@ public class PlayScreen implements Screen {
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, false);
         hexagonalTiledMapRenderer.setView(camera);
-        uiStage.getViewport().update(width, height, true);
-        group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
-        group.left();
+//        uiStage.getViewport().update(width, height, true);
+//        group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
+//        group.left();
+        uiStage.resize();
 
     }
 
@@ -252,6 +202,15 @@ public class PlayScreen implements Screen {
             this.map = map;
             TiledMapTileLayer tiledLayer = (TiledMapTileLayer) map.getLayers().get("TileLayer1");
             createActorsForLayer(tiledLayer);
+//            for (MapLayer layer : map.getLayers()) {
+//                System.out.println("Layer!");
+//                if (layer instanceof TiledMapTileLayer) {
+//                    System.out.println("TiledMapTileLayer!");
+//                    TiledMapTileLayer tiledLayer = (TiledMapTileLayer) layer;
+//                    createActorsForLayer(tiledLayer);
+//                    System.out.println(getActors().size);
+//                }
+//            }
         }
 
         private void createActorsForLayer(TiledMapTileLayer tiledLayer) {
@@ -260,17 +219,17 @@ public class PlayScreen implements Screen {
                 for (int y = 0; y < tiledLayer.getHeight(); y++) {
                     TiledMapTileLayer.Cell cell = tiledLayer.getCell(x, y);
                     System.out.println("CELL = " + cell);
-                    Hex actor = new Hex(map, tiledLayer, cell, y, x, PlayScreen.this);
-                    float x0;
-                    float y0;
-                    if (x % 2 == 0) {
-                        y0 = tiledLayer.getTileHeight() * (y + 0.5f);
-                    } else {
-                        y0 = tiledLayer.getTileHeight() * y;
-                    }
-                    x0 = (x + 0.2f) * tiledLayer.getTileWidth() * 0.75f;
-                    actor.setBounds(x0, y0, tiledLayer.getTileWidth() * 0.75f, tiledLayer.getTileHeight());
-                    addActor(actor);
+//                    Hex actor = new Hex(map, tiledLayer, cell, y, x, PlayScreen.this);
+//                    float x0;
+//                    float y0;
+//                    if (x % 2 == 0) {
+//                        y0 = tiledLayer.getTileHeight() * (y + 0.5f);
+//                    } else {
+//                        y0 = tiledLayer.getTileHeight() * y;
+//                    }
+//                    x0 = (x + 0.2f) * tiledLayer.getTileWidth() * 0.75f;
+//                    actor.setBounds(x0, y0, tiledLayer.getTileWidth() * 0.75f, tiledLayer.getTileHeight());
+//                    addActor(actor);
                 }
             }
         }
