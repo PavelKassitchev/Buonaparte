@@ -1,37 +1,34 @@
-package by.pavka.march;
+package by.pavka.march.hex;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-public class Hex extends Actor {
+import by.pavka.march.PlayScreen;
 
+public class Hex extends Group {
+
+    public final static int SIZE = 6;
     public int row;
     public int col;
+    public int index;
+    public TiledMapTileLayer.Cell cell;
     public PlayScreen playScreen;
     private TiledMap tiledMap;
     private TiledMapTileLayer tiledLayer;
-    private TiledMapTileLayer.Cell cell;
 
     public Hex(TiledMap tiledMap, TiledMapTileLayer tiledLayer, TiledMapTileLayer.Cell cell, int row, int col, PlayScreen screen) {
         this.tiledMap = tiledMap;
         this.tiledLayer = tiledLayer;
-        //this.cell = cell;
         addListener(new HexListener());
         this.row = row;
         this.col = col;
         this.cell = tiledLayer.getCell(col, row);
         playScreen = screen;
         setDebug(true);
-    }
-
-    public void unselect() {
-        int c = playScreen.selectedHex.col;
-        int r = playScreen.selectedHex.row;
-        ((TiledMapTileLayer) tiledMap.getLayers().get("TileLayer2")).setCell(c, r, null);
     }
 
     class HexListener extends ClickListener {
