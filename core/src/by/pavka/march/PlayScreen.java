@@ -32,7 +32,7 @@ import by.pavka.march.hex.Hex;
 import by.pavka.march.hex.HexGraph1;
 
 public class PlayScreen implements Screen {
-    public static final String MAP = "map/twolayers3.tmx";
+    public static final String MAP = "map/small.tmx";
 
     Game game;
     PlayStage playStage;

@@ -28,7 +28,7 @@ public class Hex extends Group {
         this.col = col;
         this.cell = tiledLayer.getCell(col, row);
         playScreen = screen;
-        setDebug(true);
+//        setDebug(true);
     }
 
     class HexListener extends ClickListener {
@@ -52,7 +52,9 @@ public class Hex extends Group {
 
         private void selectHex(TiledMapTileLayer layer) {
             TiledMapTileLayer.Cell upCell = new TiledMapTileLayer.Cell();
-            StaticTiledMapTile tile = (StaticTiledMapTile) tiledMap.getTileSets().getTile(5);
+            StaticTiledMapTile tile = (StaticTiledMapTile) tiledMap.getTileSets().getTile(2);
+//            StaticTiledMapTile tile = (StaticTiledMapTile) tiledMap.getTileSets().getTile(19);
+            System.out.println("REDHEX = " + tile);
             upCell.setTile(tile);
             layer.setCell(col, row, upCell);
             playScreen.selectedHex = Hex.this;
