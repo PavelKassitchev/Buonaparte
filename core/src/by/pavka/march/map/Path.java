@@ -1,33 +1,22 @@
-package by.pavka.march.hex;
+package by.pavka.march.map;
 
 import com.badlogic.gdx.ai.pfa.Connection;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
-
-import by.pavka.march.military.Force;
 
 public class Path extends Image implements Connection<Hex> {
 
     Hex fromHex;
     Hex toHex;
     float cost;
-    Force startForce;
-
-    //static Texture texture = new Texture("Symbols/Blue.png");
+    Direction direction;
 
     public Path(Hex fromHex, Hex toHex){
         this.fromHex = fromHex;
         this.toHex = toHex;
-        //cost = Math.max(Math.abs(fromHex.col - toHex.col), Math.abs(fromHex.row - toHex.row));
-        //cost = Vector2.dst(fromHex.col, fromHex.row, toHex.col, toHex.row);
-        cost = ((Float)(fromHex.cell.getTile().getProperties().get("cost")) + (Float)(fromHex.cell.getTile().getProperties().get("cost"))) / 2;
-
-        /*setBounds(fromHex.getRelX(), fromHex.getRelY(), 16, 0.5f);
-        if (fromHex.row != toHex.row) {
-            if (fromHex.row % 2 == 0) {
-                rotateBy(60);
-            }
-        }*/
+        cost = (Float.parseFloat(fromHex.cell.getTile().getProperties().get("cost").toString())
+                + Float.parseFloat(toHex.cell.getTile().getProperties().get("cost").toString())) / 2;
     }
 
 
@@ -51,11 +40,6 @@ public class Path extends Image implements Connection<Hex> {
     public double getDays(double speed) {
         return Hex.SIZE * (Float)getFromNode().cell.getTile().getProperties().get("cost") / speed;
     }
-//    public static Path getFrontDirection(Hex fromHex, Direction direction) {
-//
-//        Hex toHex = fromHex.getNeighbour(direction);
-//        return Play.hexGraph.getPath(fromHex, toHex);
-//    }
 
     @Override
     public float getCost() {
@@ -72,16 +56,11 @@ public class Path extends Image implements Connection<Hex> {
         return toHex;
     }
 
-//    public void render(ShapeRenderer shapeRenderer){
-//        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-//        shapeRenderer.setColor(1, 0, 0, 0.5f);
-//        shapeRenderer.rectLine(fromHex.getRelX(), fromHex.getRelY(), toHex.getRelX(), toHex.getRelY(), 1);
-//        shapeRenderer.end();
-//    }
-
-    /*@Override
-    public void draw(Batch batch, float alpha) {
-        batch.draw(texture, fromHex.getRelX(), toHex.getRelY());
-
-    }*/
+    public void render(ShapeRenderer shapeRenderer) {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(1, 0, 0, 0.5f);
+        shapeRenderer.rectLine(fromHex.getRelX(), fromHex.getRelY(), toHex.getRelX(), toHex.getRelY(), 5);
+        shapeRenderer.circle(fromHex.getRelX(), fromHex.getRelY(), 6);
+        shapeRenderer.end();
+    }
 }
