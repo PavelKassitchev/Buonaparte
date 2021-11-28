@@ -12,7 +12,15 @@ public class Formation extends Force {
     General commander;
     HQ hq;
     Array<Force> subForces;
+    Array<Force> detachedForces;
     FormationValidator validator;
+
+    public Formation() {
+    }
+
+//    public Formation(TextureRegion region, Hex hex) {
+//        super(region, hex);
+//    }
 
     @Override
     public double findSpeed() {

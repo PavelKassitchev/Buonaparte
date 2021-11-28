@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.PlayScreen;
+import by.pavka.march.military.Force;
 
 public class Hex extends Group {
 
@@ -31,7 +32,7 @@ public class Hex extends Group {
         this.col = col;
         this.cell = tiledLayer.getCell(col, row);
         playScreen = screen;
-//        setDebug(true);
+        setDebug(true);
     }
 
     public float getRelX() {
@@ -49,64 +50,68 @@ public class Hex extends Group {
     class HexListener extends ClickListener {
         @Override
         public void clicked(InputEvent event, float x, float y) {
-            System.out.println("CLICKED " + Hex.this);
-
             TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("TileLayer2");
-            if (!playScreen.longPressed && playScreen.selectedHex != null) {
-                int c = playScreen.selectedHex.col;
-                int r = playScreen.selectedHex.row;
-                layer.setCell(c, r, null);
-                playScreen.selectedHex = null;
-                if (playScreen.detailedUi) {
-                    selectHex(layer);
+            if (!playScreen.longPressed) {
+                if (playScreen.selectedHex != null) {
+                    playScreen.unselectHex();
+                    playScreen.unselectForce();
+                } else {
+                    playScreen.setDetailedUi();
+                    playScreen.unselectForce();
                 }
-                playScreen.selectedPaths = null;
-            } else if (playScreen.selectedHex == null){
-                playScreen.setDetailedUi();
                 selectHex(layer);
                 playScreen.selectedPaths = null;
-            } else {
+                playScreen.setHexInfo();
+            } else if (playScreen.selectedHex != null) {
                 playScreen.longPressed = false;
-                System.out.println("RIGHT BUTTON! Hex " + Hex.this.index);
-                GraphPath<Hex> hexPath = playScreen.getHexGraph().findPath(playScreen.selectedHex, Hex.this);
-                System.out.println(hexPath.getCount());
-                Array<Path> paths = new Array<>();
-                Hex start = null;
-                Hex end;
-                for (Hex h : hexPath) {
-                    System.out.println("Hex col = " + h.col + " row = " + h.row);
-                    end = h;
-                    if (start != null) {
-                        paths.add(playScreen.getHexGraph().getPath(start, end));
-                    }
-                    start = h;
-                }
-                playScreen.selectedPaths = paths;
+                navigate();
             }
-
-
         }
 
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
             if (button == Input.Buttons.RIGHT && playScreen.selectedHex != null) {
-                System.out.println("RIGHT BUTTON! Hex " + Hex.this.index);
-                GraphPath<Hex> hexPath = playScreen.getHexGraph().findPath(playScreen.selectedHex, Hex.this);
-                System.out.println(hexPath.getCount());
-                Array<Path> paths = new Array<>();
-                Hex start = null;
-                Hex end;
-                for (Hex h : hexPath) {
-                    System.out.println("Hex col = " + h.col + " row = " + h.row);
-                    end = h;
-                    if (start != null) {
-                        paths.add(playScreen.getHexGraph().getPath(start, end));
-                    }
-                    start = h;
-                }
-                playScreen.selectedPaths = paths;
+                navigate();
             }
             return super.touchDown(event, x, y, pointer, button);
+        }
+
+        private void navigate() {
+            GraphPath<Hex> hexPath = playScreen.getHexGraph().findPath(playScreen.selectedHex, Hex.this);
+            Array<Path> paths = new Array<>();
+            Hex start = null;
+            Hex end;
+            for (Hex h : hexPath) {
+                end = h;
+                if (start != null) {
+                    paths.add(playScreen.getHexGraph().getPath(start, end));
+                }
+                start = h;
+            }
+            playScreen.selectedPaths = paths;
+
+//            if (playScreen.selectedForce != null) {
+//                Array<Path> forcePath = new Array(paths);
+//                playScreen.selectedForce.forcePath = forcePath;
+//                playScreen.unselectHex();
+//            }
+
+            if (playScreen.selectedForce != null) {
+                Force.sendMoveOrder(playScreen.selectedForce, Hex.this);
+//                GraphPath<Hex> fPath = playScreen.getHexGraph().findPath(playScreen.selectedForce.hex, Hex.this);
+//                Array<Path> fPaths = new Array<>();
+//                Hex st = null;
+//                Hex en;
+//                for (Hex h : fPath) {
+//                    en = h;
+//                    if (st != null) {
+//                        fPaths.add(playScreen.getHexGraph().getPath(st, en));
+//                    }
+//                    st = h;
+//                }
+//                playScreen.selectedForce.forcePath = fPaths;
+                playScreen.unselectHex();
+            }
         }
 
         private void selectHex(TiledMapTileLayer layer) {
@@ -115,6 +120,17 @@ public class Hex extends Group {
             upCell.setTile(tile);
             layer.setCell(col, row, upCell);
             playScreen.selectedHex = Hex.this;
+            System.out.println(Hex.this.getChildren().size);
+            if (Hex.this.getChildren().size == 1) {
+                Force f = (Force) Hex.this.getChild(0);
+                selectForce(f);
+            }
+            System.out.println("SELECTED FORCE = " + playScreen.selectedForce);
+        }
+
+        private void selectForce(Force force) {
+            playScreen.selectedForce = force;
+            force.setAlpha(1);
         }
     }
 
@@ -122,5 +138,6 @@ public class Hex extends Group {
     public String toString() {
         return "HEX: row = " + row + " col = " + col + " cell: " + cell;
     }
+
 }
 

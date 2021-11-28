@@ -1,6 +1,5 @@
 package by.pavka.march;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -14,12 +13,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class MenuScreen implements Screen {
-    private Game game;
+    private BuonaparteGame game;
     private Stage stage;
     private TextureAtlas atlas;
     private Skin skin;
 
-    public MenuScreen(Game game) {
+    public MenuScreen(BuonaparteGame game) {
         this.game = game;
         stage = new Stage(new ExtendViewport(800, 450));
         atlas = new TextureAtlas("skin/golden-ui-skin.atlas");

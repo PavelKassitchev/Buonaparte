@@ -1,6 +1,5 @@
 package by.pavka.march;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
@@ -18,13 +17,16 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.HexagonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
@@ -34,11 +36,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.HexGraph;
 import by.pavka.march.map.Path;
+import by.pavka.march.military.Force;
+import by.pavka.march.military.Unit;
 
 public class PlayScreen extends GestureDetector implements Screen {
     public static final String MAP = "map/small.tmx";
 
-    Game game;
+    BuonaparteGame game;
     PlayStage playStage;
     Skin skin;
     OrthographicCamera camera;
@@ -50,46 +54,62 @@ public class PlayScreen extends GestureDetector implements Screen {
     public Array<Path> selectedPaths;
     public boolean detailedUi;
     public boolean longPressed;
+    public Force selectedForce;
 
     private TextureAtlas atlas;
     private TiledMap map;
     private TiledMapTileLayer tileLayer;
+    private TiledMapTileLayer selectLayer;
     private OrthographicCamera uiCamera;
     private InputMultiplexer inputMultiplexer;
 
     private Table group;
-    private boolean dragged;
+    Label labelHex;
+    Label labelForce;
+    public boolean dragged;
 
     private Texture texture = new Texture("unit/friend.png");
     private Sprite sprite;
     private TextureRegion tRegion;
     Batch batch;
+    public Force testForce;
+    public Force anotherTestForce;
 
-    public PlayScreen(Game game, GestureListener listener) {
+    public PlayScreen(BuonaparteGame game, GestureListener listener) {
         super(listener);
-        hexListener = (HexGestureListener)listener;
+        hexListener = (HexGestureListener) listener;
         hexListener.setGestureDetector(this);
         this.game = game;
         map = new TmxMapLoader().load(MAP);
-        atlas = new TextureAtlas("skin/golden-ui-skin.atlas");
-        skin = new Skin(Gdx.files.internal("skin/golden-ui-skin.json"), atlas);
+
+        atlas = new TextureAtlas("skin/clean-crispy/clean-crispy-ui.atlas");
+        skin = new Skin(Gdx.files.internal("skin/clean-crispy/clean-crispy-ui.json"), atlas);
         hexagonalTiledMapRenderer = new BattlefieldRenderer(map, 1);
         shapeRenderer = new ShapeRenderer();
 
-        //playStage = new PlayStage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), map);
-//        playStage = new PlayStage(new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), map);
-
         tileLayer = (TiledMapTileLayer) map.getLayers().get("TileLayer1");
+        selectLayer = (TiledMapTileLayer) map.getLayers().get("TileLayer2");
         int w = tileLayer.getTileWidth() * 10;
         int h = w * Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
         playStage = new PlayStage(new ExtendViewport(w, h), map);
-
         setGraphToPlayStage();
 
-//        uiStage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight())) {
+        testForce = new Unit(game.getTextureRegion("fr_cav"));
+        anotherTestForce = new Unit(game.getTextureRegion("fr_art"));
+
+
+        playStage.addForce(testForce, 2, 1);
+        playStage.addForce(anotherTestForce, 2, 2);
+
         uiStage = new Stage(new ExtendViewport(w, h)) {
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                longPressed = false;
+                float stageX = screenToStageCoordinates(new Vector2(screenX, screenY)).x;
+                float stageY = screenToStageCoordinates(new Vector2(screenX, screenY)).y;
+                if (hit(stageX, stageY, true) != null) {
+                    return super.touchDown(screenX, screenY, pointer, button);
+                }
                 return !super.touchDown(screenX, screenY, pointer, button);
             }
 
@@ -104,11 +124,10 @@ public class PlayScreen extends GestureDetector implements Screen {
             }
         };
 
-
         camera = (OrthographicCamera) playStage.getCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(tileLayer.getTileWidth() * tileLayer.getWidth() * 0.4f,
-                tileLayer.getTileHeight() * tileLayer.getHeight() * 0.5f, 0);
+        camera.position.set(tileLayer.getTileWidth() * tileLayer.getWidth() * 0.1f,
+                tileLayer.getTileHeight() * tileLayer.getHeight() * 0.1f, 0);
         uiStage.addListener(new PlayDragListener());
         uiCamera = (OrthographicCamera) uiStage.getCamera();
         inputMultiplexer = new InputMultiplexer(uiStage, this, playStage);
@@ -120,7 +139,7 @@ public class PlayScreen extends GestureDetector implements Screen {
         }
         group = new Table();
         uiStage.addActor(group);
-        TextButton back = new TextButton("Terrain", skin);
+        TextButton back = new TextButton("Back", skin);
         back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -128,7 +147,7 @@ public class PlayScreen extends GestureDetector implements Screen {
             }
         });
         group.add(back);
-        TextButton zoom = new TextButton("Units", skin);
+        TextButton zoom = new TextButton("Zoom", skin);
         zoom.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -150,10 +169,33 @@ public class PlayScreen extends GestureDetector implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 detailedUi = false;
                 group.remove();
+                unselectHex();
+                selectedPaths = null;
                 show();
             }
         });
         group.add(cancel);
+
+        Window window = new Window("Terrain", skin);
+        labelHex = new Label("", skin);
+//        labelForce = new Label("", skin);
+        window.add(labelHex);
+//        window.addListener(new ActorGestureListener());
+        window.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                System.out.println("Window!");
+                event.cancel();
+            }
+
+        });
+//        window.add(labelForce);
+        group.add(window);
+
+        ImageTextButton hexButton = new ImageTextButton("Movement Cost 120%\nWidth 60%", skin);
+        group.add(hexButton);
+
+
         group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
         group.left();
         detailedUi = true;
@@ -193,6 +235,29 @@ public class PlayScreen extends GestureDetector implements Screen {
         detailedUi = false;
     }
 
+    public void setHexInfo() {
+        labelHex.setText("Mov.cost: " + selectedHex.cell.getTile().getProperties().get("cost").toString());
+//        if (selectedHex.hasChildren()) {
+//            labelForce.setText(((Force)(selectedHex.getChild(0))).strength.infantry);
+//        }
+    }
+
+    public void unselectHex() {
+        if (selectedHex != null) {
+            int c = selectedHex.col;
+            int r = selectedHex.row;
+            selectLayer.setCell(c, r, null);
+        }
+        selectedHex = null;
+    }
+
+    public void unselectForce() {
+        if (selectedForce != null) {
+            selectedForce.setAlpha(0.7f);
+        }
+        selectedForce = null;
+    }
+
     @Override
     public void show() {
         Gdx.input.setInputProcessor(inputMultiplexer);
@@ -202,27 +267,6 @@ public class PlayScreen extends GestureDetector implements Screen {
             setDetailedUi();
         }
         group.setDebug(true, true);
-
-///////
-        TextureAtlas textureAtlas = new TextureAtlas("unit/friend.txt");
-        TextureAtlas.AtlasRegion region = textureAtlas.findRegion("fr_art");
-        tRegion = (TextureRegion) region;
-        sprite = atlas.createSprite("fr_art");
-        batch = playStage.getBatch();
-        Image image = new Image(tRegion);
-//        image.setPosition(72, 62);
-        image.setSize(44, 44);
-        image.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                System.out.println("Image clicked");
-            }
-        });
-        //stage.addActor(image);
-//        playStage.imageHex.addActor(image);
-//        image.setPosition(5, 14);
-/////
     }
 
     @Override
@@ -246,14 +290,26 @@ public class PlayScreen extends GestureDetector implements Screen {
                 path.render(shapeRenderer);
             }
         }
+//        if (selectedForce != null) {
+//            for (Path path : selectedForce.tail) {
+//                path.render(shapeRenderer, 0, 0, 1);
+//            }
+//        }
+
+
+//        if (selectedHex != null && selectedHex.hasChildren()) {
+//            Force force = (Force) selectedHex.getChild(0);
+//            if (force.forcePath != null) {
+//                for (Path path : force.forcePath) {
+//                    path.render(shapeRenderer, 0, 0, 1f);
+//                }
+//            }
+//        }
         camera.update();
         uiCamera.update();
+        playStage.act();
         playStage.draw();
         uiStage.draw();
-
-//        batch.begin();
-//        batch.draw(tRegion, 10, 10, 10, 10);
-//        batch.end();
     }
 
     @Override
@@ -273,6 +329,7 @@ public class PlayScreen extends GestureDetector implements Screen {
 
     @Override
     public void dispose() {
+        uiStage.dispose();
         playStage.dispose();
         skin.dispose();
         atlas.dispose();
@@ -295,7 +352,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     class PlayStage extends Stage {
         private TiledMap map;
         private HexGraph hexGraph;
-        Hex imageHex;
+        private Array<Force> forces;
 
         public PlayStage(Viewport viewport, TiledMap map) {
             super(viewport);
@@ -304,6 +361,30 @@ public class PlayScreen extends GestureDetector implements Screen {
 
         private void setGraph() {
             hexGraph = new HexGraph(map, PlayScreen.this);
+        }
+
+        private void addForce(Force force, int col, int row) {
+            Hex hex = hexGraph.getHex(col, row);
+            force.setHex(hex);
+            force.setRealHex(hex);
+            force.shapeRenderer = shapeRenderer;
+            force.playScreen = PlayScreen.this;
+//            force.hex = hex;
+//            hex.addActor(force);
+////            force.setBounds(0, 0, 44, 44);
+//            if (force.forcePath == null || force.forcePath.isEmpty()) {
+//                force.setPosition(4, 14);
+//            } else {
+//                force.setPosition(32, 32);
+//            }
+//            force.setPosition(4, 14);
+//            force.setSize(44, 44);
+//            force.setColor(force.getColor().r, force.getColor().g, force.getColor().b, 0.5f);
+//
+//            MoveToAction moveAction = new MoveToAction();
+//            moveAction.setPosition(300f, 0f);
+//            moveAction.setDuration(50f);
+//            force.addAction(moveAction);
         }
 
         @Override
@@ -322,11 +403,25 @@ public class PlayScreen extends GestureDetector implements Screen {
             if (keycode == Input.Keys.DOWN && camera.position.y > 0) {
                 camera.translate(0, -32 * camera.zoom, 0);
             }
+
+            if (keycode == Input.Keys.C) {
+                System.out.println("Tail! " + selectedForce.tail.peek().getFromNode().col + " " +
+                        selectedForce.tail.peek().getFromNode().row);
+                if (selectedForce.forcePath != null && !selectedForce.forcePath.isEmpty()) {
+                    System.out.println("Path! " + selectedForce.forcePath.get(0).getToNode().col + " " +
+                            selectedForce.forcePath.get(0).getToNode().row);
+                    System.out.println(selectedForce.tail.contains(selectedForce.forcePath.get(0), false));
+                    System.out.println(selectedForce.forcePath.contains(selectedForce.tail.peek(), false));
+                    System.out.println(selectedForce.forcePath.get(0).getToNode().equals(selectedForce.tail.peek().getFromNode()));
+                }
+            }
+
             camera.update();
             hexagonalTiledMapRenderer.setView(camera);
             shapeRenderer.setProjectionMatrix(camera.combined);
             return true;
         }
+
     }
 
     private class PlayDragListener extends DragListener {

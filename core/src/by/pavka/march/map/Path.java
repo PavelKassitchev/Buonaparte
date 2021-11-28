@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 
+import java.util.Objects;
+
 public class Path extends Image implements Connection<Hex> {
 
     Hex fromHex;
@@ -58,9 +60,36 @@ public class Path extends Image implements Connection<Hex> {
 
     public void render(ShapeRenderer shapeRenderer) {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(1, 0, 0, 0.5f);
+        shapeRenderer.setColor(1f, 1f, 0, 0.9f);
         shapeRenderer.rectLine(fromHex.getRelX(), fromHex.getRelY(), toHex.getRelX(), toHex.getRelY(), 5);
         shapeRenderer.circle(fromHex.getRelX(), fromHex.getRelY(), 6);
+//        shapeRenderer.triangle(toHex.getRelX(), toHex.getRelY() + 6, toHex.getRelX(), toHex.getRelY() - 6, toHex.getRelX() + 6, toHex.getRelY());
         shapeRenderer.end();
+    }
+
+    public void render(ShapeRenderer shapeRenderer, float r, float g, float b) {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(r, g, b, 0.9f);
+        shapeRenderer.rectLine(fromHex.getRelX(), fromHex.getRelY(), toHex.getRelX(), toHex.getRelY(), 5);
+        shapeRenderer.circle(fromHex.getRelX(), fromHex.getRelY(), 6);
+//        shapeRenderer.triangle(toHex.getRelX(), toHex.getRelY() + 6, toHex.getRelX(), toHex.getRelY() - 6, toHex.getRelX() + 6, toHex.getRelY());
+        shapeRenderer.end();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Path path = (Path) o;
+        return fromHex.equals(path.fromHex) && toHex.equals(path.toHex);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fromHex, toHex);
+    }
+
+    public Path reverse() {
+        return new Path(toHex, fromHex);
     }
 }

@@ -1,15 +1,31 @@
 package by.pavka.march.military;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
+import by.pavka.march.characteristic.Quality;
 import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
-import by.pavka.march.characteristic.Quality;
 
 public class Unit extends Force {
     Quality quality;
-    Formation formerSuper;
+
+
+    public Unit() {
+    }
+
+//    public Unit(TextureRegion region, Hex hex) {
+//        super(region, hex);
+//    }
+
+    public Unit(TextureRegion region) {
+        super(region, 840, 11000);
+        //TODO Delete it
+//        strength = new Strength();
+//        strength.infantry = 855;
+//        strength.length = 150;
+    }
 
     @Override
     public double findSpeed() {

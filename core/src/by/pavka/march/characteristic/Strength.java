@@ -5,7 +5,7 @@ import static by.pavka.march.military.Force.*;
 import by.pavka.march.military.UnitType;
 
 public class Strength {
-    int infantry;
+    public int infantry;
     int engineer;
     int cavalry;
     int artillery;
@@ -15,7 +15,7 @@ public class Strength {
     double charge;
 
     //double speed;
-    double length;
+    public double length;
     double recon;
 
     public double capacity;

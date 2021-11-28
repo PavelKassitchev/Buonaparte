@@ -1,0 +1,761 @@
+
+buonaparte-skin.png
+size: 2048, 2048
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+button
+  rotate: false
+  xy: 1975, 1565
+  size: 56, 42
+  split: 18, 18, 0, 0
+  pad: 13, 14, 3, 2
+  orig: 56, 42
+  offset: 0, 0
+  index: -1
+button
+  rotate: false
+  xy: 1975, 1565
+  size: 56, 42
+  split: 18, 18, 0, 0
+  pad: 13, 14, 3, 2
+  orig: 56, 42
+  offset: 0, 0
+  index: -1
+button-close
+  rotate: false
+  xy: 425, 1733
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+button-close
+  rotate: false
+  xy: 425, 1733
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+button-pressed
+  rotate: false
+  xy: 456, 1765
+  size: 56, 42
+  split: 18, 18, 0, 0
+  pad: 13, 14, 3, 2
+  orig: 56, 42
+  offset: 0, 0
+  index: -1
+button-pressed
+  rotate: false
+  xy: 456, 1765
+  size: 56, 42
+  split: 18, 18, 0, 0
+  pad: 13, 14, 3, 2
+  orig: 56, 42
+  offset: 0, 0
+  index: -1
+checkbox
+  rotate: false
+  xy: 425, 1759
+  size: 29, 24
+  orig: 29, 24
+  offset: 0, 0
+  index: -1
+checkbox
+  rotate: false
+  xy: 425, 1759
+  size: 29, 24
+  orig: 29, 24
+  offset: 0, 0
+  index: -1
+checkbox-pressed
+  rotate: false
+  xy: 2018, 1803
+  size: 29, 24
+  orig: 29, 24
+  offset: 0, 0
+  index: -1
+checkbox-pressed
+  rotate: false
+  xy: 2018, 1803
+  size: 29, 24
+  orig: 29, 24
+  offset: 0, 0
+  index: -1
+earth
+  rotate: false
+  xy: 1, 1606
+  size: 178, 164
+  orig: 178, 164
+  offset: 0, 0
+  index: -1
+font-button-export
+  rotate: false
+  xy: 1704, 1578
+  size: 139, 139
+  orig: 139, 139
+  offset: 0, 0
+  index: -1
+font-export
+  rotate: false
+  xy: 456, 1809
+  size: 88, 88
+  orig: 88, 88
+  offset: 0, 0
+  index: -1
+font-title-export
+  rotate: false
+  xy: 1, 1772
+  size: 247, 249
+  orig: 247, 249
+  offset: 0, 0
+  index: -1
+list
+  rotate: false
+  xy: 161, 1474
+  size: 39, 39
+  split: 1, 1, 1, 1
+  pad: 2, 2, 2, 2
+  orig: 39, 39
+  offset: 0, 0
+  index: -1
+list
+  rotate: false
+  xy: 161, 1474
+  size: 39, 39
+  split: 1, 1, 1, 1
+  pad: 2, 2, 2, 2
+  orig: 39, 39
+  offset: 0, 0
+  index: -1
+radio-pressed
+  rotate: false
+  xy: 2018, 1777
+  size: 29, 24
+  orig: 29, 24
+  offset: 0, 0
+  index: -1
+radio-pressed
+  rotate: false
+  xy: 2018, 1777
+  size: 29, 24
+  orig: 29, 24
+  offset: 0, 0
+  index: -1
+scrollbar
+  rotate: false
+  xy: 250, 2011
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+scrollbar
+  rotate: false
+  xy: 250, 2011
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+scrollbar-android
+  rotate: false
+  xy: 1, 1
+  size: 3, 3
+  orig: 3, 3
+  offset: 0, 0
+  index: -1
+scrollbar-android
+  rotate: false
+  xy: 1, 1
+  size: 3, 3
+  orig: 3, 3
+  offset: 0, 0
+  index: -1
+select-box
+  rotate: false
+  xy: 250, 1772
+  size: 39, 20
+  split: 4, 15, 4, 4
+  pad: 2, 16, 2, 2
+  orig: 39, 20
+  offset: 0, 0
+  index: -1
+select-box
+  rotate: false
+  xy: 250, 1772
+  size: 39, 20
+  split: 4, 15, 4, 4
+  pad: 2, 16, 2, 2
+  orig: 39, 20
+  offset: 0, 0
+  index: -1
+select-box-pressed
+  rotate: false
+  xy: 291, 1772
+  size: 39, 20
+  split: 4, 15, 4, 4
+  pad: 2, 16, 2, 2
+  orig: 39, 20
+  offset: 0, 0
+  index: -1
+select-box-pressed
+  rotate: false
+  xy: 291, 1772
+  size: 39, 20
+  split: 4, 15, 4, 4
+  pad: 2, 16, 2, 2
+  orig: 39, 20
+  offset: 0, 0
+  index: -1
+slider-fancy
+  rotate: false
+  xy: 1, 2036
+  size: 261, 11
+  orig: 261, 11
+  offset: 0, 0
+  index: -1
+slider-fancy
+  rotate: false
+  xy: 1, 2036
+  size: 261, 11
+  orig: 261, 11
+  offset: 0, 0
+  index: -1
+slider-fancy-knob
+  rotate: false
+  xy: 1, 2023
+  size: 261, 11
+  orig: 261, 11
+  offset: 0, 0
+  index: -1
+slider-horizontal
+  rotate: false
+  xy: 1845, 1706
+  size: 17, 11
+  split: 4, 4, 0, 0
+  pad: 0, 0, 0, 0
+  orig: 17, 11
+  offset: 0, 0
+  index: -1
+slider-horizontal
+  rotate: false
+  xy: 1845, 1706
+  size: 17, 11
+  split: 4, 4, 0, 0
+  pad: 0, 0, 0, 0
+  orig: 17, 11
+  offset: 0, 0
+  index: -1
+slider-knob
+  rotate: false
+  xy: 161, 1422
+  size: 18, 18
+  orig: 18, 18
+  offset: 0, 0
+  index: -1
+slider-knob
+  rotate: false
+  xy: 161, 1422
+  size: 18, 18
+  orig: 18, 18
+  offset: 0, 0
+  index: -1
+slider-vertical
+  rotate: false
+  xy: 1686, 1660
+  size: 11, 17
+  split: 0, 0, 4, 4
+  pad: 0, 0, 0, 0
+  orig: 11, 17
+  offset: 0, 0
+  index: -1
+slider-vertical
+  rotate: false
+  xy: 1686, 1660
+  size: 11, 17
+  split: 0, 0, 4, 4
+  pad: 0, 0, 0, 0
+  orig: 11, 17
+  offset: 0, 0
+  index: -1
+splitpane-horizontal
+  rotate: false
+  xy: 1538, 1706
+  size: 4, 11
+  split: 1, 1, 1, 1
+  pad: 0, 0, 0, 0
+  orig: 4, 11
+  offset: 0, 0
+  index: -1
+splitpane-horizontal
+  rotate: false
+  xy: 1538, 1706
+  size: 4, 11
+  split: 1, 1, 1, 1
+  pad: 0, 0, 0, 0
+  orig: 4, 11
+  offset: 0, 0
+  index: -1
+splitpane-vertical
+  rotate: false
+  xy: 1668, 1588
+  size: 11, 4
+  split: 1, 1, 1, 1
+  pad: 0, 0, 0, 0
+  orig: 11, 4
+  offset: 0, 0
+  index: -1
+splitpane-vertical
+  rotate: false
+  xy: 1668, 1588
+  size: 11, 4
+  split: 1, 1, 1, 1
+  pad: 0, 0, 0, 0
+  orig: 11, 4
+  offset: 0, 0
+  index: -1
+textfield
+  rotate: false
+  xy: 546, 1867
+  size: 30, 30
+  split: 4, 4, 4, 4
+  pad: 4, 4, 1, 1
+  orig: 30, 30
+  offset: 0, 0
+  index: -1
+textfield
+  rotate: false
+  xy: 546, 1867
+  size: 30, 30
+  split: 4, 4, 4, 4
+  pad: 4, 4, 1, 1
+  orig: 30, 30
+  offset: 0, 0
+  index: -1
+tooltip
+  rotate: false
+  xy: 1975, 1609
+  size: 64, 64
+  split: 13, 13, 12, 12
+  pad: 10, 10, 10, 10
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+tooltip
+  rotate: false
+  xy: 1975, 1609
+  size: 64, 64
+  split: 13, 13, 12, 12
+  pad: 10, 10, 10, 10
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+touchpad
+  rotate: false
+  xy: 341, 1701
+  size: 82, 82
+  orig: 82, 82
+  offset: 0, 0
+  index: -1
+touchpad
+  rotate: false
+  xy: 341, 1701
+  size: 82, 82
+  orig: 82, 82
+  offset: 0, 0
+  index: -1
+touchpad-knob
+  rotate: false
+  xy: 161, 1442
+  size: 30, 30
+  orig: 30, 30
+  offset: 0, 0
+  index: -1
+touchpad-knob
+  rotate: false
+  xy: 161, 1442
+  size: 30, 30
+  orig: 30, 30
+  offset: 0, 0
+  index: -1
+tree-minus
+  rotate: false
+  xy: 1975, 1546
+  size: 22, 17
+  orig: 22, 17
+  offset: 0, 0
+  index: -1
+tree-minus
+  rotate: false
+  xy: 1975, 1546
+  size: 22, 17
+  orig: 22, 17
+  offset: 0, 0
+  index: -1
+tree-plus
+  rotate: false
+  xy: 546, 1847
+  size: 21, 18
+  orig: 21, 18
+  offset: 0, 0
+  index: -1
+tree-plus
+  rotate: false
+  xy: 546, 1847
+  size: 21, 18
+  orig: 21, 18
+  offset: 0, 0
+  index: -1
+white
+  rotate: false
+  xy: 341, 1629
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+white
+  rotate: false
+  xy: 341, 1629
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+window
+  rotate: false
+  xy: 341, 1632
+  size: 76, 67
+  split: 2, 2, 32, 2
+  pad: 2, 2, 34, 2
+  orig: 76, 67
+  offset: 0, 0
+  index: -1
+window
+  rotate: false
+  xy: 341, 1632
+  size: 76, 67
+  split: 2, 2, 32, 2
+  pad: 2, 2, 34, 2
+  orig: 76, 67
+  offset: 0, 0
+  index: -1
+Army
+  rotate: false
+  xy: 1544, 1679
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Art
+  rotate: false
+  xy: 1704, 1719
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Brigade
+  rotate: false
+  xy: 1, 1456
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Cav
+  rotate: false
+  xy: 1, 1346
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Cav_Brigade
+  rotate: false
+  xy: 1, 1196
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Cav_Corps
+  rotate: false
+  xy: 1, 1046
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Cav_Division
+  rotate: false
+  xy: 1, 896
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Cav_Regiment
+  rotate: false
+  xy: 1, 746
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Common_Mov
+  rotate: false
+  xy: 1845, 1545
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+Common_Mov_Cav
+  rotate: false
+  xy: 1538, 1464
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+Corps
+  rotate: false
+  xy: 1, 486
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Division
+  rotate: false
+  xy: 1, 336
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Enemy
+  rotate: false
+  xy: 1864, 1675
+  size: 152, 152
+  orig: 152, 152
+  offset: 0, 0
+  index: -1
+Enemy_Cav
+  rotate: false
+  xy: 1384, 1565
+  size: 152, 152
+  orig: 152, 152
+  offset: 0, 0
+  index: -1
+Eng
+  rotate: false
+  xy: 1, 226
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+G_Art
+  rotate: false
+  xy: 1, 116
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+G_Cav
+  rotate: false
+  xy: 1, 6
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+G_Cav_Brigade
+  rotate: false
+  xy: 181, 1622
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+G_Cav_Division
+  rotate: false
+  xy: 264, 1899
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+G_Cav_Regiment
+  rotate: false
+  xy: 424, 1899
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+G_Inf
+  rotate: false
+  xy: 584, 1939
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+G_Inf_Brigade
+  rotate: false
+  xy: 744, 1899
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+G_Inf_Division
+  rotate: false
+  xy: 904, 1899
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+G_Inf_Regiment
+  rotate: false
+  xy: 1064, 1899
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Grenad
+  rotate: false
+  xy: 1224, 1939
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Heavy_Art
+  rotate: false
+  xy: 1384, 1939
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Heavy_Cav
+  rotate: false
+  xy: 1544, 1939
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Horse_Art
+  rotate: false
+  xy: 1704, 1939
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Inf
+  rotate: false
+  xy: 1864, 1939
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Inf_Brigade
+  rotate: false
+  xy: 584, 1789
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Inf_Corps
+  rotate: false
+  xy: 744, 1749
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Inf_Division
+  rotate: false
+  xy: 904, 1749
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Inf_Regiment
+  rotate: false
+  xy: 1064, 1749
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Irreg_Cav
+  rotate: false
+  xy: 1224, 1829
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Light_Art
+  rotate: false
+  xy: 1384, 1829
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Light_Cav
+  rotate: false
+  xy: 1544, 1829
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Light_Inf
+  rotate: false
+  xy: 1704, 1829
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Mil
+  rotate: false
+  xy: 1864, 1829
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+Regiment
+  rotate: false
+  xy: 1224, 1679
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+Supply
+  rotate: false
+  xy: 1384, 1719
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+common
+  rotate: false
+  xy: 1, 636
+  size: 158, 108
+  orig: 158, 108
+  offset: 0, 0
+  index: -1
+cann
+  rotate: false
+  xy: 1538, 1594
+  size: 146, 83
+  orig: 146, 83
+  offset: 0, 0
+  index: -1
+caval
+  rotate: false
+  xy: 514, 1759
+  size: 50, 48
+  orig: 50, 48
+  offset: 0, 0
+  index: -1
+hex
+  rotate: false
+  xy: 250, 1794
+  size: 103, 103
+  orig: 103, 103
+  offset: 0, 0
+  index: -1
+inf
+  rotate: false
+  xy: 161, 1515
+  size: 47, 89
+  orig: 47, 89
+  offset: 0, 0
+  index: -1
+shako
+  rotate: false
+  xy: 355, 1785
+  size: 99, 112
+  orig: 99, 112
+  offset: 0, 0
+  index: -1
