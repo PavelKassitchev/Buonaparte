@@ -33,7 +33,7 @@ public abstract class Force extends Image {
 
     public static final int TEST_SPEED = 3;
     public static final int TEST_REPORT_PERIOD = 1;
-    public static final int TEST_REPORT_SPEED = 0;
+    public static final int TEST_REPORT_SPEED = 3;
     public static final int TEST_ORDER_SPEED = 5;
 
     Nation nation;
@@ -63,6 +63,7 @@ public abstract class Force extends Image {
     public int size;
     public ShapeRenderer shapeRenderer;
     public PlayScreen playScreen;
+    public boolean showPath;
 
     TextureRegion reg = new TextureRegion(new Texture("unit/cav1.png"));
 
@@ -129,17 +130,16 @@ public abstract class Force extends Image {
         for (Path path : visualTail) {
             path.render(shapeRenderer, 0, 0, 1);
         }
-//        if (visualForcePath != null) {
-//            for (Path path : visualForcePath) {
-//                path.render(shapeRenderer, 0.4f, 0.2f, 0.4f);
-//            }
-//            if (!visualForcePath.isEmpty()) {
-//                Path p = visualForcePath.first();
-//                p.render(shapeRenderer, 1, 0, 0);
-//            }
-//        }
+        if (visualForcePath != null && !visualForcePath.isEmpty()) {
+            Path p = visualForcePath.first();
+            p.render(shapeRenderer, 1, 0, 0);
+            if (showPath) {
+                for (Path path : visualForcePath) {
+                    path.render(shapeRenderer, 0.4f, 0.2f, 0.4f);
+                }
+            }
+        }
         batch.begin();
-
     }
 
     public void setRealHex(Hex hex) {

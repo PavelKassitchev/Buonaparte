@@ -6,7 +6,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -26,7 +25,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
@@ -66,9 +64,12 @@ public class PlayScreen extends GestureDetector implements Screen {
     private Table group;
     Label labelHex;
     Label labelForce;
+
+    public ImageTextButton hexButton;
+    public ImageTextButton forceButton;
     public boolean dragged;
 
-    private Texture texture = new Texture("unit/friend.png");
+    //    private Texture texture = new Texture("unit/friend.png");
     private Sprite sprite;
     private TextureRegion tRegion;
     Batch batch;
@@ -169,31 +170,49 @@ public class PlayScreen extends GestureDetector implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 detailedUi = false;
                 group.remove();
-                unselectHex();
+//                unselectHex();
+                uncheckHex();
                 selectedPaths = null;
                 show();
             }
         });
         group.add(cancel);
 
-        Window window = new Window("Terrain", skin);
-        labelHex = new Label("", skin);
-//        labelForce = new Label("", skin);
-        window.add(labelHex);
-//        window.addListener(new ActorGestureListener());
-        window.addListener(new ClickListener() {
+//        Window window = new Window("Terrain", skin);
+//        labelHex = new Label("", skin);
+////        labelForce = new Label("", skin);
+//        window.add(labelHex);
+////        window.addListener(new ActorGestureListener());
+//        window.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                System.out.println("Window!");
+//                event.cancel();
+//            }
+//
+//        });
+////        window.add(labelForce);
+//        group.add(window);
+
+        hexButton = new ImageTextButton("", skin, "toggle");
+        hexButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("Window!");
-                event.cancel();
+                System.out.println("Button disabled: " + hexButton.isDisabled());
+                if (hexButton.isChecked() && !hexButton.isDisabled()) {
+                    forceButton.setChecked(false);
+                    hexButton.setChecked(true);
+                    hexButton.setDisabled(true);
+                    selectedHex = selectedForce.visualHex;
+                    selectedHex.mark();
+                    uncheckForce();
+                }
             }
-
         });
-//        window.add(labelForce);
-        group.add(window);
-
-        ImageTextButton hexButton = new ImageTextButton("Movement Cost 120%\nWidth 60%", skin);
         group.add(hexButton);
+
+        forceButton = new ImageTextButton("Force: none ", skin, "toggle");
+        group.add(forceButton);
 
 
         group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
@@ -235,27 +254,27 @@ public class PlayScreen extends GestureDetector implements Screen {
         detailedUi = false;
     }
 
-    public void setHexInfo() {
-        labelHex.setText("Mov.cost: " + selectedHex.cell.getTile().getProperties().get("cost").toString());
-//        if (selectedHex.hasChildren()) {
-//            labelForce.setText(((Force)(selectedHex.getChild(0))).strength.infantry);
-//        }
-    }
-
-    public void unselectHex() {
+    public void uncheckHex() {
         if (selectedHex != null) {
             int c = selectedHex.col;
             int r = selectedHex.row;
             selectLayer.setCell(c, r, null);
         }
         selectedHex = null;
+        hexButton.setDisabled(false);
+        hexButton.setChecked(false);
+//        selectedPaths = null;
     }
 
-    public void unselectForce() {
+    public void uncheckForce() {
         if (selectedForce != null) {
             selectedForce.setAlpha(0.7f);
+            selectedForce.showPath = false;
         }
         selectedForce = null;
+        forceButton.setDisabled(true);
+        forceButton.setChecked(false);
+//        selectedPaths = null;
     }
 
     @Override

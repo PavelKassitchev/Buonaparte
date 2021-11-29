@@ -338,6 +338,7 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton$ImageTextButtonStyle: {
 		over: button-over-c
 		checked: button-pressed-c
 		checkedOver: button-pressed-over-c
+		imageUp: button-over-c
 	}
 	radio: {
 		imageUp: radio-c
