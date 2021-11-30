@@ -123,6 +123,47 @@ public abstract class Force extends Image {
         }).start();
     }
 
+    public static void sendMoveOrder(final Force force, final Array<Hex> destinations) {
+        System.out.println("DESTINATIONS SENT!");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(TEST_ORDER_SPEED * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("DESTINATIONS SENT!");
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        GraphPath<Hex> hexPath;
+                        Array<Path> paths = new Array<>();
+                        Hex start = force.hex;
+                        for (Hex h : destinations) {
+                            hexPath = force.playScreen.getHexGraph().findPath(start, h);
+                            Hex st = null;
+                            Hex en;
+                            for (Hex hx : hexPath) {
+                                en = hx;
+                                if (st != null) {
+                                    paths.add(force.playScreen.getHexGraph().getPath(st, en));
+                                }
+                                st = hx;
+                            }
+                            start = st;
+                        }
+                        force.forcePath = paths;
+                        System.out.println("Full DESTINATIONS = " + force.playScreen.destinations.size);
+                        for (Path p : force.forcePath) {
+                            System.out.println(p.fromHex + "   " + p.toHex);
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
@@ -174,6 +215,16 @@ public abstract class Force extends Image {
 
     public void setAlpha(float a) {
         setColor(getColor().b, getColor().g, getColor().r, a);
+    }
+
+    public void mark() {
+        setAlpha(1);
+        showPath = true;
+    }
+
+    public void unmark() {
+        setAlpha (0.75f);
+        showPath = false;
     }
 
     private void sendReport(float delta) {

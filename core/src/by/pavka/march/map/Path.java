@@ -9,8 +9,8 @@ import java.util.Objects;
 
 public class Path extends Image implements Connection<Hex> {
 
-    Hex fromHex;
-    Hex toHex;
+    public Hex fromHex;
+    public Hex toHex;
     float cost;
     Direction direction;
 
