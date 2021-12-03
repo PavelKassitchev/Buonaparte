@@ -31,9 +31,9 @@ public abstract class Force extends Image {
     public static final String SUP = "supply";
     public static final double MAX_SPEED = 36.0;
 
-    public static final int TEST_SPEED = 3;
+    public static final int TEST_SPEED = 2;
     public static final int TEST_REPORT_PERIOD = 1;
-    public static final int TEST_REPORT_SPEED = 3;
+    public static final int TEST_REPORT_SPEED = 1;
     public static final int TEST_ORDER_SPEED = 5;
 
     Nation nation;
@@ -44,8 +44,8 @@ public abstract class Force extends Image {
 
     double speed;
 
-    Formation superForce;
-    Formation remoteHeadForce;
+    public Formation superForce;
+    public Formation remoteHeadForce;
 
     TextureRegion icon;
     public Hex hex;
@@ -72,7 +72,7 @@ public abstract class Force extends Image {
 
     public Force(TextureRegion region, int inf, float len) {
         super(region);
-        setAlpha(0.7f);
+        unmark();
         strength = new Strength();
         strength.infantry = inf;
         strength.length = len;
@@ -93,43 +93,30 @@ public abstract class Force extends Image {
         });
     }
 
-    public static void sendMoveOrder(final Force force, final Hex destination) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(TEST_ORDER_SPEED * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        GraphPath<Hex> fPath = force.playScreen.getHexGraph().findPath(force.hex, destination);
-                        Array<Path> fPaths = new Array<>();
-                        Hex st = null;
-                        Hex en;
-                        for (Hex h : fPath) {
-                            en = h;
-                            if (st != null) {
-                                fPaths.add(force.playScreen.getHexGraph().getPath(st, en));
-                            }
-                            st = h;
-                        }
-                        force.forcePath = fPaths;
-                    }
-                });
-            }
-        }).start();
+    public int findCommandDistance() {
+        int delay = 0;
+        if (remoteHeadForce != null) {
+            GraphPath<Hex> hexPath = playScreen.getHexGraph().findPath(remoteHeadForce.hex, hex);
+            delay = hexPath.getCount() > 1 ? hexPath.getCount() - 1 : 0;
+            System.out.println("COMMAND DEDLAY = " + delay);
+        }
+        return delay;
     }
 
     public static void sendMoveOrder(final Force force, final Array<Hex> destinations) {
-        System.out.println("DESTINATIONS SENT!");
+
         new Thread(new Runnable() {
             @Override
             public void run() {
+//                int orderDelay = 0;
+//                if (force.remoteHeadForce != null) {
+//                    GraphPath<Hex> hexPath = force.playScreen.getHexGraph().findPath(force.remoteHeadForce.hex, force.hex);
+//                    orderDelay = hexPath.getCount() > 2 ? hexPath.getCount() - 2 : 0;
+//                    System.out.println("DESTINATIONS SENT WITH DELAY " + orderDelay);
+//                }
                 try {
-                    Thread.sleep(TEST_ORDER_SPEED * 1000);
+                    Thread.sleep(force.findCommandDistance() * 1000);
+                    //Thread.sleep(TEST_ORDER_SPEED * 1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -213,50 +200,56 @@ public abstract class Force extends Image {
     }
 
 
-    public void setAlpha(float a) {
-        setColor(getColor().b, getColor().g, getColor().r, a);
-    }
-
     public void mark() {
-        setAlpha(1);
+        setColor(getColor().b, getColor().g, getColor().r, 1);
         showPath = true;
     }
 
     public void unmark() {
-        setAlpha (0.75f);
+        setColor(getColor().b, getColor().g, getColor().r, 0.75f);
         showPath = false;
     }
 
     private void sendReport(float delta) {
-        report += delta;
-        if (report > TEST_REPORT_PERIOD) {
-            report = 0;
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    final Hex delayedHex = hex;
-                    final Array<Path> delayedTail = new Array<>(tail);
-                    final Array<Path> delayedPath = new Array<>(forcePath);
-                    try {
-                        Thread.sleep(TEST_REPORT_SPEED * 1000);
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    Gdx.app.postRunnable(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            visualHex = delayedHex;
-                            visualTail = delayedTail;
-                            visualForcePath = delayedPath;
-                            setHex(visualHex);
-                        }
-                    });
-                }
-            }).start();
+        //final int delay = findCommandDistance() > 1 ? findCommandDistance() - 1 : 0;
+        if (findCommandDistance() > 1) {
+            report += delta;
+            if (report > TEST_REPORT_PERIOD) {
+                report = 0;
+                sendReport();
+            }
         }
+    }
+
+    private void sendReport() {
+        final int delay = findCommandDistance() > 1 ? findCommandDistance() - 1 : 0;
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                final Hex delayedHex = hex;
+                final Array<Path> delayedTail = new Array<>(tail);
+                final Array<Path> delayedPath = new Array<>(forcePath);
+                try {
+                        //Thread.sleep(TEST_REPORT_SPEED * 1000);
+                    Thread.sleep(delay * 1000);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Gdx.app.postRunnable(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        visualHex = delayedHex;
+                        visualTail = delayedTail;
+                        visualForcePath = delayedPath;
+                        setHex(visualHex);
+                    }
+                });
+            }
+        }).start();
+
     }
 
     public void receiveMoveOrder(Array<Path> paths) {
@@ -269,7 +262,7 @@ public abstract class Force extends Image {
         if (forcePath != null && !forcePath.isEmpty()) {
             move(delta);
         }
-        sendReport(delta);
+        //sendReport(delta);
     }
 
 
@@ -281,14 +274,16 @@ public abstract class Force extends Image {
             Hex toHex = path.getToNode();
             setRealHex(toHex);
 
+            if (playScreen.selectedForce == this && playScreen.destinations.contains(toHex, true)) {
+                playScreen.destinations.removeValue(toHex, true);
+            }
+
             if (tail.contains(path.reverse(), false)) {
-                System.out.println("CUTTING!");
                 tail.pop();
                 if (currentSections > 1) {
                     currentSections--;
                 }
             } else {
-                System.out.println("ADDING!");
                 tail.add(path);
                 currentSections++;
                 if (currentSections > sections) {
@@ -296,6 +291,7 @@ public abstract class Force extends Image {
                     tail.removeIndex(0);
                 }
             }
+            sendReport();
         }
     }
 

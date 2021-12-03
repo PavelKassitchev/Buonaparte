@@ -1,5 +1,6 @@
 package by.pavka.march.military;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.characteristic.Spirit;
@@ -18,9 +19,9 @@ public class Formation extends Force {
     public Formation() {
     }
 
-//    public Formation(TextureRegion region, Hex hex) {
-//        super(region, hex);
-//    }
+    public Formation(TextureRegion region) {
+        super(region, 20000, 2000);
+    }
 
     @Override
     public double findSpeed() {

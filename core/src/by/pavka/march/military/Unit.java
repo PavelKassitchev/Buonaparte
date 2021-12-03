@@ -27,6 +27,8 @@ public class Unit extends Force {
 //        strength.length = 150;
     }
 
+
+
     @Override
     public double findSpeed() {
         return speed;

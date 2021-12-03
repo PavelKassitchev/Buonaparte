@@ -35,6 +35,7 @@ import by.pavka.march.map.Hex;
 import by.pavka.march.map.HexGraph;
 import by.pavka.march.map.Path;
 import by.pavka.march.military.Force;
+import by.pavka.march.military.Formation;
 import by.pavka.march.military.Unit;
 
 public class PlayScreen extends GestureDetector implements Screen {
@@ -74,6 +75,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     Batch batch;
     public Force testForce;
     public Force anotherTestForce;
+    public Formation headForce;
 
     public PlayScreen(BuonaparteGame game, GestureListener listener) {
         super(listener);
@@ -93,12 +95,21 @@ public class PlayScreen extends GestureDetector implements Screen {
         playStage = new PlayStage(new ExtendViewport(w, h), map);
         setGraphToPlayStage();
 
+        //TODO reformat!
+
         testForce = new Unit(game.getTextureRegion("fr_cav"));
         anotherTestForce = new Unit(game.getTextureRegion("fr_art"));
+        headForce = new Formation(game.getTextureRegion("fr_inf"));
+        testForce.remoteHeadForce = headForce;
+        anotherTestForce.remoteHeadForce = headForce;
 
 
         playStage.addForce(testForce, 2, 1);
         playStage.addForce(anotherTestForce, 2, 2);
+        playStage.addForce(headForce, 4, 4);
+
+
+//
 
         uiStage = new Stage(new ExtendViewport(w, h)) {
             @Override
