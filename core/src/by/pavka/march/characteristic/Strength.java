@@ -16,7 +16,7 @@ public class Strength {
 
     //double speed;
     public double length;
-    double recon;
+    public double recon;
 
     public double capacity;
     public double foodConsumption;

@@ -1,6 +1,11 @@
 package by.pavka.march.map;
 
-import static by.pavka.march.map.Direction.*;
+import static by.pavka.march.map.Direction.NORTH;
+import static by.pavka.march.map.Direction.NORTHEAST;
+import static by.pavka.march.map.Direction.NORTHWEST;
+import static by.pavka.march.map.Direction.SOUTH;
+import static by.pavka.march.map.Direction.SOUTHEAST;
+import static by.pavka.march.map.Direction.SOUTHWEST;
 
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
@@ -11,6 +16,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 
 import by.pavka.march.PlayScreen;
 
@@ -102,16 +108,29 @@ public class HexGraph implements IndexedGraph<Hex> {
         return neighbours;
     }
 
-    public void addHex(Hex hex){
+    public ObjectSet<Hex> getArea(Hex hex, int radius, ObjectSet<Hex> area) {
+        area.add(hex);
+        while (radius > 0) {
+            radius--;
+            Array<Hex> neighbours = getNeighbours(hex);
+            area.addAll(neighbours);
+            for (Hex h : neighbours) {
+                getArea(h, radius, area);
+            }
+        }
+        return area;
+    }
+
+    public void addHex(Hex hex) {
         hex.index = lastNodeIndex;
         lastNodeIndex++;
         hexes.add(hex);
     }
 
-    public void connectHexes(Hex fromHex, Hex toHex){
+    public void connectHexes(Hex fromHex, Hex toHex) {
         Path path = new Path(fromHex, toHex);
         path.direction = findDirection(fromHex, toHex);
-        if(!pathsMap.containsKey(fromHex)){
+        if (!pathsMap.containsKey(fromHex)) {
             pathsMap.put(fromHex, new Array<Connection<Hex>>());
         }
         pathsMap.get(fromHex).add(path);
@@ -152,7 +171,7 @@ public class HexGraph implements IndexedGraph<Hex> {
         }
     }
 
-    public GraphPath<Hex> findPath(Hex startHex, Hex goalHex){
+    public GraphPath<Hex> findPath(Hex startHex, Hex goalHex) {
         GraphPath<Hex> hexPath = new DefaultGraphPath<Hex>();
         new IndexedAStarPathFinder<Hex>(this).searchNodePath(startHex, goalHex, hexHeuristic, hexPath);
         return hexPath;
@@ -170,14 +189,14 @@ public class HexGraph implements IndexedGraph<Hex> {
 
     @Override
     public Array<Connection<Hex>> getConnections(Hex fromNode) {
-        if(pathsMap.containsKey(fromNode)){
+        if (pathsMap.containsKey(fromNode)) {
             return pathsMap.get(fromNode);
         }
         return new Array<>(0);
     }
 
     public Hex getHex(int x, int y) {
-        for (Hex hex: hexes) {
+        for (Hex hex : hexes) {
             if (hex.col == x && hex.row == y) return hex;
         }
         return null;
@@ -185,9 +204,9 @@ public class HexGraph implements IndexedGraph<Hex> {
 
     public Path getPath(Hex start, Hex end) {
         Array<Connection<Hex>> pathsFrom = pathsMap.get(start);
-        for (Connection path: pathsFrom) {
+        for (Connection path : pathsFrom) {
             if (path.getToNode() == end) {
-                return (Path)path;
+                return (Path) path;
             }
         }
         return null;

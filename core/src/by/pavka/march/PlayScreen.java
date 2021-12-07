@@ -1,5 +1,7 @@
 package by.pavka.march;
 
+import static by.pavka.march.configuration.Nation.FRANCE;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
@@ -27,10 +29,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import by.pavka.march.configuration.Nation;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.HexGraph;
 import by.pavka.march.map.Path;
@@ -40,8 +44,11 @@ import by.pavka.march.military.Unit;
 
 public class PlayScreen extends GestureDetector implements Screen {
     public static final String MAP = "map/small.tmx";
+    public static final Nation nation = FRANCE;
 
     BuonaparteGame game;
+    public int time;
+
     PlayStage playStage;
     Skin skin;
     OrthographicCamera camera;
@@ -54,6 +61,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     public boolean detailedUi;
     public boolean longPressed;
     public Force selectedForce;
+    public ObjectIntMap<Force> enemies;
 
     public Array<Hex> destinations;
 
@@ -76,6 +84,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     public Force testForce;
     public Force anotherTestForce;
     public Formation headForce;
+    public Force enemy;
 
     public PlayScreen(BuonaparteGame game, GestureListener listener) {
         super(listener);
@@ -102,11 +111,21 @@ public class PlayScreen extends GestureDetector implements Screen {
         headForce = new Formation(game.getTextureRegion("fr_inf"));
         testForce.remoteHeadForce = headForce;
         anotherTestForce.remoteHeadForce = headForce;
+        testForce.nation = nation;
+        anotherTestForce.nation = nation;
+        headForce.nation = nation;
+
+        enemy = new Unit(game.getTextureRegion("hostile"));
+        enemy.nation = Nation.AUSTRIA;
 
 
         playStage.addForce(testForce, 2, 1);
         playStage.addForce(anotherTestForce, 2, 2);
         playStage.addForce(headForce, 4, 4);
+        playStage.addForce(enemy, 8, 8);
+
+        enemies = new ObjectIntMap<Force>();
+//        enemies.put(enemy, 0);
 
 
 //

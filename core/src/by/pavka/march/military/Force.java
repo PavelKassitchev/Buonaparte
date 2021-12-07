@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectSet;
 
 import by.pavka.march.PlayScreen;
 import by.pavka.march.characteristic.Spirit;
@@ -36,7 +38,7 @@ public abstract class Force extends Image {
     public static final int TEST_REPORT_SPEED = 1;
     public static final int TEST_ORDER_SPEED = 5;
 
-    Nation nation;
+    public Nation nation;
     String name;
 
     public Strength strength;
@@ -58,6 +60,8 @@ public abstract class Force extends Image {
     public Array<Path> visualForcePath;
     public Array<Path> tail;
     public Array<Path> visualTail;
+    public ObjectIntMap<Force> visualEnemies;
+    public int visualTime;
     public int sections;
     public int currentSections;
     public int size;
@@ -98,7 +102,6 @@ public abstract class Force extends Image {
         if (remoteHeadForce != null) {
             GraphPath<Hex> hexPath = playScreen.getHexGraph().findPath(remoteHeadForce.hex, hex);
             delay = hexPath.getCount() > 1 ? hexPath.getCount() - 1 : 0;
-            System.out.println("COMMAND DEDLAY = " + delay);
         }
         return delay;
     }
@@ -120,7 +123,6 @@ public abstract class Force extends Image {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                System.out.println("DESTINATIONS SENT!");
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
@@ -141,7 +143,6 @@ public abstract class Force extends Image {
                             start = st;
                         }
                         force.forcePath = paths;
-                        System.out.println("Full DESTINATIONS = " + force.playScreen.destinations.size);
                         for (Path p : force.forcePath) {
                             System.out.println(p.fromHex + "   " + p.toHex);
                         }
@@ -153,25 +154,31 @@ public abstract class Force extends Image {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
-        batch.end();
-        for (Path path : visualTail) {
-            path.render(shapeRenderer, 0, 0, 1);
-        }
-        if (visualForcePath != null && !visualForcePath.isEmpty()) {
-            Path p = visualForcePath.first();
-            p.render(shapeRenderer, 1, 0, 0);
-            if (showPath) {
-                for (Path path : visualForcePath) {
-                    path.render(shapeRenderer, 0.4f, 0.2f, 0.4f);
+        if (nation == PlayScreen.nation || playScreen.enemies.containsKey(this)) {
+            super.draw(batch, parentAlpha);
+            batch.end();
+            for (Path path : visualTail) {
+                path.render(shapeRenderer, 0, 0, 1);
+            }
+            if (visualForcePath != null && !visualForcePath.isEmpty()) {
+                Path p = visualForcePath.first();
+                p.render(shapeRenderer, 1, 0, 0);
+                if (showPath) {
+                    for (Path path : visualForcePath) {
+                        path.render(shapeRenderer, 0.4f, 0.2f, 0.4f);
+                    }
                 }
             }
+            batch.begin();
         }
-        batch.begin();
     }
 
     public void setRealHex(Hex hex) {
+        if (this.hex != null) {
+            this.hex.removeForce(this);
+        }
         this.hex = hex;
+        hex.addForce(this);
     }
 
     public void setHex(Hex hex) {
@@ -210,6 +217,46 @@ public abstract class Force extends Image {
         showPath = false;
     }
 
+    public boolean isEnemy() {
+        return nation != PlayScreen.nation;
+    }
+
+    public void recon() {
+        for (Hex h : getReconArea()) {
+            if (h.getForces().size > 0) {
+                if (h.getForces().get(0) == this) {
+                    System.out.println("My Force!");
+                } else {
+                    System.out.println("ENEMY FOUND!");
+                    playScreen.enemies.put(h.getForces().get(0), 0);
+                }
+            }
+        }
+    }
+
+    public ObjectSet<Hex> getReconArea() {
+        int radius;
+        if (strength.recon <= 6) {
+            radius = 1;
+        } else if (strength.recon <= 18) {
+            radius = 2;
+        } else if (strength.recon <= 36) {
+            radius = 3;
+        } else if (strength.recon <= 60) {
+            radius = 4;
+        } else {
+            radius = 5;
+        }
+        ObjectSet<Hex> reconArea = playScreen.getHexGraph().getArea(hex, radius, new ObjectSet<Hex>());
+        if (radius > 1) {
+            if (forcePath != null && forcePath.size > radius) {
+                Hex h = forcePath.get(radius).toHex;
+                reconArea.add(h);
+            }
+        }
+        return reconArea;
+    }
+
     private void sendReport(float delta) {
         //final int delay = findCommandDistance() > 1 ? findCommandDistance() - 1 : 0;
         if (findCommandDistance() > 1) {
@@ -230,6 +277,7 @@ public abstract class Force extends Image {
                 final Hex delayedHex = hex;
                 final Array<Path> delayedTail = new Array<>(tail);
                 final Array<Path> delayedPath = new Array<>(forcePath);
+                final int time = playScreen.time;
                 try {
                         //Thread.sleep(TEST_REPORT_SPEED * 1000);
                     Thread.sleep(delay * 1000);
@@ -245,6 +293,7 @@ public abstract class Force extends Image {
                         visualTail = delayedTail;
                         visualForcePath = delayedPath;
                         setHex(visualHex);
+                        visualTime = time;
                     }
                 });
             }
@@ -291,6 +340,7 @@ public abstract class Force extends Image {
                     tail.removeIndex(0);
                 }
             }
+            recon();
             sendReport();
         }
     }

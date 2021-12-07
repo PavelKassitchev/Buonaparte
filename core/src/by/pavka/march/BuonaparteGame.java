@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class BuonaparteGame extends Game {
 	public static final int TILE_SIZE_PX = 72;
 	public static final int HEX_SIZE_M = 3500;
+//	public static final Nation nation = FRANCE;
 	private TextureAtlas textureAtlas;
 	
 	@Override

@@ -25,6 +25,7 @@ public class Hex extends Group {
     private TiledMapTileLayer tiledLayer;
     private TiledMapTileLayer markLayer;
     StaticTiledMapTile tile;
+    private Array<Force> forces;
 
     public Hex(TiledMap tiledMap, TiledMapTileLayer tiledLayer, TiledMapTileLayer.Cell cell, int row, int col, PlayScreen screen) {
         this.tiledMap = tiledMap;
@@ -36,6 +37,7 @@ public class Hex extends Group {
         this.col = col;
         this.cell = tiledLayer.getCell(col, row);
         playScreen = screen;
+        forces = new Array<>();
         setDebug(true);
     }
 
@@ -61,11 +63,41 @@ public class Hex extends Group {
         markLayer.setCell(col, row, null);
     }
 
+    public Array<Force> getForces() {
+        return forces;
+    }
+
+    public void addForce(Force force) {
+        forces.add(force);
+    }
+
+    public void removeForce(Force force) {
+        forces.removeValue(force, true);
+    }
+
+    public Array<Force> enemies() {
+        if (!forces.isEmpty()) {
+            Array<Force> enemies = new Array<>();
+            for (Force f : getForces()) {
+                if (f.isEnemy()) {
+                    enemies.add(f);
+                }
+            }
+            return enemies;
+        }
+        return null;
+    }
+
+
+
     class HexListener extends ClickListener {
         @Override
         public void clicked(InputEvent event, float x, float y) {
             if (!playScreen.longPressed) {
                 playScreen.setDetailedUi(Hex.this);
+//                if (playScreen.selectedForce != null) {
+//                    playScreen.selectedForce.getReconArea();
+//                }
             } else if (playScreen.selectedHex != null || playScreen.selectedForce != null || playScreen.selectedPaths != null) {
                 navigate();
             }
@@ -111,6 +143,7 @@ public class Hex extends Group {
                 System.out.println(p.fromHex + "   " + p.toHex);
             }
         }
+
     }
 }
 

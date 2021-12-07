@@ -21,6 +21,7 @@ public class Unit extends Force {
 
     public Unit(TextureRegion region) {
         super(region, 840, 11000);
+        strength.recon = 20;
         //TODO Delete it
 //        strength = new Strength();
 //        strength.infantry = 855;
