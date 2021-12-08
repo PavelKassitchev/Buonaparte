@@ -223,7 +223,6 @@ public class HexGraph implements IndexedGraph<Hex> {
                 timeToGo += Hex.SIZE / speed;
             }
         }
-        System.out.println("TIME TO GO: " + timeToGo);
         return timeToGo;
     }
 }

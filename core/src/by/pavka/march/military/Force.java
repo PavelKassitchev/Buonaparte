@@ -225,46 +225,95 @@ public abstract class Force extends Image {
         return nation != PlayScreen.nation;
     }
 
+    public void updateEnemies(ObjectIntMap<Force> enemies) {
+        for (Force f : visualEnemies.keys()) {
+            if (!enemies.containsKey(f)) {
+                visualEnemies.remove(f, 0);
+            }
+        }
+        visualEnemies.putAll(enemies);
+    }
+
     public void recon() {
+        final ObjectIntMap<Force> enemies = new ObjectIntMap<>();
         for (Hex h : getReconArea()) {
-//            if (h.getForces().size > 0) {
-//                if (h.getForces().get(0) == this) {
-//                    System.out.println("My Force!");
-//                } else {
-//                    System.out.println("ENEMY FOUND!");
-//                    playScreen.enemies.put(h.getForces().get(0), 0);
-//                }
-//            }
             if (h.enemies() != null) {
                 for (Force f : h.enemies()) {
                     if (ReconData.reconEnemy(f) != null) {
-                        final int delay = (int)(Courier.courierDelay(h, hex) * 1000);
-                        final Force force = f;
-                        new Thread(new Runnable() {
+                        enemies.put(f, playScreen.time);
 
-                            @Override
-                            public void run() {
-                                final int time = playScreen.time;
-                                try {
-                                    Thread.sleep(delay);
 
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                Gdx.app.postRunnable(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        visualEnemies.put(force, time);
-                                    }
-                                });
-                            }
-                        }).start();
+//                        final int delay = (int)(Courier.courierDelay(h, hex) * 1000);
+//                        final Force force = f;
+//                        new Thread(new Runnable() {
+//
+//                            @Override
+//                            public void run() {
+//                                final int time = playScreen.time;
+//                                try {
+//                                    Thread.sleep(delay);
+//
+//                                } catch (InterruptedException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                Gdx.app.postRunnable(new Runnable() {
+//
+//                                    @Override
+//                                    public void run() {
+//                                        visualEnemies.put(force, time);
+//                                    }
+//                                });
+//                            }
+//                        }).start();
 
                     }
+//                    final int delay = (int)(Courier.courierDelay(h, hex) * 1000);
+//                    new Thread(new Runnable() {
+//
+//                            @Override
+//                            public void run() {
+//                                try {
+//                                    Thread.sleep(delay);
+//
+//                                } catch (InterruptedException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                Gdx.app.postRunnable(new Runnable() {
+//
+//                                    @Override
+//                                    public void run() {
+//                                        updateEnemies(new ObjectIntMap<Force>(enemies));
+//                                    }
+//                                });
+//                            }
+//                        }).start();
                 }
             }
         }
+        System.out.println("FOUND " + enemies.size + " ENEMIES");
+        updateEnemies(enemies);
+        System.out.println("VIEWED " + visualEnemies.size + " ENEMIES");
+
+//        final int delay = (int)(Courier.courierDelay(h, hex) * 1000);
+//                    new Thread(new Runnable() {
+//
+//                            @Override
+//                            public void run() {
+//                                try {
+//                                    Thread.sleep(delay);
+//
+//                                } catch (InterruptedException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                Gdx.app.postRunnable(new Runnable() {
+//
+//                                    @Override
+//                                    public void run() {
+//                                        updateEnemies(new ObjectIntMap<Force>(enemies));
+//                                    }
+//                                });
+//                            }
+//                        }).start();
     }
 
     public ObjectSet<Hex> getReconArea() {
@@ -328,7 +377,8 @@ public abstract class Force extends Image {
                         visualTail = delayedTail;
                         visualForcePath = delayedPath;
                         setHex(visualHex);
-                        playScreen.enemies.putAll(delayedEnemies);
+                        //playScreen.enemies.putAll(delayedEnemies);
+                        playScreen.updateEnemies(delayedEnemies);
                         visualTime = time;
                     }
                 });

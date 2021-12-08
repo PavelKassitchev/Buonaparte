@@ -366,6 +366,16 @@ public class PlayScreen extends GestureDetector implements Screen {
         Courier.playScreen = this;
     }
 
+    public void updateEnemies(ObjectIntMap<Force> visualEnemies) {
+        for (Force f : enemies.keys()) {
+            if (!visualEnemies.containsKey(f)) {
+                enemies.remove(f, 0);
+            }
+        }
+        enemies.putAll(visualEnemies);
+        System.out.println(enemies.size + " ENEMIES VISIBLE");
+    }
+
     public HexGraph getHexGraph() {
         return playStage.hexGraph;
     }
