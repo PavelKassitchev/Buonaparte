@@ -7,4 +7,9 @@ public class ReconData {
     public String guns;
     public String wagons;
     public int time;
+
+    public static ReconData reconEnemy(Force force) {
+        //TODO
+        return new ReconData();
+    }
 }

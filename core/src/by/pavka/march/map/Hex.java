@@ -15,7 +15,7 @@ import by.pavka.march.military.Force;
 
 public class Hex extends Group {
 
-    public final static int SIZE = 6;
+    public final static float SIZE = 3.5f;
     public int row;
     public int col;
     public int index;

@@ -38,6 +38,7 @@ import by.pavka.march.configuration.Nation;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.HexGraph;
 import by.pavka.march.map.Path;
+import by.pavka.march.military.Courier;
 import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
 import by.pavka.march.military.Unit;
@@ -360,6 +361,9 @@ public class PlayScreen extends GestureDetector implements Screen {
 
     public void setGraphToPlayStage() {
         playStage.setGraph();
+
+        //TODO refactor
+        Courier.playScreen = this;
     }
 
     public HexGraph getHexGraph() {

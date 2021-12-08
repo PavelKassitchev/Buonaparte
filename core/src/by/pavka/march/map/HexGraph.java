@@ -177,6 +177,7 @@ public class HexGraph implements IndexedGraph<Hex> {
         return hexPath;
     }
 
+
     @Override
     public int getIndex(Hex node) {
         return node.index;
@@ -210,5 +211,19 @@ public class HexGraph implements IndexedGraph<Hex> {
             }
         }
         return null;
+    }
+
+    public double findTimeToGo(Hex start, Hex finish, double speed) {
+        GraphPath<Hex> path = findPath(start, finish);
+        double timeToGo = 0;
+        for (Hex h : path) {
+            if (h == path.get(0) || h == path.get(path.getCount() - 1)) {
+                timeToGo += Hex.SIZE / (speed * 2);
+            } else {
+                timeToGo += Hex.SIZE / speed;
+            }
+        }
+        System.out.println("TIME TO GO: " + timeToGo);
+        return timeToGo;
     }
 }
