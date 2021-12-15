@@ -15,7 +15,7 @@ public class Quality {
     public final double recon;
 
     public final double capacity;
-    public final double ammoConsuption;
+    public final double ammoConsumption;
     public final double foodConsumption;
 
     public Quality(UnitType unitType, int strength, double fire, double charge,
@@ -28,7 +28,7 @@ public class Quality {
         this.length = length;
         this.recon = recon;
         this.capacity = capacity;
-        ammoConsuption = ammo;
+        ammoConsumption = ammo;
         foodConsumption = food;
     }
 }

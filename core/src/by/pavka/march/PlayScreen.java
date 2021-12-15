@@ -1,5 +1,6 @@
 package by.pavka.march;
 
+import static by.pavka.march.configuration.Nation.AUSTRIA;
 import static by.pavka.march.configuration.Nation.FRANCE;
 
 import com.badlogic.gdx.Gdx;
@@ -29,12 +30,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import by.pavka.march.configuration.Nation;
+import by.pavka.march.configuration.Configurator;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.HexGraph;
 import by.pavka.march.map.Path;
@@ -45,16 +47,16 @@ import by.pavka.march.military.Unit;
 
 public class PlayScreen extends GestureDetector implements Screen {
     public static final String MAP = "map/small.tmx";
-    public static final Nation nation = FRANCE;
+//    public static final Nation nation = FRANCE;
 
-    BuonaparteGame game;
+    public BuonaparteGame game;
     public int time;
 
     PlayStage playStage;
     Skin skin;
     OrthographicCamera camera;
     HexagonalTiledMapRenderer hexagonalTiledMapRenderer;
-    ShapeRenderer shapeRenderer;
+    public ShapeRenderer shapeRenderer;
     Stage uiStage;
     HexGestureListener hexListener;
     public Hex selectedHex;
@@ -62,7 +64,8 @@ public class PlayScreen extends GestureDetector implements Screen {
     public boolean detailedUi;
     public boolean longPressed;
     public Force selectedForce;
-    public ObjectIntMap<Force> enemies;
+//    public ObjectIntMap<Force> enemies;
+    public ObjectMap<Force, Hex> enemies;
 
     public Array<Hex> destinations;
 
@@ -87,6 +90,89 @@ public class PlayScreen extends GestureDetector implements Screen {
     public Formation headForce;
     public Force enemy;
 
+    private HexGraph hexGraph;
+
+    public PlayScreen(BuonaparteGame game, GestureListener listener, Configurator configurator) {
+        super(listener);
+//
+//        atlas = new TextureAtlas("skin/clean-crispy/clean-crispy-ui.atlas");
+//        skin = new Skin(Gdx.files.internal("skin/clean-crispy/clean-crispy-ui.json"), atlas);
+        skin = game.getSkin();
+
+        hexListener = (HexGestureListener) listener;
+        hexListener.setGestureDetector(this);
+        this.game = configurator.game;
+        shapeRenderer = new ShapeRenderer();
+        map = new TmxMapLoader().load(configurator.getMapName());
+//        map = configurator.getMap();
+//        hexagonalTiledMapRenderer = configurator.getHexagonalRenderer();
+        hexagonalTiledMapRenderer = new HexagonalTiledMapRenderer(map);
+        tileLayer = (TiledMapTileLayer) map.getLayers().get(configurator.getLayerName());
+//        tileLayer = configurator.getTileLayer();
+        int w = tileLayer.getTileWidth() * 10;
+        int h = w * Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
+        playStage = new PlayStage(new ExtendViewport(w, h));
+//        hexGraph = configurator.getHexGraph(this);
+
+        hexGraph = new HexGraph(map, this);
+        Courier.hexGraph = hexGraph;
+
+//        testForce = new Unit(game.getTextureRegion("fr_cav"));
+//        anotherTestForce = new Unit(game.getTextureRegion("fr_art"));
+//        headForce = new Formation(game.getTextureRegion("fr_inf"));
+//        testForce.remoteHeadForce = headForce;
+//        anotherTestForce.remoteHeadForce = headForce;
+//        testForce.nation = FRANCE;
+//        anotherTestForce.nation = FRANCE;
+//        headForce.nation = FRANCE;
+//
+//        enemy = new Unit(game.getTextureRegion("hostile"));
+//        enemy.nation = AUSTRIA;
+//
+//
+//        playStage.addForce(testForce, 2, 1);
+//        playStage.addForce(anotherTestForce, 2, 2);
+//        playStage.addForce(headForce, 4, 4);
+//        playStage.addForce(enemy, 8, 8);
+
+
+
+        configurator.addForces(this);
+//        enemies = new ObjectIntMap<Force>();
+        enemies = new ObjectMap<>();
+
+        uiStage = new Stage(new ExtendViewport(w, h)) {
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                longPressed = false;
+                float stageX = screenToStageCoordinates(new Vector2(screenX, screenY)).x;
+                float stageY = screenToStageCoordinates(new Vector2(screenX, screenY)).y;
+                if (hit(stageX, stageY, true) != null) {
+                    return super.touchDown(screenX, screenY, pointer, button);
+                }
+                return !super.touchDown(screenX, screenY, pointer, button);
+            }
+
+            @Override
+            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                super.touchUp(screenX, screenY, pointer, button);
+                if (dragged) {
+                    dragged = false;
+                    return true;
+                }
+                return false;
+            }
+        };
+
+        camera = (OrthographicCamera) playStage.getCamera();
+        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.position.set(tileLayer.getTileWidth() * tileLayer.getWidth() * 0.1f,
+                tileLayer.getTileHeight() * tileLayer.getHeight() * 0.1f, 0);
+        uiStage.addListener(new PlayDragListener());
+        uiCamera = (OrthographicCamera) uiStage.getCamera();
+        inputMultiplexer = new InputMultiplexer(uiStage, this, playStage);
+    }
+
     public PlayScreen(BuonaparteGame game, GestureListener listener) {
         super(listener);
         hexListener = (HexGestureListener) listener;
@@ -102,8 +188,12 @@ public class PlayScreen extends GestureDetector implements Screen {
         tileLayer = (TiledMapTileLayer) map.getLayers().get("TileLayer1");
         int w = tileLayer.getTileWidth() * 10;
         int h = w * Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
-        playStage = new PlayStage(new ExtendViewport(w, h), map);
-        setGraphToPlayStage();
+        playStage = new PlayStage(new ExtendViewport(w, h));
+
+        hexGraph = new HexGraph(map, this);
+        Courier.hexGraph = hexGraph;
+//        Courier.playScreen = this;
+        //setGraphToPlayStage();
 
         //TODO reformat!
 
@@ -112,12 +202,12 @@ public class PlayScreen extends GestureDetector implements Screen {
         headForce = new Formation(game.getTextureRegion("fr_inf"));
         testForce.remoteHeadForce = headForce;
         anotherTestForce.remoteHeadForce = headForce;
-        testForce.nation = nation;
-        anotherTestForce.nation = nation;
-        headForce.nation = nation;
+        testForce.nation = FRANCE;
+        anotherTestForce.nation = FRANCE;
+        headForce.nation = FRANCE;
 
         enemy = new Unit(game.getTextureRegion("hostile"));
-        enemy.nation = Nation.AUSTRIA;
+        enemy.nation = AUSTRIA;
 
 
         playStage.addForce(testForce, 2, 1);
@@ -125,7 +215,8 @@ public class PlayScreen extends GestureDetector implements Screen {
         playStage.addForce(headForce, 4, 4);
         playStage.addForce(enemy, 8, 8);
 
-        enemies = new ObjectIntMap<Force>();
+//        enemies = new ObjectIntMap<Force>();
+        enemies = new ObjectMap<>();
 //        enemies.put(enemy, 0);
 
 
@@ -195,7 +286,7 @@ public class PlayScreen extends GestureDetector implements Screen {
             });
             group.add(hexButton);
 
-            forceButton = new ImageTextButton("Forces: none ", skin, "toggle");
+            forceButton = new ImageTextButton("Forces: none", skin, "toggle");
             group.add(forceButton);
             detailedUi = true;
         }
@@ -295,6 +386,7 @@ public class PlayScreen extends GestureDetector implements Screen {
         selectedForce = null;
         forceButton.setDisabled(true);
         forceButton.setChecked(false);
+        forceButton.setText("Forces: none");
     }
 
     @Override
@@ -359,47 +451,50 @@ public class PlayScreen extends GestureDetector implements Screen {
         hexagonalTiledMapRenderer.dispose();
     }
 
-    public void setGraphToPlayStage() {
-        playStage.setGraph();
-
-        //TODO refactor
-        Courier.playScreen = this;
-    }
-
-    public void updateEnemies(ObjectIntMap<Force> visualEnemies) {
-        for (Force f : enemies.keys()) {
-            if (!visualEnemies.containsKey(f)) {
-                enemies.remove(f, 0);
+    public void updateEnemies(ObjectMap<Force, Hex> visualEnemies, ObjectSet<Hex> reconArea, int visualTime) {
+        for (Hex h : reconArea) {
+            Array<Actor> enem = h.getChildren();
+            for (Actor ac : enem) {
+                Force f = (Force)ac;
+                if (f.isEnemy() && f.visualTime <= visualTime && !visualEnemies.containsKey(f)) {
+                    enemies.remove(f);
+//                    f.unvisualize();
+                }
             }
         }
-        enemies.putAll(visualEnemies);
-        System.out.println(enemies.size + " ENEMIES VISIBLE");
+        for (Force f : visualEnemies.keys()) {
+            if (!enemies.containsKey(f) || f.visualTime <= visualTime) {
+                f.visualTime = visualTime;
+                Hex h = visualEnemies.get(f);
+                enemies.put(f, h);
+            }
+        }
     }
 
+
     public HexGraph getHexGraph() {
-        return playStage.hexGraph;
+        return hexGraph;
     }
 
     public void addActorToPlayStage(Actor actor) {
         playStage.addActor(actor);
     }
 
-    class PlayStage extends Stage {
-        private TiledMap map;
-        private HexGraph hexGraph;
-        private Array<Force> forces;
+    public class PlayStage extends Stage {
+//        private TiledMap map;
+        //private HexGraph hexGraph;
 
-        public PlayStage(Viewport viewport, TiledMap map) {
+        public PlayStage(Viewport viewport) {
             super(viewport);
-            this.map = map;
+//            this.map = map;
         }
 
-        private void setGraph() {
-            hexGraph = new HexGraph(map, PlayScreen.this);
-        }
+//        private void setGraph() {
+//            hexGraph = new HexGraph(map, PlayScreen.this);
+//        }
 
         private void addForce(Force force, int col, int row) {
-            Hex hex = hexGraph.getHex(col, row);
+            Hex hex = PlayScreen.this.hexGraph.getHex(col, row);
             force.setHex(hex);
             force.setRealHex(hex);
             force.shapeRenderer = shapeRenderer;

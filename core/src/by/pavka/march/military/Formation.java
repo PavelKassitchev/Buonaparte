@@ -152,7 +152,7 @@ public class Formation extends Force {
     }
 
     public Formation attach(Force force) {
-        if (validator.canAttch(force)) {
+        if (validator.canAttach(force)) {
             add(force);
             force.superForce = this;
             Strength s = force.strength;

@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 
 import by.pavka.march.PlayScreen;
@@ -60,7 +60,9 @@ public abstract class Force extends Image {
     public Array<Path> visualForcePath;
     public Array<Path> tail;
     public Array<Path> visualTail;
-    public ObjectIntMap<Force> visualEnemies;
+//    public ObjectIntMap<Force> visualEnemies;
+    public ObjectMap<Force, Hex> visualEnemies;
+    public ObjectSet<Hex> reconArea;
     public int visualTime;
     public int sections;
     public int currentSections;
@@ -87,7 +89,9 @@ public abstract class Force extends Image {
         visualTail = new Array<>();
         forcePath = new Array<>();
         visualForcePath = new Array<>();
-        visualEnemies = new ObjectIntMap<>();
+//        visualEnemies = new ObjectIntMap<>();
+        visualEnemies = new ObjectMap<>();
+        reconArea = new ObjectSet<>();
 
         addListener(new ClickListener() {
             @Override
@@ -98,14 +102,16 @@ public abstract class Force extends Image {
         });
     }
 
-    public int findCommandDistance() {
+    public int findReportDistance(Force force) {
         int delay = 0;
-        if (remoteHeadForce != null) {
-//            GraphPath<Hex> hexPath = playScreen.getHexGraph().findPath(remoteHeadForce.hex, hex);
-//            delay = hexPath.getCount() > 1 ? hexPath.getCount() - 1 : 0;
-            delay = (int)(Courier.courierDelay(remoteHeadForce.hex, hex) * 1000);
+        if (force != null) {
+            delay = (int)(Courier.courierDelay(force.hex, hex) * 1000);
         }
         return delay;
+    }
+
+    public int findCommandDistance() {
+        return findReportDistance(remoteHeadForce);
     }
 
     public static void sendMoveOrder(final Force force, final Array<Hex> destinations) {
@@ -158,7 +164,7 @@ public abstract class Force extends Image {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        if (nation == PlayScreen.nation || playScreen.enemies.containsKey(this)) {
+        if (nation == playScreen.game.nation || playScreen.enemies.containsKey(this)) {
             super.draw(batch, parentAlpha);
             batch.end();
             for (Path path : visualTail) {
@@ -210,6 +216,13 @@ public abstract class Force extends Image {
 
     }
 
+    public void unvisualize() {
+        if (visualHex != null) {
+            visualHex.removeActor(this);
+        }
+        visualHex = null;
+    }
+
 
     public void mark() {
         setColor(getColor().b, getColor().g, getColor().r, 1);
@@ -222,98 +235,32 @@ public abstract class Force extends Image {
     }
 
     public boolean isEnemy() {
-        return nation != PlayScreen.nation;
-    }
-
-    public void updateEnemies(ObjectIntMap<Force> enemies) {
-        for (Force f : visualEnemies.keys()) {
-            if (!enemies.containsKey(f)) {
-                visualEnemies.remove(f, 0);
-            }
-        }
-        visualEnemies.putAll(enemies);
+        return nation != playScreen.game.nation;
     }
 
     public void recon() {
-        final ObjectIntMap<Force> enemies = new ObjectIntMap<>();
-        for (Hex h : getReconArea()) {
-            if (h.enemies() != null) {
-                for (Force f : h.enemies()) {
+        final ObjectMap<Force, Hex> enemies = new ObjectMap<>();
+        reconArea = getReconArea();
+        for (Hex h : reconArea) {
+            if (h.enemiesOf(this) != null) {
+                for (Force f : h.enemiesOf(this)) {
                     if (ReconData.reconEnemy(f) != null) {
-                        enemies.put(f, playScreen.time);
-
-
-//                        final int delay = (int)(Courier.courierDelay(h, hex) * 1000);
-//                        final Force force = f;
-//                        new Thread(new Runnable() {
-//
-//                            @Override
-//                            public void run() {
-//                                final int time = playScreen.time;
-//                                try {
-//                                    Thread.sleep(delay);
-//
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                }
-//                                Gdx.app.postRunnable(new Runnable() {
-//
-//                                    @Override
-//                                    public void run() {
-//                                        visualEnemies.put(force, time);
-//                                    }
-//                                });
-//                            }
-//                        }).start();
-
+                        f.setHex(h);
+                        enemies.put(f, h);
                     }
-//                    final int delay = (int)(Courier.courierDelay(h, hex) * 1000);
-//                    new Thread(new Runnable() {
-//
-//                            @Override
-//                            public void run() {
-//                                try {
-//                                    Thread.sleep(delay);
-//
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                }
-//                                Gdx.app.postRunnable(new Runnable() {
-//
-//                                    @Override
-//                                    public void run() {
-//                                        updateEnemies(new ObjectIntMap<Force>(enemies));
-//                                    }
-//                                });
-//                            }
-//                        }).start();
                 }
             }
         }
-        System.out.println("FOUND " + enemies.size + " ENEMIES");
         updateEnemies(enemies);
-        System.out.println("VIEWED " + visualEnemies.size + " ENEMIES");
+    }
 
-//        final int delay = (int)(Courier.courierDelay(h, hex) * 1000);
-//                    new Thread(new Runnable() {
-//
-//                            @Override
-//                            public void run() {
-//                                try {
-//                                    Thread.sleep(delay);
-//
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                }
-//                                Gdx.app.postRunnable(new Runnable() {
-//
-//                                    @Override
-//                                    public void run() {
-//                                        updateEnemies(new ObjectIntMap<Force>(enemies));
-//                                    }
-//                                });
-//                            }
-//                        }).start();
+    public void updateEnemies(ObjectMap<Force, Hex> enemies) {
+        for (Force f : visualEnemies.keys()) {
+            if (!enemies.containsKey(f)) {
+                visualEnemies.remove(f);
+            }
+        }
+        visualEnemies.putAll(enemies);
     }
 
     public ObjectSet<Hex> getReconArea() {
@@ -359,7 +306,9 @@ public abstract class Force extends Image {
                 final Hex delayedHex = hex;
                 final Array<Path> delayedTail = new Array<>(tail);
                 final Array<Path> delayedPath = new Array<>(forcePath);
-                final ObjectIntMap<Force> delayedEnemies = new ObjectIntMap<>(visualEnemies);
+//                final ObjectIntMap<Force> delayedEnemies = new ObjectIntMap<>(visualEnemies);
+                final ObjectMap<Force, Hex> delayedEnemies = new ObjectMap<Force, Hex>(visualEnemies);
+                final ObjectSet<Hex> delayedArea = reconArea;
                 final int time = playScreen.time;
                 try {
                         //Thread.sleep(TEST_REPORT_SPEED * 1000);
@@ -377,9 +326,9 @@ public abstract class Force extends Image {
                         visualTail = delayedTail;
                         visualForcePath = delayedPath;
                         setHex(visualHex);
-                        //playScreen.enemies.putAll(delayedEnemies);
-                        playScreen.updateEnemies(delayedEnemies);
                         visualTime = time;
+                        //playScreen.enemies.putAll(delayedEnemies);
+                        playScreen.updateEnemies(delayedEnemies, reconArea, visualTime);
                     }
                 });
             }
@@ -426,8 +375,10 @@ public abstract class Force extends Image {
                     tail.removeIndex(0);
                 }
             }
-            recon();
-            sendReport();
+            if (!isEnemy()) {
+                recon();
+                sendReport();
+            }
         }
     }
 

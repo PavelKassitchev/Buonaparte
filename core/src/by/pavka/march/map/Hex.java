@@ -88,6 +88,19 @@ public class Hex extends Group {
         return null;
     }
 
+    public Array<Force> enemiesOf(Force force) {
+        if (!forces.isEmpty()) {
+            Array<Force> enemies = new Array<>();
+            for (Force f : getForces()) {
+                if (f.nation != force.nation) {
+                    enemies.add(f);
+                }
+            }
+            return enemies;
+        }
+        return null;
+    }
+
 
 
     class HexListener extends ClickListener {
