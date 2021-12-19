@@ -31,7 +31,7 @@ public abstract class Force extends Image {
     public static final String ENG = "engineer";
     public static final String ART = "artillery";
     public static final String SUP = "supply";
-    public static final double MAX_SPEED = 36.0;
+    public static final float MAX_SPEED = 36.0f;
 
     public static final int TEST_SPEED = 2;
     public static final int TEST_REPORT_PERIOD = 1;
@@ -44,7 +44,7 @@ public abstract class Force extends Image {
     public Strength strength;
     Spirit spirit;
 
-    double speed;
+    float speed;
 
     public Formation superForce;
     public Formation remoteHeadForce;
@@ -60,10 +60,10 @@ public abstract class Force extends Image {
     public Array<Path> visualForcePath;
     public Array<Path> tail;
     public Array<Path> visualTail;
-//    public ObjectIntMap<Force> visualEnemies;
+    //    public ObjectIntMap<Force> visualEnemies;
     public ObjectMap<Force, Hex> visualEnemies;
     public ObjectSet<Hex> reconArea;
-    public int visualTime;
+    public float visualTime;
     public int sections;
     public int currentSections;
     public int size;
@@ -102,15 +102,15 @@ public abstract class Force extends Image {
         });
     }
 
-    public int findReportDistance(Force force) {
-        int delay = 0;
+    public float findReportDistance(Force force) {
+        float delay = 0;
         if (force != null) {
-            delay = (int)(Courier.courierDelay(force.hex, hex) * 1000);
+            delay = (float) Courier.courierDelay(force.hex, hex) * 1000 / playScreen.HOURS_IN_SECOND;
         }
         return delay;
     }
 
-    public int findCommandDistance() {
+    public float findCommandDistance() {
         return findReportDistance(remoteHeadForce);
     }
 
@@ -127,7 +127,7 @@ public abstract class Force extends Image {
 //                }
                 try {
                     //Thread.sleep(force.findCommandDistance() * 1000);
-                    Thread.sleep(force.findCommandDistance());
+                    Thread.sleep((long) force.findCommandDistance());
 
                     //Thread.sleep(TEST_ORDER_SPEED * 1000);
                 } catch (InterruptedException e) {
@@ -191,7 +191,7 @@ public abstract class Force extends Image {
         hex.addForce(this);
     }
 
-    public void setHex(Hex hex) {
+    public void setVisualHex(Hex hex) {
         if (visualHex != null) {
             visualHex.removeActor(this);
         }
@@ -245,7 +245,7 @@ public abstract class Force extends Image {
             if (h.enemiesOf(this) != null) {
                 for (Force f : h.enemiesOf(this)) {
                     if (ReconData.reconEnemy(f) != null) {
-                        f.setHex(h);
+//                        f.setVisualHex(h);
                         enemies.put(f, h);
                     }
                 }
@@ -286,19 +286,24 @@ public abstract class Force extends Image {
         return reconArea;
     }
 
-    private void sendReport(float delta) {
-        //final int delay = findCommandDistance() > 1 ? findCommandDistance() - 1 : 0;
-        if (findCommandDistance() > 1) {
-            report += delta;
-            if (report > TEST_REPORT_PERIOD) {
-                report = 0;
-                sendReport();
-            }
-        }
-    }
+//    private void sendReport(float delta) {
+//        //final int delay = findCommandDistance() > 1 ? findCommandDistance() - 1 : 0;
+//        if (findCommandDistance() > 1) {
+//            report += delta;
+//            if (report > TEST_REPORT_PERIOD) {
+//                report = 0;
+//                sendReport();
+//            }
+//        }
+//    }
 
-    private void sendReport() {
-        final int delay = findCommandDistance() > 1 ? findCommandDistance() - 1 : 0;
+    private void sendReport(final String tag) {
+        final float delay;
+        if (remoteHeadForce == null || playScreen.getHexGraph().areNeighbours(remoteHeadForce.hex, hex)) {
+            delay = 0;
+        } else {
+            delay = findCommandDistance();
+        }
         new Thread(new Runnable() {
 
             @Override
@@ -309,28 +314,42 @@ public abstract class Force extends Image {
 //                final ObjectIntMap<Force> delayedEnemies = new ObjectIntMap<>(visualEnemies);
                 final ObjectMap<Force, Hex> delayedEnemies = new ObjectMap<Force, Hex>(visualEnemies);
                 final ObjectSet<Hex> delayedArea = reconArea;
-                final int time = playScreen.time;
+                final float time = playScreen.time;
                 try {
-                        //Thread.sleep(TEST_REPORT_SPEED * 1000);
+                    while (playScreen.timer.isChecked()) {
+                        Thread.sleep(20);
+                    }
+                    //Thread.sleep(TEST_REPORT_SPEED * 1000);
                     //Thread.sleep(delay * 1000);
-                    Thread.sleep(delay);
+                    Thread.sleep((long) delay);
+                    while (playScreen.timer.isChecked()) {
+                        Thread.sleep(50);
+                    }
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Gdx.app.postRunnable(new Runnable() {
+                if (time > visualTime) {
+                    Gdx.app.postRunnable(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        visualHex = delayedHex;
-                        visualTail = delayedTail;
-                        visualForcePath = delayedPath;
-                        setHex(visualHex);
-                        visualTime = time;
-                        //playScreen.enemies.putAll(delayedEnemies);
-                        playScreen.updateEnemies(delayedEnemies, reconArea, visualTime);
-                    }
-                });
+                        @Override
+                        public void run() {
+                            visualHex = delayedHex;
+                            visualTail = delayedTail;
+                            visualForcePath = delayedPath;
+                            setVisualHex(visualHex);
+                            visualTime = time;
+                            //playScreen.enemies.putAll(delayedEnemies);
+                            playScreen.updateEnemies(delayedEnemies, delayedArea, visualTime);
+                            if (playScreen.selectedForce == Force.this) {
+                                System.out.println("State: " + tag + " Visual Time: " + visualTime + ".  Real hex: col - " + hex.col + " row - " + hex.row +
+                                        " Visual hex: col - " + visualHex.col + " row - " + visualHex.row);
+                            }
+                        }
+                    });
+                } else if (playScreen.selectedForce == Force.this) {
+                    System.out.println("State: " + tag + " SURPRISE! time & visual time are " + time + "   " + visualTime + " Force: " + this);
+                }
             }
         }).start();
 
@@ -340,19 +359,36 @@ public abstract class Force extends Image {
 
     }
 
+    private boolean readyToRecon(float delta) {
+        report += delta;
+        if (report > 1) {
+            report = 0;
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);
         if (forcePath != null && !forcePath.isEmpty()) {
             move(delta);
         }
+        if (!isEnemy() && readyToRecon(delta)) {
+            recon();
+            sendReport("JUST RECON");
+        }
         //sendReport(delta);
     }
 
 
     public void move(float delta) {
-        start += delta;
-        if (start > TEST_SPEED) {
+        if (!playScreen.timer.isChecked()) {
+            start += delta;
+        }
+        Path p = forcePath.get(0);
+        float timeToCross = Hex.SIZE * p.getCost() / speed;
+        if (start > timeToCross / playScreen.HOURS_IN_SECOND) {
             start = 0;
             Path path = forcePath.removeIndex(0);
             Hex toHex = path.getToNode();
@@ -375,14 +411,18 @@ public abstract class Force extends Image {
                     tail.removeIndex(0);
                 }
             }
-            if (!isEnemy()) {
-                recon();
-                sendReport();
+//            if (!isEnemy()) {
+//                recon();
+//                sendReport("IN MOVEMENT");
+//            }
+            if (isEnemy()) {
+                System.out.println("Real hex: col - " + hex.col + " row - " + hex.row +
+                        " Visual hex: col - " + visualHex.col + " row - " + visualHex.row);
             }
         }
     }
 
-    public abstract double findSpeed();
+    public abstract float findSpeed();
 
     public abstract Spirit findSpirit();
 

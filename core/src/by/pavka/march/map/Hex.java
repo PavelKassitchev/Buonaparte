@@ -151,10 +151,10 @@ public class Hex extends Group {
             if (playScreen.selectedForce != null) {
                 Force.sendMoveOrder(playScreen.selectedForce, playScreen.destinations);
             }
-            System.out.println("Full length = " + playScreen.selectedPaths.size);
-            for (Path p : playScreen.selectedPaths) {
-                System.out.println(p.fromHex + "   " + p.toHex);
-            }
+//            System.out.println("Full length = " + playScreen.selectedPaths.size);
+//            for (Path p : playScreen.selectedPaths) {
+//                System.out.println(p.fromHex + "   " + p.toHex);
+//            }
         }
 
     }

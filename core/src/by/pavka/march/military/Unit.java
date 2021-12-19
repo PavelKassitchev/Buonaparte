@@ -22,6 +22,7 @@ public class Unit extends Force {
     public Unit(TextureRegion region) {
         super(region, 840, 11000);
         strength.recon = 20;
+        speed = 4.0f;
         //TODO Delete it
 //        strength = new Strength();
 //        strength.infantry = 855;
@@ -31,7 +32,7 @@ public class Unit extends Force {
 
 
     @Override
-    public double findSpeed() {
+    public float findSpeed() {
         return speed;
     }
 

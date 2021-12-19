@@ -48,9 +48,10 @@ import by.pavka.march.military.Unit;
 public class PlayScreen extends GestureDetector implements Screen {
     public static final String MAP = "map/small.tmx";
 //    public static final Nation nation = FRANCE;
+    public static final float HOURS_IN_SECOND = 0.5f;
 
     public BuonaparteGame game;
-    public int time;
+    public float time;
 
     PlayStage playStage;
     Skin skin;
@@ -76,7 +77,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     private InputMultiplexer inputMultiplexer;
 
     private Table group;
-
+    public ImageTextButton timer;
     public ImageTextButton hexButton;
     public ImageTextButton forceButton;
     public boolean dragged;
@@ -333,6 +334,8 @@ public class PlayScreen extends GestureDetector implements Screen {
             }
             String info = String.format("%d Forces\n%d Soldiers", forceNumber, soldierNumber);
             forceButton.setText(info);
+        } else {
+            forceButton.setText("Forces: none");
         }
     }
 
@@ -365,6 +368,18 @@ public class PlayScreen extends GestureDetector implements Screen {
             }
         });
         group.add(zoom);
+        timer = new ImageTextButton("Time: " + (int)time, skin, "toggle") {
+            @Override
+            public void act(float delta) {
+                super.act(delta);
+                if (!isChecked()) {
+                    time += delta;
+                    setText("Time: " + (int)time);
+                }
+            }
+        };
+        timer.setChecked(true);
+        group.add(timer);
         group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
         group.left();
         detailedUi = false;
@@ -386,7 +401,7 @@ public class PlayScreen extends GestureDetector implements Screen {
         selectedForce = null;
         forceButton.setDisabled(true);
         forceButton.setChecked(false);
-        forceButton.setText("Forces: none");
+//        forceButton.setText("Forces: none");
     }
 
     @Override
@@ -423,6 +438,7 @@ public class PlayScreen extends GestureDetector implements Screen {
         uiCamera.update();
         playStage.act();
         playStage.draw();
+        uiStage.act();
         uiStage.draw();
     }
 
@@ -451,7 +467,7 @@ public class PlayScreen extends GestureDetector implements Screen {
         hexagonalTiledMapRenderer.dispose();
     }
 
-    public void updateEnemies(ObjectMap<Force, Hex> visualEnemies, ObjectSet<Hex> reconArea, int visualTime) {
+    public void updateEnemies(ObjectMap<Force, Hex> visualEnemies, ObjectSet<Hex> reconArea, float visualTime) {
         for (Hex h : reconArea) {
             Array<Actor> enem = h.getChildren();
             for (Actor ac : enem) {
@@ -466,6 +482,7 @@ public class PlayScreen extends GestureDetector implements Screen {
             if (!enemies.containsKey(f) || f.visualTime <= visualTime) {
                 f.visualTime = visualTime;
                 Hex h = visualEnemies.get(f);
+                f.setVisualHex(h);
                 enemies.put(f, h);
             }
         }
@@ -495,7 +512,7 @@ public class PlayScreen extends GestureDetector implements Screen {
 
         private void addForce(Force force, int col, int row) {
             Hex hex = PlayScreen.this.hexGraph.getHex(col, row);
-            force.setHex(hex);
+            force.setVisualHex(hex);
             force.setRealHex(hex);
             force.shapeRenderer = shapeRenderer;
             force.playScreen = PlayScreen.this;

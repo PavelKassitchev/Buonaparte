@@ -66,7 +66,7 @@ public class Configurator {
 
     private void addForce(Force force, int col, int row, PlayScreen playScreen) {
         Hex hex = playScreen.getHexGraph().getHex(col, row);
-        force.setHex(hex);
+        force.setVisualHex(hex);
         force.setRealHex(hex);
         force.shapeRenderer = playScreen.shapeRenderer;
         force.playScreen = playScreen;
@@ -84,7 +84,7 @@ public class Configurator {
         Force force = new Unit(region);
         force.nation = nation;
         Hex hex = playScreen.getHexGraph().getHex(col, row);
-        force.setHex(hex);
+        force.setVisualHex(hex);
         force.setRealHex(hex);
         force.shapeRenderer = playScreen.shapeRenderer;
         force.playScreen = playScreen;

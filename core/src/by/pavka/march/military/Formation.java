@@ -21,11 +21,12 @@ public class Formation extends Force {
 
     public Formation(TextureRegion region) {
         super(region, 20000, 2000);
+        speed = 16.0f;
     }
 
     @Override
-    public double findSpeed() {
-        double speed = MAX_SPEED;
+    public float findSpeed() {
+        float speed = MAX_SPEED;
         for (Force force : subForces) {
             if (force.findSpeed() < speed) {
                 speed = force.findSpeed();

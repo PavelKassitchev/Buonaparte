@@ -10,7 +10,7 @@ public class Courier {
     public static HexGraph hexGraph;
 
     public static double courierDelay(Hex start, Hex finish) {
-//        return playScreen.getHexGraph().findTimeToGo(start, finish, MAX_SPEED);
-        return hexGraph.findTimeToGo(start, finish, MAX_SPEED);
+//        return hexGraph.findTimeToGo(start, finish, MAX_SPEED);
+        return Math.pow(hexGraph.findDistanceCost(start, finish) / MAX_SPEED, 2.13);
     }
 }

@@ -72,6 +72,10 @@ public class HexGraph implements IndexedGraph<Hex> {
         }
     }
 
+    public boolean areNeighbours(Hex one, Hex two) {
+        return getNeighbours(one).contains(two, true) || one == two;
+    }
+
     public Array<Hex> getNeighbours(Hex hex) {
         Array<Hex> neighbours = new Array<Hex>();
         if (hex.col > 0) {
@@ -224,5 +228,19 @@ public class HexGraph implements IndexedGraph<Hex> {
             }
         }
         return timeToGo;
+    }
+
+    public float findDistanceCost(Hex start, Hex finish) {
+        GraphPath<Hex> path = findPath(start, finish);
+        float distanceCost = 0;
+        for (Hex h : path) {
+            if (h == path.get(0) || h == path.get(path.getCount() - 1)) {
+                distanceCost += Hex.SIZE * Float.parseFloat(h.cell.getTile().getProperties().get("cost").toString()) / 2;
+            } else {
+                distanceCost += Hex.SIZE * Float.parseFloat(h.cell.getTile().getProperties().get("cost").toString());
+            }
+        }
+
+        return distanceCost;
     }
 }
