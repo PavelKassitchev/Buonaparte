@@ -2,6 +2,7 @@ package by.pavka.march.military;
 
 import static by.pavka.march.BuonaparteGame.HEX_SIZE_M;
 import static by.pavka.march.BuonaparteGame.TILE_SIZE_PX;
+import static by.pavka.march.PlayScreen.HOURS_IN_SECOND;
 import static by.pavka.march.characteristic.Stock.NORMAL_FOOD_STOCK_DAYS;
 
 import com.badlogic.gdx.Gdx;
@@ -18,12 +19,14 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 
 import by.pavka.march.PlayScreen;
+import by.pavka.march.characteristic.March;
 import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
 import by.pavka.march.configuration.Nation;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.Path;
+import by.pavka.march.order.Order;
 
 public abstract class Force extends Image {
     public static final String CAV = "cavalry";
@@ -56,6 +59,7 @@ public abstract class Force extends Image {
 
     float start = 0;
     float report = 0;
+    float camp = 0;
     public Array<Path> forcePath;
     public Array<Path> visualForcePath;
     public Array<Path> tail;
@@ -70,6 +74,7 @@ public abstract class Force extends Image {
     public ShapeRenderer shapeRenderer;
     public PlayScreen playScreen;
     public boolean showPath;
+    March march;
 
     TextureRegion reg = new TextureRegion(new Texture("unit/cav1.png"));
 
@@ -105,13 +110,33 @@ public abstract class Force extends Image {
     public float findReportDistance(Force force) {
         float delay = 0;
         if (force != null) {
-            delay = (float) Courier.courierDelay(force.hex, hex) * 1000 / playScreen.HOURS_IN_SECOND;
+            delay = (float) Courier.courierDelay(force.hex, hex) * 1000 / HOURS_IN_SECOND;
         }
         return delay;
     }
 
     public float findCommandDistance() {
         return findReportDistance(remoteHeadForce);
+    }
+
+    public static void sendOrder (final Force force, final Order order) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep((long) force.findCommandDistance());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        order.execute(force);
+                    }
+                });
+            }
+        }).start();
     }
 
     public static void sendMoveOrder(final Force force, final Array<Hex> destinations) {
@@ -341,14 +366,8 @@ public abstract class Force extends Image {
                             visualTime = time;
                             //playScreen.enemies.putAll(delayedEnemies);
                             playScreen.updateEnemies(delayedEnemies, delayedArea, visualTime);
-                            if (playScreen.selectedForce == Force.this) {
-                                System.out.println("State: " + tag + " Visual Time: " + visualTime + ".  Real hex: col - " + hex.col + " row - " + hex.row +
-                                        " Visual hex: col - " + visualHex.col + " row - " + visualHex.row);
-                            }
                         }
                     });
-                } else if (playScreen.selectedForce == Force.this) {
-                    System.out.println("State: " + tag + " SURPRISE! time & visual time are " + time + "   " + visualTime + " Force: " + this);
                 }
             }
         }).start();
@@ -381,16 +400,32 @@ public abstract class Force extends Image {
         //sendReport(delta);
     }
 
-
-    public void move(float delta) {
-        if (!playScreen.timer.isChecked()) {
-            start += delta;
+    public void camp(float delta, float duration) {
+        if (currentSections > 1) {
+            camp += delta;
+            if (camp > duration / HOURS_IN_SECOND) {
+                System.out.println("Camping time - " + camp);
+                camp = 0;
+                System.out.println("Tail section number: " + currentSections);
+                currentSections--;
+                tail.removeIndex(0);
+            }
         }
-        Path p = forcePath.get(0);
-        float timeToCross = Hex.SIZE * p.getCost() / speed;
-        if (start > timeToCross / playScreen.HOURS_IN_SECOND) {
+
+    }
+
+    public boolean readyToCamp() {
+
+        return false;
+    }
+
+    public void normalMarch(float delta) {
+        start += delta;
+        Path path = forcePath.get(0);
+        float timeToCross = Hex.SIZE * path.getCost() / speed;
+        if (start > timeToCross / HOURS_IN_SECOND) {
             start = 0;
-            Path path = forcePath.removeIndex(0);
+            forcePath.removeIndex(0);
             Hex toHex = path.getToNode();
             setRealHex(toHex);
 
@@ -411,13 +446,58 @@ public abstract class Force extends Image {
                     tail.removeIndex(0);
                 }
             }
+            if (!isEnemy()) {
+                recon();
+                sendReport("IN MOVEMENT");
+            }
+        }
+    }
+
+
+    public void move(float delta) {
+//        if (!playScreen.timer.isChecked()) {
+//            start += delta;
+//        }
+//        Path p = forcePath.get(0);
+//        float timeToCross = Hex.SIZE * p.getCost() / speed;
+//        if (start > timeToCross / HOURS_IN_SECOND) {
+//            start = 0;
+//            Path path = forcePath.removeIndex(0);
+//            Hex toHex = path.getToNode();
+//            setRealHex(toHex);
+//
+//            if (playScreen.selectedForce == this && playScreen.destinations.contains(toHex, true)) {
+//                playScreen.destinations.removeValue(toHex, true);
+//            }
+//
+//            if (tail.contains(path.reverse(), false)) {
+//                tail.pop();
+//                if (currentSections > 1) {
+//                    currentSections--;
+//                }
+//            } else {
+//                tail.add(path);
+//                currentSections++;
+//                if (currentSections > sections) {
+//                    currentSections--;
+//                    tail.removeIndex(0);
+//                }
+//            }
 //            if (!isEnemy()) {
 //                recon();
 //                sendReport("IN MOVEMENT");
 //            }
-            if (isEnemy()) {
-                System.out.println("Real hex: col - " + hex.col + " row - " + hex.row +
-                        " Visual hex: col - " + visualHex.col + " row - " + visualHex.row);
+//            if (isEnemy()) {
+//                System.out.println("Real hex: col - " + hex.col + " row - " + hex.row +
+//                        " Visual hex: col - " + visualHex.col + " row - " + visualHex.row);
+//            }
+//        }
+
+        if (!playScreen.timer.isChecked()) {
+            if (playScreen.time < 14 || playScreen.time > 25) {
+                normalMarch(delta);
+            } else {
+                camp(delta, 0.66f);
             }
         }
     }

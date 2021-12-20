@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.PlayScreen;
 import by.pavka.march.military.Force;
+import by.pavka.march.order.MoveOrder;
 
 public class Hex extends Group {
 
@@ -75,19 +76,6 @@ public class Hex extends Group {
         forces.removeValue(force, true);
     }
 
-    public Array<Force> enemies() {
-        if (!forces.isEmpty()) {
-            Array<Force> enemies = new Array<>();
-            for (Force f : getForces()) {
-                if (f.isEnemy()) {
-                    enemies.add(f);
-                }
-            }
-            return enemies;
-        }
-        return null;
-    }
-
     public Array<Force> enemiesOf(Force force) {
         if (!forces.isEmpty()) {
             Array<Force> enemies = new Array<>();
@@ -108,9 +96,6 @@ public class Hex extends Group {
         public void clicked(InputEvent event, float x, float y) {
             if (!playScreen.longPressed) {
                 playScreen.setDetailedUi(Hex.this);
-//                if (playScreen.selectedForce != null) {
-//                    playScreen.selectedForce.getReconArea();
-//                }
             } else if (playScreen.selectedHex != null || playScreen.selectedForce != null || playScreen.selectedPaths != null) {
                 navigate();
             }
@@ -149,12 +134,9 @@ public class Hex extends Group {
                 playScreen.selectedPaths = paths;
             }
             if (playScreen.selectedForce != null) {
-                Force.sendMoveOrder(playScreen.selectedForce, playScreen.destinations);
+//                Force.sendMoveOrder(playScreen.selectedForce, playScreen.destinations);
+                Force.sendOrder(playScreen.selectedForce, new MoveOrder(playScreen.destinations));
             }
-//            System.out.println("Full length = " + playScreen.selectedPaths.size);
-//            for (Path p : playScreen.selectedPaths) {
-//                System.out.println(p.fromHex + "   " + p.toHex);
-//            }
         }
 
     }
