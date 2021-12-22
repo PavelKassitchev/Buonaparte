@@ -15,6 +15,19 @@ public class Unit extends Force {
     public Unit() {
     }
 
+    @Override
+    public void fatigue(float f) {
+        spirit.fatigue += f;
+    }
+
+    @Override
+    public void rest(float f) {
+        spirit.fatigue -= f;
+        if (spirit.fatigue < 0) {
+            spirit.fatigue = 0;
+        }
+    }
+
 //    public Unit(TextureRegion region, Hex hex) {
 //        super(region, hex);
 //    }

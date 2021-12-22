@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 
 import by.pavka.march.PlayScreen;
 import by.pavka.march.characteristic.March;
+import by.pavka.march.characteristic.MarchConfig;
 import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
@@ -74,7 +75,8 @@ public abstract class Force extends Image {
     public ShapeRenderer shapeRenderer;
     public PlayScreen playScreen;
     public boolean showPath;
-    March march;
+    MarchConfig marchConfig;
+    public boolean hasDayToRest;
 
     TextureRegion reg = new TextureRegion(new Texture("unit/cav1.png"));
 
@@ -97,6 +99,10 @@ public abstract class Force extends Image {
 //        visualEnemies = new ObjectIntMap<>();
         visualEnemies = new ObjectMap<>();
         reconArea = new ObjectSet<>();
+
+        spirit = new Spirit(0, 1, 0);
+
+        marchConfig = new MarchConfig(March.REGULAR);
 
         addListener(new ClickListener() {
             @Override
@@ -125,7 +131,13 @@ public abstract class Force extends Image {
             @Override
             public void run() {
                 try {
+                    while (force.playScreen.timer.isChecked()) {
+                        Thread.sleep(20);
+                    }
                     Thread.sleep((long) force.findCommandDistance());
+                    while (force.playScreen.timer.isChecked()) {
+                        Thread.sleep(20);
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -374,10 +386,6 @@ public abstract class Force extends Image {
 
     }
 
-    public void receiveMoveOrder(Array<Path> paths) {
-
-    }
-
     private boolean readyToRecon(float delta) {
         report += delta;
         if (report > 1) {
@@ -390,7 +398,7 @@ public abstract class Force extends Image {
     @Override
     public void act(float delta) {
         super.act(delta);
-        if (forcePath != null && !forcePath.isEmpty()) {
+        if (forcePath != null && !forcePath.isEmpty() || !tail.isEmpty()) {
             move(delta);
         }
         if (!isEnemy() && readyToRecon(delta)) {
@@ -401,10 +409,11 @@ public abstract class Force extends Image {
     }
 
     public void camp(float delta, float duration) {
+        fatigue(delta * HOURS_IN_SECOND * marchConfig.fatigueFactor());
         if (currentSections > 1) {
             camp += delta;
             if (camp > duration / HOURS_IN_SECOND) {
-                System.out.println("Camping time - " + camp);
+                System.out.println("Camping time - " + camp + " Fatigue - " + spirit.fatigue);
                 camp = 0;
                 System.out.println("Tail section number: " + currentSections);
                 currentSections--;
@@ -414,90 +423,78 @@ public abstract class Force extends Image {
 
     }
 
-    public boolean readyToCamp() {
+    public abstract void fatigue(float f);
 
-        return false;
+    public float prepareToCamp() {
+        if (!tail.isEmpty()) {
+            Path path = tail.get(0);
+            float timeToCross = Hex.SIZE * path.getCost() / (speed * marchConfig.speedFactor());
+            if (timeToCross * (currentSections - 1) > playScreen.timeToNight()) {
+                return timeToCross;
+            }
+        }
+        return 0;
     }
 
     public void normalMarch(float delta) {
         start += delta;
-        Path path = forcePath.get(0);
-        float timeToCross = Hex.SIZE * path.getCost() / speed;
-        if (start > timeToCross / HOURS_IN_SECOND) {
-            start = 0;
-            forcePath.removeIndex(0);
-            Hex toHex = path.getToNode();
-            setRealHex(toHex);
+        if (!forcePath.isEmpty()) {
+            fatigue(delta * HOURS_IN_SECOND * marchConfig.fatigueFactor());
+            Path path = forcePath.get(0);
+            float timeToCross = Hex.SIZE * path.getCost() / (speed * marchConfig.speedFactor());
+            if (start > timeToCross / HOURS_IN_SECOND) {
+                start = 0;
+                forcePath.removeIndex(0);
+                Hex toHex = path.getToNode();
+                setRealHex(toHex);
 
-            if (playScreen.selectedForce == this && playScreen.destinations.contains(toHex, true)) {
-                playScreen.destinations.removeValue(toHex, true);
-            }
+                if (playScreen.selectedForce == this && playScreen.destinations.contains(toHex, true)) {
+                    playScreen.destinations.removeValue(toHex, true);
+                }
 
-            if (tail.contains(path.reverse(), false)) {
-                tail.pop();
-                if (currentSections > 1) {
-                    currentSections--;
+                if (tail.contains(path.reverse(), false)) {
+                    tail.pop();
+                    if (currentSections > 1) {
+                        currentSections--;
+                    }
+                } else {
+                    tail.add(path);
+                    currentSections++;
+                    if (currentSections > sections) {
+                        currentSections--;
+                        tail.removeIndex(0);
+                    }
                 }
-            } else {
-                tail.add(path);
-                currentSections++;
-                if (currentSections > sections) {
-                    currentSections--;
-                    tail.removeIndex(0);
+                if (!isEnemy()) {
+                    recon();
+                    sendReport("IN MOVEMENT");
                 }
             }
-            if (!isEnemy()) {
-                recon();
-                sendReport("IN MOVEMENT");
-            }
+        } else {
+            Path path = tail.get(0);
+            float timeToCamp = Hex.SIZE * path.getCost() / (speed * marchConfig.speedFactor()) * (currentSections - 1);
+
+            camp(delta, timeToCamp);
         }
     }
 
+    public abstract void rest(float f);
+
 
     public void move(float delta) {
-//        if (!playScreen.timer.isChecked()) {
-//            start += delta;
-//        }
-//        Path p = forcePath.get(0);
-//        float timeToCross = Hex.SIZE * p.getCost() / speed;
-//        if (start > timeToCross / HOURS_IN_SECOND) {
-//            start = 0;
-//            Path path = forcePath.removeIndex(0);
-//            Hex toHex = path.getToNode();
-//            setRealHex(toHex);
-//
-//            if (playScreen.selectedForce == this && playScreen.destinations.contains(toHex, true)) {
-//                playScreen.destinations.removeValue(toHex, true);
-//            }
-//
-//            if (tail.contains(path.reverse(), false)) {
-//                tail.pop();
-//                if (currentSections > 1) {
-//                    currentSections--;
-//                }
-//            } else {
-//                tail.add(path);
-//                currentSections++;
-//                if (currentSections > sections) {
-//                    currentSections--;
-//                    tail.removeIndex(0);
-//                }
-//            }
-//            if (!isEnemy()) {
-//                recon();
-//                sendReport("IN MOVEMENT");
-//            }
-//            if (isEnemy()) {
-//                System.out.println("Real hex: col - " + hex.col + " row - " + hex.row +
-//                        " Visual hex: col - " + visualHex.col + " row - " + visualHex.row);
-//            }
-//        }
-
         if (!playScreen.timer.isChecked()) {
-            if (playScreen.time < 14 || playScreen.time > 25) {
+            if(playScreen.isNight() && spirit.fatigue > 9.6f) {
+                hasDayToRest = true;
+            } else if (playScreen.isNight()) {
+                hasDayToRest = false;
+            }
+            if (!playScreen.isNight() && !hasDayToRest && prepareToCamp() == 0) {
                 normalMarch(delta);
+            } else if (prepareToCamp() > 0) {
+                camp(delta, prepareToCamp());
             } else {
-                camp(delta, 0.66f);
+                float f = delta * HOURS_IN_SECOND * MarchConfig.REST_FACTOR;
+                rest(f);
             }
         }
     }

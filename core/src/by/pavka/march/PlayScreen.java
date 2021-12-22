@@ -467,6 +467,26 @@ public class PlayScreen extends GestureDetector implements Screen {
         hexagonalTiledMapRenderer.dispose();
     }
 
+    public float getPlayTime() {
+        //TODO refactor
+        return (time - ((int)time / 48) * 48) / 2;
+    }
+
+    public boolean isNight() {
+        if (getPlayTime() > 22 || getPlayTime() < 6) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isMorning() {
+        return false;
+    }
+
+    public float timeToNight() {
+        return 22 - getPlayTime();
+    }
+
     public void updateEnemies(ObjectMap<Force, Hex> visualEnemies, ObjectSet<Hex> reconArea, float visualTime) {
         for (Hex h : reconArea) {
             Array<Actor> enem = h.getChildren();

@@ -10,6 +10,9 @@ public class MarchConfig {
     public static final int BIG_FORCE = 12000;
     public static final int BIGGEST_FORCE = 16000;
     public static final int HUGE_FORCE = 20000;
+
+    public static final float REST_FACTOR = 0.4f;
+
     int size;
     int phases;
     int currentPhase;
@@ -18,6 +21,10 @@ public class MarchConfig {
     Hex body;
     Hex tail;
     Direction tailDirection;
+
+    March march;
+    float hoursInMove;
+    int daysInMove;
 
 
     public void setSize(Strength strength) {
@@ -43,5 +50,17 @@ public class MarchConfig {
             return;
         }
         size = HUGE_FORCE;
+    }
+
+    public MarchConfig(March march) {
+        this.march = march;
+    }
+
+    public float fatigueFactor() {
+        return march.fatigueFactor;
+    }
+
+    public float speedFactor() {
+        return march.speedFactor;
     }
 }

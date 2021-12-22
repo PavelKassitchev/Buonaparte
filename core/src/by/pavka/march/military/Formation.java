@@ -19,6 +19,20 @@ public class Formation extends Force {
     public Formation() {
     }
 
+    @Override
+    public void fatigue(float f) {
+        for (Force force : subForces) {
+            force.fatigue(f);
+        }
+    }
+
+    @Override
+    public void rest(float f) {
+        for (Force force : subForces) {
+            force.rest(f);
+        }
+    }
+
     public Formation(TextureRegion region) {
         super(region, 20000, 2000);
         speed = 16.0f;
