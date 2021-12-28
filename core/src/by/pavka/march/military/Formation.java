@@ -17,6 +17,7 @@ public class Formation extends Force {
     FormationValidator validator;
 
     public Formation() {
+        subForces = new Array<>();
     }
 
     @Override
@@ -35,6 +36,7 @@ public class Formation extends Force {
 
     public Formation(TextureRegion region) {
         super(region, 20000, 2000);
+        subForces = new Array<>();
         speed = 16.0f;
     }
 

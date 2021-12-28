@@ -1,18 +1,11 @@
 package by.pavka.march;
 
-import static by.pavka.march.configuration.Nation.AUSTRIA;
-import static by.pavka.march.configuration.Nation.FRANCE;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -23,10 +16,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
@@ -42,12 +40,9 @@ import by.pavka.march.map.HexGraph;
 import by.pavka.march.map.Path;
 import by.pavka.march.military.Courier;
 import by.pavka.march.military.Force;
-import by.pavka.march.military.Formation;
-import by.pavka.march.military.Unit;
 
 public class PlayScreen extends GestureDetector implements Screen {
     public static final String MAP = "map/small.tmx";
-//    public static final Nation nation = FRANCE;
     public static final float HOURS_IN_SECOND = 0.5f;
 
     public BuonaparteGame game;
@@ -64,17 +59,17 @@ public class PlayScreen extends GestureDetector implements Screen {
     public Array<Path> selectedPaths;
     public boolean detailedUi;
     public boolean longPressed;
-    public Force selectedForce;
-//    public ObjectIntMap<Force> enemies;
+    public Array<Force> selectedForces;
     public ObjectMap<Force, Hex> enemies;
 
     public Array<Hex> destinations;
 
-    private TextureAtlas atlas;
     private TiledMap map;
     private TiledMapTileLayer tileLayer;
     private OrthographicCamera uiCamera;
     private InputMultiplexer inputMultiplexer;
+
+    public Window forceWindow;
 
     private Table group;
     public ImageTextButton timer;
@@ -82,22 +77,10 @@ public class PlayScreen extends GestureDetector implements Screen {
     public ImageTextButton forceButton;
     public boolean dragged;
 
-    //    private Texture texture = new Texture("unit/friend.png");
-    private Sprite sprite;
-    private TextureRegion tRegion;
-    Batch batch;
-    public Force testForce;
-    public Force anotherTestForce;
-    public Formation headForce;
-    public Force enemy;
-
     private HexGraph hexGraph;
 
     public PlayScreen(BuonaparteGame game, GestureListener listener, Configurator configurator) {
         super(listener);
-//
-//        atlas = new TextureAtlas("skin/clean-crispy/clean-crispy-ui.atlas");
-//        skin = new Skin(Gdx.files.internal("skin/clean-crispy/clean-crispy-ui.json"), atlas);
         skin = game.getSkin();
 
         hexListener = (HexGestureListener) listener;
@@ -105,42 +88,21 @@ public class PlayScreen extends GestureDetector implements Screen {
         this.game = configurator.game;
         shapeRenderer = new ShapeRenderer();
         map = new TmxMapLoader().load(configurator.getMapName());
-//        map = configurator.getMap();
-//        hexagonalTiledMapRenderer = configurator.getHexagonalRenderer();
+
         hexagonalTiledMapRenderer = new HexagonalTiledMapRenderer(map);
         tileLayer = (TiledMapTileLayer) map.getLayers().get(configurator.getLayerName());
-//        tileLayer = configurator.getTileLayer();
+
         int w = tileLayer.getTileWidth() * 10;
         int h = w * Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
         playStage = new PlayStage(new ExtendViewport(w, h));
-//        hexGraph = configurator.getHexGraph(this);
 
         hexGraph = new HexGraph(map, this);
         Courier.hexGraph = hexGraph;
-
-//        testForce = new Unit(game.getTextureRegion("fr_cav"));
-//        anotherTestForce = new Unit(game.getTextureRegion("fr_art"));
-//        headForce = new Formation(game.getTextureRegion("fr_inf"));
-//        testForce.remoteHeadForce = headForce;
-//        anotherTestForce.remoteHeadForce = headForce;
-//        testForce.nation = FRANCE;
-//        anotherTestForce.nation = FRANCE;
-//        headForce.nation = FRANCE;
-//
-//        enemy = new Unit(game.getTextureRegion("hostile"));
-//        enemy.nation = AUSTRIA;
-//
-//
-//        playStage.addForce(testForce, 2, 1);
-//        playStage.addForce(anotherTestForce, 2, 2);
-//        playStage.addForce(headForce, 4, 4);
-//        playStage.addForce(enemy, 8, 8);
-
-
 
         configurator.addForces(this);
-//        enemies = new ObjectIntMap<Force>();
+
         enemies = new ObjectMap<>();
+        selectedForces = new Array<>();
 
         uiStage = new Stage(new ExtendViewport(w, h)) {
             @Override
@@ -174,86 +136,17 @@ public class PlayScreen extends GestureDetector implements Screen {
         inputMultiplexer = new InputMultiplexer(uiStage, this, playStage);
     }
 
-    public PlayScreen(BuonaparteGame game, GestureListener listener) {
-        super(listener);
-        hexListener = (HexGestureListener) listener;
-        hexListener.setGestureDetector(this);
-        this.game = game;
-        map = new TmxMapLoader().load(MAP);
-
-        atlas = new TextureAtlas("skin/clean-crispy/clean-crispy-ui.atlas");
-        skin = new Skin(Gdx.files.internal("skin/clean-crispy/clean-crispy-ui.json"), atlas);
-        hexagonalTiledMapRenderer = new BattlefieldRenderer(map, 1);
-        shapeRenderer = new ShapeRenderer();
-
-        tileLayer = (TiledMapTileLayer) map.getLayers().get("TileLayer1");
-        int w = tileLayer.getTileWidth() * 10;
-        int h = w * Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
-        playStage = new PlayStage(new ExtendViewport(w, h));
-
-        hexGraph = new HexGraph(map, this);
-        Courier.hexGraph = hexGraph;
-//        Courier.playScreen = this;
-        //setGraphToPlayStage();
-
-        //TODO reformat!
-
-        testForce = new Unit(game.getTextureRegion("fr_cav"));
-        anotherTestForce = new Unit(game.getTextureRegion("fr_art"));
-        headForce = new Formation(game.getTextureRegion("fr_inf"));
-        testForce.remoteHeadForce = headForce;
-        anotherTestForce.remoteHeadForce = headForce;
-        testForce.nation = FRANCE;
-        anotherTestForce.nation = FRANCE;
-        headForce.nation = FRANCE;
-
-        enemy = new Unit(game.getTextureRegion("hostile"));
-        enemy.nation = AUSTRIA;
-
-
-        playStage.addForce(testForce, 2, 1);
-        playStage.addForce(anotherTestForce, 2, 2);
-        playStage.addForce(headForce, 4, 4);
-        playStage.addForce(enemy, 8, 8);
-
-//        enemies = new ObjectIntMap<Force>();
-        enemies = new ObjectMap<>();
-//        enemies.put(enemy, 0);
-
-
-//
-
-        uiStage = new Stage(new ExtendViewport(w, h)) {
-            @Override
-            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                longPressed = false;
-                float stageX = screenToStageCoordinates(new Vector2(screenX, screenY)).x;
-                float stageY = screenToStageCoordinates(new Vector2(screenX, screenY)).y;
-                if (hit(stageX, stageY, true) != null) {
-                    return super.touchDown(screenX, screenY, pointer, button);
-                }
-                return !super.touchDown(screenX, screenY, pointer, button);
-            }
-
-            @Override
-            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                super.touchUp(screenX, screenY, pointer, button);
-                if (dragged) {
-                    dragged = false;
-                    return true;
-                }
-                return false;
-            }
-        };
-
-        camera = (OrthographicCamera) playStage.getCamera();
-        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(tileLayer.getTileWidth() * tileLayer.getWidth() * 0.1f,
-                tileLayer.getTileHeight() * tileLayer.getHeight() * 0.1f, 0);
-        uiStage.addListener(new PlayDragListener());
-        uiCamera = (OrthographicCamera) uiStage.getCamera();
-        inputMultiplexer = new InputMultiplexer(uiStage, this, playStage);
+    public void destroyForceWindow() {
+        if (forceWindow != null) {
+            forceWindow.remove();
+            forceWindow = null;
+        }
     }
+
+    private void createForceWindow() {
+
+    }
+
 
     public void setDetailedUi(Hex hex) {
         if (!detailedUi) {
@@ -264,8 +157,9 @@ public class PlayScreen extends GestureDetector implements Screen {
                     detailedUi = false;
                     group.remove();
                     uncheckHex();
-                    uncheckForce();
+                    uncheckForces();
                     selectedPaths = null;
+                    destroyForceWindow();
                     show();
                 }
             });
@@ -275,31 +169,78 @@ public class PlayScreen extends GestureDetector implements Screen {
             hexButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    if (hexButton.isChecked() && !hexButton.isDisabled()) {
-                        forceButton.setChecked(false);
-                        checkHex(selectedForce.visualHex);
-                        uncheckForce();
-                        setHexInfo(selectedHex);
-                        destinations = new Array<>();
-                        selectedPaths = null;
+
+                    forceButton.setChecked(false);
+                    if (!selectedForces.isEmpty()) {
+                        checkHex(selectedForces.get(0).visualHex);
+                        uncheckForces();
                     }
+
+                    setHexInfo(selectedHex);
+                    destinations = new Array<>();
+                    selectedPaths = null;
+                    destroyForceWindow();
                 }
             });
             group.add(hexButton);
 
             forceButton = new ImageTextButton("Forces: none", skin, "toggle");
+            forceButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (!hexButton.isChecked()) {
+                        System.out.println(("Force Button is checked"));
+                        forceWindow = new Window("Forces", skin);
+                        uiStage.addActor(forceWindow);
+
+                        HorizontalGroup hGroup = new HorizontalGroup();
+                        ButtonGroup buttonGroup = new ButtonGroup();
+                        buttonGroup.setMinCheckCount(1);
+                        buttonGroup.setMaxCheckCount(1);
+
+                        for (Force f : selectedForces) {
+                            final Button button = new TextButton("Tab " + f.getName(), skin, "toggle");
+                            hGroup.addActor(button);
+                            buttonGroup.add(button);
+                        }
+                        forceWindow.add(hGroup).top();
+                        forceWindow.row();
+                        Label label = new Label("This is an extremely strong force of unknown power. It is just a sample label", skin);
+                        label.setWrap(true);
+                        forceWindow.add(label).fill();
+//                        forceWindow.debugAll();
+                        forceWindow.pack();
+
+                    } else if (selectedHex.hasChildren()) {
+                        selectedPaths = null;
+                        destinations = new Array<>();
+
+                        Array<Force> checked = new Array<>();
+                        for (Actor f : selectedHex.getChildren()) {
+                            checked.add((Force) f);
+                        }
+                        checkForces(checked);
+                        uncheckHex();
+                        hexButton.setChecked(false);
+                        forceButton.setChecked(true);
+                    }
+                }
+            });
             group.add(forceButton);
             detailedUi = true;
         }
         destinations = new Array<>();
         selectedPaths = null;
         uncheckHex();
-        uncheckForce();
+        uncheckForces();
         setHexInfo(hex);
         setForceInfo(hex);
-        if (hex.getChildren().size == 1) {
-            Force f = (Force) hex.getChild(0);
-            checkForce(f);
+        if (!hex.getChildren().isEmpty()) {
+            Array<Force> checked = new Array<>();
+            for (Actor f : hex.getChildren()) {
+                checked.add((Force) f);
+            }
+            checkForces(checked);
         } else {
             checkHex(hex);
         }
@@ -310,15 +251,20 @@ public class PlayScreen extends GestureDetector implements Screen {
         hex.mark();
         hexButton.setChecked(true);
         hexButton.setDisabled(true);
+        forceButton.setChecked(false);
+        forceButton.setDisabled(true);
     }
 
     public void setHexInfo(Hex hex) {
         hexButton.setText("Mov.cost = " + hex.cell.getTile().getProperties().get("cost").toString());
     }
 
-    public void checkForce(Force force) {
-        selectedForce = force;
-        force.mark();
+    public void checkForces(Array<Force> forces) {
+        selectedForces = new Array<>();
+        for (Force f : forces) {
+            selectedForces.add(f);
+            f.mark();
+        }
         forceButton.setChecked(true);
         hexButton.setChecked(false);
     }
@@ -368,13 +314,13 @@ public class PlayScreen extends GestureDetector implements Screen {
             }
         });
         group.add(zoom);
-        timer = new ImageTextButton("Time: " + (int)time, skin, "toggle") {
+        timer = new ImageTextButton("Time: " + (int) time, skin, "toggle") {
             @Override
             public void act(float delta) {
                 super.act(delta);
                 if (!isChecked()) {
                     time += delta;
-                    setText("Time: " + (int)time);
+                    setText("Time: " + (int) time);
                 }
             }
         };
@@ -394,14 +340,15 @@ public class PlayScreen extends GestureDetector implements Screen {
         hexButton.setChecked(false);
     }
 
-    public void uncheckForce() {
-        if (selectedForce != null) {
-            selectedForce.unmark();
+    public void uncheckForces() {
+        if (selectedForces != null && !selectedForces.isEmpty()) {
+            for (Force f : selectedForces) {
+                f.unmark();
+            }
+            selectedForces = new Array<>();
+            forceButton.setDisabled(true);
+            forceButton.setChecked(false);
         }
-        selectedForce = null;
-        forceButton.setDisabled(true);
-        forceButton.setChecked(false);
-//        forceButton.setText("Forces: none");
     }
 
     @Override
@@ -421,7 +368,6 @@ public class PlayScreen extends GestureDetector implements Screen {
         uiStage.getViewport().update(width, height, true);
         group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
         group.left();
-
     }
 
     @Override
@@ -462,24 +408,19 @@ public class PlayScreen extends GestureDetector implements Screen {
         uiStage.dispose();
         playStage.dispose();
         skin.dispose();
-        atlas.dispose();
         map.dispose();
         hexagonalTiledMapRenderer.dispose();
     }
 
     public float getPlayTime() {
         //TODO refactor
-        return (time - ((int)time / 48) * 48) / 2;
+        return (time - ((int) time / 48) * 48) / 2;
     }
 
     public boolean isNight() {
         if (getPlayTime() > 22 || getPlayTime() < 6) {
             return true;
         }
-        return false;
-    }
-
-    public boolean isMorning() {
         return false;
     }
 
@@ -491,7 +432,7 @@ public class PlayScreen extends GestureDetector implements Screen {
         for (Hex h : reconArea) {
             Array<Actor> enem = h.getChildren();
             for (Actor ac : enem) {
-                Force f = (Force)ac;
+                Force f = (Force) ac;
                 if (f.isEnemy() && f.visualTime <= visualTime && !visualEnemies.containsKey(f)) {
                     enemies.remove(f);
 //                    f.unvisualize();
@@ -518,24 +459,9 @@ public class PlayScreen extends GestureDetector implements Screen {
     }
 
     public class PlayStage extends Stage {
-//        private TiledMap map;
-        //private HexGraph hexGraph;
 
         public PlayStage(Viewport viewport) {
             super(viewport);
-//            this.map = map;
-        }
-
-//        private void setGraph() {
-//            hexGraph = new HexGraph(map, PlayScreen.this);
-//        }
-
-        private void addForce(Force force, int col, int row) {
-            Hex hex = PlayScreen.this.hexGraph.getHex(col, row);
-            force.setVisualHex(hex);
-            force.setRealHex(hex);
-            force.shapeRenderer = shapeRenderer;
-            force.playScreen = PlayScreen.this;
         }
 
         @Override
@@ -553,18 +479,6 @@ public class PlayScreen extends GestureDetector implements Screen {
             }
             if (keycode == Input.Keys.DOWN && camera.position.y > 0) {
                 camera.translate(0, -32 * camera.zoom, 0);
-            }
-
-            if (keycode == Input.Keys.C) {
-                System.out.println("Tail! " + selectedForce.tail.peek().getFromNode().col + " " +
-                        selectedForce.tail.peek().getFromNode().row);
-                if (selectedForce.forcePath != null && !selectedForce.forcePath.isEmpty()) {
-                    System.out.println("Path! " + selectedForce.forcePath.get(0).getToNode().col + " " +
-                            selectedForce.forcePath.get(0).getToNode().row);
-                    System.out.println(selectedForce.tail.contains(selectedForce.forcePath.get(0), false));
-                    System.out.println(selectedForce.forcePath.contains(selectedForce.tail.peek(), false));
-                    System.out.println(selectedForce.forcePath.get(0).getToNode().equals(selectedForce.tail.peek().getFromNode()));
-                }
             }
 
             camera.update();

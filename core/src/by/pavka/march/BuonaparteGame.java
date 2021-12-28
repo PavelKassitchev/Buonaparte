@@ -32,4 +32,11 @@ public class BuonaparteGame extends Game {
 	public Skin getSkin() {
 		return skin;
 	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+		skin.dispose();
+		textureAtlas.dispose();
+	}
 }

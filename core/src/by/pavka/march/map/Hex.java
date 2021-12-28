@@ -95,16 +95,19 @@ public class Hex extends Group {
         @Override
         public void clicked(InputEvent event, float x, float y) {
             if (!playScreen.longPressed) {
+                playScreen.destroyForceWindow();
                 playScreen.setDetailedUi(Hex.this);
-            } else if (playScreen.selectedHex != null || playScreen.selectedForce != null || playScreen.selectedPaths != null) {
+//                playScreen.forceWindow.remove();
+            } else if (playScreen.selectedHex != null || !playScreen.selectedForces.isEmpty() ||
+                    playScreen.selectedPaths != null) {
                 navigate();
             }
         }
 
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-            if (button == Input.Buttons.RIGHT && (playScreen.selectedHex != null || playScreen.selectedForce != null
-            || playScreen.selectedPaths != null)) {
+            if (button == Input.Buttons.RIGHT && (playScreen.selectedHex != null
+            || playScreen.selectedPaths != null || !playScreen.selectedForces.isEmpty())) {
                 navigate();
             }
             return super.touchDown(event, x, y, pointer, button);
@@ -116,8 +119,9 @@ public class Hex extends Group {
             Array<Path> paths = new Array<>();
             if (playScreen.selectedPaths == null && playScreen.selectedHex != null) {
                 hexPath = playScreen.getHexGraph().findPath(playScreen.selectedHex, Hex.this);
-            } else if (playScreen.selectedPaths == null && playScreen.selectedForce != null) {
-                hexPath = playScreen.getHexGraph().findPath(playScreen.selectedForce.visualHex, Hex.this);
+            } else if (playScreen.selectedPaths == null && !playScreen.selectedForces.isEmpty()) {
+//                hexPath = playScreen.getHexGraph().findPath(playScreen.selectedForce.visualHex, Hex.this);
+                hexPath = playScreen.getHexGraph().findPath(playScreen.selectedForces.get(0).visualHex, Hex.this);
             } else {
                 Hex begin = playScreen.selectedPaths.peek().toHex;
                 hexPath = playScreen.getHexGraph().findPath(begin, Hex.this);
@@ -133,9 +137,18 @@ public class Hex extends Group {
                 start = h;
                 playScreen.selectedPaths = paths;
             }
-            if (playScreen.selectedForce != null) {
-//                Force.sendMoveOrder(playScreen.selectedForce, playScreen.destinations);
-                Force.sendOrder(playScreen.selectedForce, new MoveOrder(playScreen.destinations));
+//            if (playScreen.selectedForce != null) {
+////                Force.sendMoveOrder(playScreen.selectedForce, playScreen.destinations);
+//                Force.sendOrder(playScreen.selectedForce, new MoveOrder(playScreen.destinations));
+//            }
+
+
+            Array<Force> forces = playScreen.selectedForces;
+            if(!forces.isEmpty()) {
+                System.out.println("CHECKED NOT EMPTY");
+                for (Force f : forces) {
+                    Force.sendOrder(f, new MoveOrder(playScreen.destinations));
+                }
             }
         }
 

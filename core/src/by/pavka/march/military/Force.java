@@ -398,6 +398,8 @@ public abstract class Force extends Image {
     @Override
     public void act(float delta) {
         super.act(delta);
+        float f = delta * HOURS_IN_SECOND * MarchConfig.REST_FACTOR;
+        rest(f);
         if (forcePath != null && !forcePath.isEmpty() || !tail.isEmpty()) {
             move(delta);
         }
@@ -448,7 +450,8 @@ public abstract class Force extends Image {
                 Hex toHex = path.getToNode();
                 setRealHex(toHex);
 
-                if (playScreen.selectedForce == this && playScreen.destinations.contains(toHex, true)) {
+                if (playScreen.selectedForces.contains(this, true)
+                        && playScreen.destinations.contains(toHex, true)) {
                     playScreen.destinations.removeValue(toHex, true);
                 }
 
@@ -492,10 +495,11 @@ public abstract class Force extends Image {
                 normalMarch(delta);
             } else if (prepareToCamp() > 0) {
                 camp(delta, prepareToCamp());
-            } else {
-                float f = delta * HOURS_IN_SECOND * MarchConfig.REST_FACTOR;
-                rest(f);
             }
+//            else {
+//                float f = delta * HOURS_IN_SECOND * MarchConfig.REST_FACTOR;
+//                rest(f);
+//            }
         }
     }
 
