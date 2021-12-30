@@ -7,7 +7,6 @@ import static by.pavka.march.characteristic.Stock.NORMAL_FOOD_STOCK_DAYS;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.GraphPath;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -46,7 +45,7 @@ public abstract class Force extends Image {
     String name;
 
     public Strength strength;
-    Spirit spirit;
+    public Spirit spirit;
 
     float speed;
 
@@ -77,8 +76,6 @@ public abstract class Force extends Image {
     public boolean showPath;
     MarchConfig marchConfig;
     public boolean hasDayToRest;
-
-    TextureRegion reg = new TextureRegion(new Texture("unit/cav1.png"));
 
     public Force() {
     }
@@ -397,17 +394,18 @@ public abstract class Force extends Image {
 
     @Override
     public void act(float delta) {
-        super.act(delta);
-        float f = delta * HOURS_IN_SECOND * MarchConfig.REST_FACTOR;
-        rest(f);
-        if (forcePath != null && !forcePath.isEmpty() || !tail.isEmpty()) {
-            move(delta);
+        if (!playScreen.timer.isChecked()) {
+            super.act(delta);
+            float f = delta * HOURS_IN_SECOND * MarchConfig.REST_FACTOR;
+            rest(f);
+            if (forcePath != null && !forcePath.isEmpty() || !tail.isEmpty()) {
+                move(delta);
+            }
+            if (!isEnemy() && readyToRecon(delta)) {
+                recon();
+                sendReport("JUST RECON");
+            }
         }
-        if (!isEnemy() && readyToRecon(delta)) {
-            recon();
-            sendReport("JUST RECON");
-        }
-        //sendReport(delta);
     }
 
     public void camp(float delta, float duration) {

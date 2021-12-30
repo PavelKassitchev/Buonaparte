@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Tree;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
@@ -40,6 +41,7 @@ import by.pavka.march.map.HexGraph;
 import by.pavka.march.map.Path;
 import by.pavka.march.military.Courier;
 import by.pavka.march.military.Force;
+import by.pavka.march.military.Formation;
 
 public class PlayScreen extends GestureDetector implements Screen {
     public static final String MAP = "map/small.tmx";
@@ -143,145 +145,85 @@ public class PlayScreen extends GestureDetector implements Screen {
         }
     }
 
+    class SelectForceButton extends TextButton {
+        private Force force;
+
+        public SelectForceButton(Force force) {
+            super("Select", skin);
+            this.force = force;
+        }
+
+        public void setForce(Force f) {
+            force = f;
+        }
+    }
+
     private void createForceWindow() {
+        forceWindow = new Window("Forces", skin);
+        uiStage.addActor(forceWindow);
 
-    }
-
-
-    public void setDetailedUi(Hex hex) {
-        if (!detailedUi) {
-            TextButton cancel = new TextButton("Cancel", skin);
-            cancel.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    detailedUi = false;
-                    group.remove();
-                    uncheckHex();
-                    uncheckForces();
-                    selectedPaths = null;
-                    destroyForceWindow();
-                    show();
-                }
-            });
-            group.add(cancel);
-
-            hexButton = new ImageTextButton("", skin, "toggle");
-            hexButton.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-
-                    forceButton.setChecked(false);
-                    if (!selectedForces.isEmpty()) {
-                        checkHex(selectedForces.get(0).visualHex);
-                        uncheckForces();
-                    }
-
-                    setHexInfo(selectedHex);
-                    destinations = new Array<>();
-                    selectedPaths = null;
-                    destroyForceWindow();
-                }
-            });
-            group.add(hexButton);
-
-            forceButton = new ImageTextButton("Forces: none", skin, "toggle");
-            forceButton.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    if (!hexButton.isChecked()) {
-                        System.out.println(("Force Button is checked"));
-                        forceWindow = new Window("Forces", skin);
-                        uiStage.addActor(forceWindow);
-
-                        HorizontalGroup hGroup = new HorizontalGroup();
-                        ButtonGroup buttonGroup = new ButtonGroup();
-                        buttonGroup.setMinCheckCount(1);
-                        buttonGroup.setMaxCheckCount(1);
-
-                        for (Force f : selectedForces) {
-                            final Button button = new TextButton("Tab " + f.getName(), skin, "toggle");
-                            hGroup.addActor(button);
-                            buttonGroup.add(button);
-                        }
-                        forceWindow.add(hGroup).top();
-                        forceWindow.row();
-                        Label label = new Label("This is an extremely strong force of unknown power. It is just a sample label", skin);
-                        label.setWrap(true);
-                        forceWindow.add(label).fill();
-//                        forceWindow.debugAll();
-                        forceWindow.pack();
-
-                    } else if (selectedHex.hasChildren()) {
-                        selectedPaths = null;
-                        destinations = new Array<>();
-
-                        Array<Force> checked = new Array<>();
-                        for (Actor f : selectedHex.getChildren()) {
-                            checked.add((Force) f);
-                        }
-                        checkForces(checked);
-                        uncheckHex();
-                        hexButton.setChecked(false);
-                        forceButton.setChecked(true);
-                    }
-                }
-            });
-            group.add(forceButton);
-            detailedUi = true;
-        }
-        destinations = new Array<>();
-        selectedPaths = null;
-        uncheckHex();
-        uncheckForces();
-        setHexInfo(hex);
-        setForceInfo(hex);
-        if (!hex.getChildren().isEmpty()) {
-            Array<Force> checked = new Array<>();
-            for (Actor f : hex.getChildren()) {
-                checked.add((Force) f);
+        HorizontalGroup hGroup = new HorizontalGroup();
+        ButtonGroup buttonGroup = new ButtonGroup();
+        buttonGroup.setMinCheckCount(1);
+        buttonGroup.setMaxCheckCount(1);
+        final Label label = new Label("", skin);
+        final Force initForce = selectedForces.get(0);
+        String text = String.format("%d soldiers \nfatigue: %.1f", initForce.strength.soldiers(), initForce.spirit.fatigue);
+        label.setText(text);
+        final SelectForceButton select = new SelectForceButton(initForce);
+        select.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectedForces.clear();
+                selectedForces.add(select.force);
+                destroyForceWindow();
             }
-            checkForces(checked);
-        } else {
-            checkHex(hex);
+        });
+//        selectedForces = new Array<>();
+//        selectedForces.add(initForce);
+
+//        Tree<ForceNode, Force> tree = null;
+
+        for (final Force f : selectedForces) {
+
+//            tree = new Tree<ForceNode, Force>(skin);
+//            tree.add(new ForceNode(f));
+            final Button button = new TextButton(f.getName(), skin, "toggle");
+            hGroup.addActor(button);
+            buttonGroup.add(button);
+            button.addListener(new ClickListener(){
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    final String txt = String.format("%d soldiers \nfatigue: %.1f", f.strength.soldiers(), f.spirit.fatigue);
+                    label.setText(txt);
+                    select.setForce(f);
+//                    selectedForces = new Array<>();
+//                    selectedForces.add(f);
+                }
+            });
         }
+        forceWindow.add(hGroup).top();
+        forceWindow.row();
+//        forceWindow.add(tree).fill();
+//        forceWindow.row();
+        forceWindow.add(label).fill();
+        forceWindow.row();
+        forceWindow.add(select);
+        forceWindow.row();
+        forceWindow.pack();
     }
 
-    public void checkHex(Hex hex) {
-        selectedHex = hex;
-        hex.mark();
-        hexButton.setChecked(true);
-        hexButton.setDisabled(true);
-        forceButton.setChecked(false);
-        forceButton.setDisabled(true);
-    }
-
-    public void setHexInfo(Hex hex) {
-        hexButton.setText("Mov.cost = " + hex.cell.getTile().getProperties().get("cost").toString());
-    }
-
-    public void checkForces(Array<Force> forces) {
-        selectedForces = new Array<>();
-        for (Force f : forces) {
-            selectedForces.add(f);
-            f.mark();
-        }
-        forceButton.setChecked(true);
-        hexButton.setChecked(false);
-    }
-
-    public void setForceInfo(Hex hex) {
-        if (hex.hasChildren()) {
-            SnapshotArray<Actor> forces = hex.getChildren();
-            int forceNumber = 0;
-            int soldierNumber = 0;
-            for (Actor a : forces) {
-                forceNumber++;
-                soldierNumber += ((Force) a).strength.soldiers();
+    class ForceNode extends Tree.Node<ForceNode, Force, Label> {
+        public ForceNode(Force f) {
+            super(new Label(f.getName(), skin));
+            setValue(f);
+            if (f instanceof Formation) {
+                Formation formation = (Formation) f;
+                for (Force force : formation.subForces) {
+                    ForceNode fd = new ForceNode(force);
+                    add(fd);
+                }
             }
-            String info = String.format("%d Forces\n%d Soldiers", forceNumber, soldierNumber);
-            forceButton.setText(info);
-        } else {
-            forceButton.setText("Forces: none");
         }
     }
 
@@ -329,6 +271,124 @@ public class PlayScreen extends GestureDetector implements Screen {
         group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
         group.left();
         detailedUi = false;
+    }
+
+
+    public void setDetailedUi(Hex hex) {
+        if (!detailedUi) {
+            TextButton cancel = new TextButton("Cancel", skin);
+            cancel.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    detailedUi = false;
+                    group.remove();
+                    uncheckHex();
+                    uncheckForces();
+                    selectedPaths = null;
+                    destroyForceWindow();
+                    show();
+                }
+            });
+            group.add(cancel);
+
+            hexButton = new ImageTextButton("", skin, "toggle");
+            hexButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+
+                    forceButton.setChecked(false);
+                    if (!selectedForces.isEmpty()) {
+                        checkHex(selectedForces.get(0).visualHex);
+                        uncheckForces();
+                    }
+
+                    setHexInfo(selectedHex);
+                    destinations = new Array<>();
+                    selectedPaths = null;
+                    destroyForceWindow();
+                }
+            });
+            group.add(hexButton);
+
+            forceButton = new ImageTextButton("Forces: none", skin, "toggle");
+            forceButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (!hexButton.isChecked()) {
+                        forceButton.setChecked(true);
+                        destroyForceWindow();
+                        createForceWindow();
+                    } else if (selectedHex.hasChildren()) {
+                        selectedPaths = null;
+                        destinations = new Array<>();
+                        checkForces(selectedHex);
+                        uncheckHex();
+                        hexButton.setChecked(false);
+                        forceButton.setChecked(true);
+                    }
+                }
+            });
+            group.add(forceButton);
+            detailedUi = true;
+        }
+        destinations = new Array<>();
+        selectedPaths = null;
+        uncheckHex();
+        uncheckForces();
+        setHexInfo(hex);
+        setForceInfo(hex);
+        if (hex.hasChildren()) {
+            checkForces(hex);
+        } else {
+            checkHex(hex);
+        }
+    }
+
+    public void checkForces(Array<Force> forces) {
+        selectedForces = new Array<>();
+        for (Force f : forces) {
+            selectedForces.add(f);
+            f.mark();
+        }
+        forceButton.setChecked(true);
+        hexButton.setChecked(false);
+    }
+
+    private void checkForces(Hex hex) {
+        Array<Force> checked = new Array<>();
+        for (Actor f : hex.getChildren()) {
+            checked.add((Force) f);
+        }
+        checkForces(checked);
+    }
+
+    public void checkHex(Hex hex) {
+        selectedHex = hex;
+        hex.mark();
+        hexButton.setChecked(true);
+        hexButton.setDisabled(true);
+        forceButton.setChecked(false);
+        forceButton.setDisabled(true);
+    }
+
+    public void setHexInfo(Hex hex) {
+        hexButton.setText("Mov.cost = " + hex.cell.getTile().getProperties().get("cost").toString());
+    }
+
+    public void setForceInfo(Hex hex) {
+        if (hex.hasChildren()) {
+            SnapshotArray<Actor> forces = hex.getChildren();
+            int forceNumber = 0;
+            int soldierNumber = 0;
+            for (Actor a : forces) {
+                forceNumber++;
+                soldierNumber += ((Force) a).strength.soldiers();
+            }
+            String info = String.format("%d Forces\n%d Soldiers", forceNumber, soldierNumber);
+            forceButton.setText(info);
+        } else {
+            forceButton.setText("Forces: none");
+        }
     }
 
     public void uncheckHex() {

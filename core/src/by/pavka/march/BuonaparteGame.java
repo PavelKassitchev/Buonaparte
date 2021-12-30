@@ -22,6 +22,8 @@ public class BuonaparteGame extends Game {
 		textureAtlas = new TextureAtlas("unit/friend.txt");
 		TextureAtlas atlas = new TextureAtlas("skin/clean-crispy/clean-crispy-ui.atlas");
 		skin = new Skin(Gdx.files.internal("skin/clean-crispy/clean-crispy-ui.json"), atlas);
+//		TextureAtlas atlas = new TextureAtlas("skin/golden-ui-skin.atlas");
+//		skin = new Skin(Gdx.files.internal("skin/golden-ui-skin.json"), atlas);
 		setScreen(new MenuScreen(this));
 	}
 

@@ -40,8 +40,14 @@ public class Configurator {
 
     public void addForces(PlayScreen playScreen) {
         Force testForce = new Unit(game.getTextureRegion("fr_cav"));
+        testForce.setName("X.Cav.Sq.");
         Force anotherTestForce = new Unit(game.getTextureRegion("fr_art"));
-        Formation headForce = new Formation(game.getTextureRegion("fr_inf"));
+        anotherTestForce.setName("II.Art.Bttr.");
+        Formation headForce = new Formation(game.getTextureRegion("fr_mil"));
+        headForce.setName("IV.Inf.Regmnt.");
+        Force unit = new Unit(game.getTextureRegion("fr_inf"));
+        unit.setName("I.Inf.Bat.");
+        headForce.attach(unit);
         testForce.remoteHeadForce = headForce;
         anotherTestForce.remoteHeadForce = headForce;
         testForce.nation = FRANCE;
