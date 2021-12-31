@@ -72,6 +72,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     private InputMultiplexer inputMultiplexer;
 
     public Window forceWindow;
+    public Window treeWindow;
 
     private Table group;
     public ImageTextButton timer;
@@ -143,19 +144,35 @@ public class PlayScreen extends GestureDetector implements Screen {
             forceWindow.remove();
             forceWindow = null;
         }
+        destroyTreeWindow();
     }
 
-    class SelectForceButton extends TextButton {
+    private void destroyTreeWindow() {
+        if (treeWindow != null) {
+            treeWindow.remove();
+            treeWindow = null;
+        }
+    }
+
+    class ForceButton extends TextButton {
         private Force force;
 
-        public SelectForceButton(Force force) {
-            super("Select", skin);
+        public ForceButton(String name, Force force) {
+            super(name, skin);
             this.force = force;
         }
 
         public void setForce(Force f) {
             force = f;
         }
+    }
+
+    private void setLabelInfo(Label label, Force force) {
+        String text = String.format("%d soldiers \n  infantry: %d\n  cavalry: %d\n  guns: %d\n  wagons: %d" +
+                "\nmorale-%.1f\nfatigue-%.1f\nxp-%.1f", force.strength.soldiers(), force.strength.infantry,
+                 force.strength.cavalry, force.strength.artillery, force.strength.supply, force.spirit.morale,
+                 force.spirit.fatigue, force.spirit.xp);
+        label.setText(text);
     }
 
     private void createForceWindow() {
@@ -168,15 +185,34 @@ public class PlayScreen extends GestureDetector implements Screen {
         buttonGroup.setMaxCheckCount(1);
         final Label label = new Label("", skin);
         final Force initForce = selectedForces.get(0);
-        String text = String.format("%d soldiers \nfatigue: %.1f", initForce.strength.soldiers(), initForce.spirit.fatigue);
-        label.setText(text);
-        final SelectForceButton select = new SelectForceButton(initForce);
+        setLabelInfo(label, initForce);
+//        String text = String.format("%d soldiers \nfatigue: %.1f", initForce.strength.soldiers(), initForce.spirit.fatigue);
+//        label.setText(text);
+        final ForceButton select = new ForceButton("Select", initForce);
         select.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 selectedForces.clear();
                 selectedForces.add(select.force);
                 destroyForceWindow();
+                setForceInfo(select.force);
+            }
+        });
+        final ForceButton order = new ForceButton("Order", initForce);
+        order.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectedForces.clear();
+                selectedForces.add(order.force);
+                destroyForceWindow();
+                setForceInfo(order.force);
+                treeWindow = new Window(order.force.getName(), skin);
+                uiStage.addActor(treeWindow);
+                treeWindow.setBounds(uiStage.getWidth() * 0.1f, uiStage.getHeight() * 0.1f,
+                        uiStage.getWidth() * 0.8f, uiStage.getHeight() * 0.8f);
+                Tree<ForceNode, Force> tree = new Tree<ForceNode, Force>(skin);
+                tree.add(new ForceNode(order.force));
+                treeWindow.add(tree).fill();
             }
         });
 //        selectedForces = new Array<>();
@@ -194,9 +230,11 @@ public class PlayScreen extends GestureDetector implements Screen {
             button.addListener(new ClickListener(){
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    final String txt = String.format("%d soldiers \nfatigue: %.1f", f.strength.soldiers(), f.spirit.fatigue);
-                    label.setText(txt);
+//                    final String txt = String.format("%d soldiers \nfatigue: %.1f", f.strength.soldiers(), f.spirit.fatigue);
+//                    label.setText(txt);
+                    setLabelInfo(label, f);
                     select.setForce(f);
+                    order.setForce(f);
 //                    selectedForces = new Array<>();
 //                    selectedForces.add(f);
                 }
@@ -210,6 +248,7 @@ public class PlayScreen extends GestureDetector implements Screen {
         forceWindow.row();
         forceWindow.add(select);
         forceWindow.row();
+        forceWindow.add(order);
         forceWindow.pack();
     }
 
@@ -373,6 +412,11 @@ public class PlayScreen extends GestureDetector implements Screen {
 
     public void setHexInfo(Hex hex) {
         hexButton.setText("Mov.cost = " + hex.cell.getTile().getProperties().get("cost").toString());
+    }
+
+    public void setForceInfo(Force force) {
+        String info = String.format("1 Force\n%d Soldiers", force.strength.soldiers());
+        forceButton.setText(info);
     }
 
     public void setForceInfo(Hex hex) {

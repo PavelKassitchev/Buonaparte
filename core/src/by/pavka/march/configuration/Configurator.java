@@ -48,6 +48,15 @@ public class Configurator {
         Force unit = new Unit(game.getTextureRegion("fr_inf"));
         unit.setName("I.Inf.Bat.");
         headForce.attach(unit);
+        Formation formation = new Formation(game.getTextureRegion("fr_inf"));
+        Formation formation1 = new Formation((game.getTextureRegion("fr_inf")));
+        Unit un = new Unit(game.getTextureRegion("fr_inf"));
+        formation.setName("I.Division");
+        formation1.setName("III.Brigade");
+        un.setName("III.Regiment");
+        formation1.attach(un);
+        formation.attach(formation1);
+        headForce.attach(formation);
         testForce.remoteHeadForce = headForce;
         anotherTestForce.remoteHeadForce = headForce;
         testForce.nation = FRANCE;

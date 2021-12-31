@@ -6,10 +6,10 @@ import by.pavka.march.military.UnitType;
 
 public class Strength {
     public int infantry;
-    int engineer;
-    int cavalry;
-    int artillery;
-    int supply;
+    public int engineer;
+    public int cavalry;
+    public int artillery;
+    public int supply;
 
     double fire;
     double charge;
