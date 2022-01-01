@@ -18,9 +18,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -186,8 +188,6 @@ public class PlayScreen extends GestureDetector implements Screen {
         final Label label = new Label("", skin);
         final Force initForce = selectedForces.get(0);
         setLabelInfo(label, initForce);
-//        String text = String.format("%d soldiers \nfatigue: %.1f", initForce.strength.soldiers(), initForce.spirit.fatigue);
-//        label.setText(text);
         final ForceButton select = new ForceButton("Select", initForce);
         select.addListener(new ClickListener() {
             @Override
@@ -210,40 +210,32 @@ public class PlayScreen extends GestureDetector implements Screen {
                 uiStage.addActor(treeWindow);
                 treeWindow.setBounds(uiStage.getWidth() * 0.1f, uiStage.getHeight() * 0.1f,
                         uiStage.getWidth() * 0.8f, uiStage.getHeight() * 0.8f);
-                Tree<ForceNode, Force> tree = new Tree<ForceNode, Force>(skin);
+                Tree<ForceNode, Force> tree = new Tree<>(skin);
                 tree.add(new ForceNode(order.force));
-                treeWindow.add(tree).fill();
+                Table table = new Table(skin);
+                table.add(tree);
+                table.row();
+                table.add(new Label("Label", skin)).left();
+                ScrollPane scrollPane = new ScrollPane(table, skin);
+                scrollPane.setScrollingDisabled(true, false);
+                treeWindow.add(scrollPane).left().top().width(treeWindow.getWidth());
             }
         });
-//        selectedForces = new Array<>();
-//        selectedForces.add(initForce);
-
-//        Tree<ForceNode, Force> tree = null;
-
         for (final Force f : selectedForces) {
-
-//            tree = new Tree<ForceNode, Force>(skin);
-//            tree.add(new ForceNode(f));
             final Button button = new TextButton(f.getName(), skin, "toggle");
             hGroup.addActor(button);
             buttonGroup.add(button);
             button.addListener(new ClickListener(){
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-//                    final String txt = String.format("%d soldiers \nfatigue: %.1f", f.strength.soldiers(), f.spirit.fatigue);
-//                    label.setText(txt);
                     setLabelInfo(label, f);
                     select.setForce(f);
                     order.setForce(f);
-//                    selectedForces = new Array<>();
-//                    selectedForces.add(f);
                 }
             });
         }
         forceWindow.add(hGroup).top();
         forceWindow.row();
-//        forceWindow.add(tree).fill();
-//        forceWindow.row();
         forceWindow.add(label).fill();
         forceWindow.row();
         forceWindow.add(select);
@@ -252,9 +244,23 @@ public class PlayScreen extends GestureDetector implements Screen {
         forceWindow.pack();
     }
 
-    class ForceNode extends Tree.Node<ForceNode, Force, Label> {
+//    class ForceNode extends Tree.Node<ForceNode, Force, Label> {
+//        public ForceNode(Force f) {
+//            super(new Label(f.getName(), skin));
+//            setValue(f);
+//            if (f instanceof Formation) {
+//                Formation formation = (Formation) f;
+//                for (Force force : formation.subForces) {
+//                    ForceNode fd = new ForceNode(force);
+//                    add(fd);
+//                }
+//            }
+//        }
+//    }
+
+    class ForceNode extends Tree.Node<ForceNode, Force, CheckBox> {
         public ForceNode(Force f) {
-            super(new Label(f.getName(), skin));
+            super(new CheckBox(f.getName(), skin));
             setValue(f);
             if (f instanceof Formation) {
                 Formation formation = (Formation) f;
