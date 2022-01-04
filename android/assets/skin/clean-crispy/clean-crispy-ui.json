@@ -318,6 +318,17 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
 		checked: button-pressed-c
 		checkedOver: button-pressed-over-c
 	}
+	force: {
+		up: button-minimize-over
+		down: button-minimize-pressed
+		checked: button-close-over
+		disabled: button-close
+	}
+	force-add: {
+		up: button-maximize-over
+		down: button-maximize-pressed
+		disabled: button-close
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton$ImageTextButtonStyle: {
 	default: {

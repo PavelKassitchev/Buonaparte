@@ -79,12 +79,22 @@ public class Configurator {
 
     }
 
+    private void setPlayScreenToChildren(Force force, PlayScreen playScreen) {
+        if (force instanceof Formation && !((Formation)force).subForces.isEmpty()) {
+            for (Force f : ((Formation)force).subForces) {
+                f.playScreen = playScreen;
+                setPlayScreenToChildren(f, playScreen);
+            }
+        }
+    }
+
     private void addForce(Force force, int col, int row, PlayScreen playScreen) {
         Hex hex = playScreen.getHexGraph().getHex(col, row);
         force.setVisualHex(hex);
         force.setRealHex(hex);
         force.shapeRenderer = playScreen.shapeRenderer;
         force.playScreen = playScreen;
+        setPlayScreenToChildren(force, playScreen);
     }
 
     private void addForce(Nation nation, int col, int row, PlayScreen playScreen) {

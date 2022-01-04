@@ -14,7 +14,7 @@ public class Formation extends Force {
     HQ hq;
     public Array<Force> subForces;
     Array<Force> detachedForces;
-    FormationValidator validator;
+    public FormationValidator validator;
 
     public Formation() {
         subForces = new Array<>();
@@ -170,7 +170,7 @@ public class Formation extends Force {
 
     public Formation attach(Force force) {
 //        if (validator.canAttach(force)) {
-        if(true){
+        if (true){
             add(force);
             force.superForce = this;
             Strength s = force.strength;

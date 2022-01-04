@@ -26,7 +26,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Tree;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
@@ -43,7 +42,8 @@ import by.pavka.march.map.HexGraph;
 import by.pavka.march.map.Path;
 import by.pavka.march.military.Courier;
 import by.pavka.march.military.Force;
-import by.pavka.march.military.Formation;
+import by.pavka.march.structure.ForceNode;
+import by.pavka.march.structure.ForceTree;
 
 public class PlayScreen extends GestureDetector implements Screen {
     public static final String MAP = "map/small.tmx";
@@ -65,6 +65,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     public boolean longPressed;
     public Array<Force> selectedForces;
     public ObjectMap<Force, Hex> enemies;
+    public Force resigningForce;
 
     public Array<Hex> destinations;
 
@@ -198,7 +199,7 @@ public class PlayScreen extends GestureDetector implements Screen {
                 setForceInfo(select.force);
             }
         });
-        final ForceButton order = new ForceButton("Order", initForce);
+        final ForceButton order = new ForceButton("Orders", initForce);
         order.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -210,12 +211,22 @@ public class PlayScreen extends GestureDetector implements Screen {
                 uiStage.addActor(treeWindow);
                 treeWindow.setBounds(uiStage.getWidth() * 0.1f, uiStage.getHeight() * 0.1f,
                         uiStage.getWidth() * 0.8f, uiStage.getHeight() * 0.8f);
-                Tree<ForceNode, Force> tree = new Tree<>(skin);
-                tree.add(new ForceNode(order.force));
+                ForceTree tree = new ForceTree(skin);
+                System.out.println("CREATING TREE! " + order.force.playScreen);
+                tree.add(new ForceNode(order.force, skin));
                 Table table = new Table(skin);
                 table.add(tree);
                 table.row();
-                table.add(new Label("Label", skin)).left();
+                CheckBox asGroup = new CheckBox("as Group", skin);
+                CheckBox asGarrison = new CheckBox("as Garrison", skin);
+                ButtonGroup<CheckBox> bg = new ButtonGroup<>(asGroup, asGarrison);
+                bg.setMinCheckCount(0);
+                bg.setMaxCheckCount(1);
+                table.add(asGroup).left();
+                table.add(asGarrison);
+                table.row();
+                TextButton detach = new TextButton("Detach", skin);
+                table.add(detach).left();
                 ScrollPane scrollPane = new ScrollPane(table, skin);
                 scrollPane.setScrollingDisabled(true, false);
                 treeWindow.add(scrollPane).left().top().width(treeWindow.getWidth());
@@ -258,19 +269,36 @@ public class PlayScreen extends GestureDetector implements Screen {
 //        }
 //    }
 
-    class ForceNode extends Tree.Node<ForceNode, Force, CheckBox> {
-        public ForceNode(Force f) {
-            super(new CheckBox(f.getName(), skin));
-            setValue(f);
-            if (f instanceof Formation) {
-                Formation formation = (Formation) f;
-                for (Force force : formation.subForces) {
-                    ForceNode fd = new ForceNode(force);
-                    add(fd);
-                }
-            }
-        }
-    }
+//    class ForceNode extends Tree.Node<ForceNode, Force, CheckBox> {
+//        public ForceNode(final Force f) {
+//            super(new CheckBox(f.getName(), skin));
+//            setValue(f);
+//            if (f instanceof Formation) {
+//                Formation formation = (Formation) f;
+//                for (Force force : formation.subForces) {
+//                    ForceNode fn = new ForceNode(force);
+//                    add(fn);
+//                }
+//            }
+//            getActor().addListener(new ChangeListener() {
+//
+//                @Override
+//                public void changed(ChangeEvent changeEvent, Actor actor) {
+//                    if (hasChildren()) {
+//                        if (((CheckBox)actor).isChecked()) {
+//                            for (ForceNode fn : getChildren()) {
+//                                ((CheckBox)fn.getActor()).setChecked(true);
+//                            }
+//                        } else {
+//                            for (ForceNode fn : getChildren()) {
+//                                ((CheckBox)fn.getActor()).setChecked(false);
+//                            }
+//                        }
+//                    }
+//                }
+//            });
+//        }
+//    }
 
     public void setGeneralUi() {
         if (group != null) {
