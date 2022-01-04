@@ -211,8 +211,7 @@ public class PlayScreen extends GestureDetector implements Screen {
                 uiStage.addActor(treeWindow);
                 treeWindow.setBounds(uiStage.getWidth() * 0.1f, uiStage.getHeight() * 0.1f,
                         uiStage.getWidth() * 0.8f, uiStage.getHeight() * 0.8f);
-                ForceTree tree = new ForceTree(skin);
-                System.out.println("CREATING TREE! " + order.force.playScreen);
+                final ForceTree tree = new ForceTree(skin);
                 tree.add(new ForceNode(order.force, skin));
                 Table table = new Table(skin);
                 table.add(tree);
@@ -226,6 +225,16 @@ public class PlayScreen extends GestureDetector implements Screen {
                 table.add(asGarrison);
                 table.row();
                 TextButton detach = new TextButton("Detach", skin);
+                detach.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        Array<Force> forces = tree.findForcesToDetach();
+                        for (Force force : forces) {
+                            force.detach();
+                        }
+                        destroyForceWindow();
+                    }
+                });
                 table.add(detach).left();
                 ScrollPane scrollPane = new ScrollPane(table, skin);
                 scrollPane.setScrollingDisabled(true, false);

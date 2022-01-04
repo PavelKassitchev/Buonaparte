@@ -569,6 +569,8 @@ public abstract class Force extends Image {
         superForce = null;
         speed = findSpeed();
         spirit = findSpirit();
+
+
         return true;
     }
 

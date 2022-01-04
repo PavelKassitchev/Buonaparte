@@ -2,6 +2,7 @@ package by.pavka.march.structure;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Tree;
+import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
@@ -58,6 +59,25 @@ public class ForceTree extends Tree<ForceNode, Force> {
         } else {
             for (ForceNode fn : node.getChildren()) {
                 setReadyToAssign(fn, node);
+            }
+        }
+    }
+
+    public Array<Force> findForcesToDetach() {
+        Array<Force> forcesToDetach = new Array<Force>();
+        ForceNode rootNode = getRootNodes().get(0);
+        setToDetach(rootNode, forcesToDetach);
+        return forcesToDetach;
+    }
+
+    private void setToDetach(ForceNode rootNode, Array<Force> forcesToDetach) {
+        if (rootNode.hasChildren()) {
+            for (ForceNode fn : rootNode.getChildren()) {
+                if (fn.getActor().checkBox.isChecked()) {
+                    forcesToDetach.add(fn.getValue());
+                } else {
+                    setToDetach(fn, forcesToDetach);
+                }
             }
         }
     }

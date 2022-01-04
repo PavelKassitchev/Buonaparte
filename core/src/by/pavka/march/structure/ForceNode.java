@@ -75,8 +75,10 @@ public class ForceNode extends Tree.Node<ForceNode, Force, ForceView> {
                         ForceNode.this.add(assignNode);
                         if (ForceNode.this.getActor().checkBox.isChecked()) {
                             assignNode.getActor().checkBox.setChecked(true);
+                            assignNode.getActor().checkBox.setDisabled(true);
                         } else {
                             assignNode.getActor().checkBox.setChecked(false);
+                            assignNode.getActor().checkBox.setDisabled(false);
                         }
                         getTree().getRootNodes().get(0).updateChildren();
                         ((ForceTree)getTree()).prepareForResigning();
