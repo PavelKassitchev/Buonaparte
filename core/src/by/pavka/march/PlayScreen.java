@@ -230,7 +230,7 @@ public class PlayScreen extends GestureDetector implements Screen {
                     public void clicked(InputEvent event, float x, float y) {
                         Array<Force> forces = tree.findForcesToDetach();
                         for (Force force : forces) {
-                            force.detach();
+                            force.detach(true);
                         }
                         destroyForceWindow();
                     }
@@ -264,50 +264,6 @@ public class PlayScreen extends GestureDetector implements Screen {
         forceWindow.pack();
     }
 
-//    class ForceNode extends Tree.Node<ForceNode, Force, Label> {
-//        public ForceNode(Force f) {
-//            super(new Label(f.getName(), skin));
-//            setValue(f);
-//            if (f instanceof Formation) {
-//                Formation formation = (Formation) f;
-//                for (Force force : formation.subForces) {
-//                    ForceNode fd = new ForceNode(force);
-//                    add(fd);
-//                }
-//            }
-//        }
-//    }
-
-//    class ForceNode extends Tree.Node<ForceNode, Force, CheckBox> {
-//        public ForceNode(final Force f) {
-//            super(new CheckBox(f.getName(), skin));
-//            setValue(f);
-//            if (f instanceof Formation) {
-//                Formation formation = (Formation) f;
-//                for (Force force : formation.subForces) {
-//                    ForceNode fn = new ForceNode(force);
-//                    add(fn);
-//                }
-//            }
-//            getActor().addListener(new ChangeListener() {
-//
-//                @Override
-//                public void changed(ChangeEvent changeEvent, Actor actor) {
-//                    if (hasChildren()) {
-//                        if (((CheckBox)actor).isChecked()) {
-//                            for (ForceNode fn : getChildren()) {
-//                                ((CheckBox)fn.getActor()).setChecked(true);
-//                            }
-//                        } else {
-//                            for (ForceNode fn : getChildren()) {
-//                                ((CheckBox)fn.getActor()).setChecked(false);
-//                            }
-//                        }
-//                    }
-//                }
-//            });
-//        }
-//    }
 
     public void setGeneralUi() {
         if (group != null) {

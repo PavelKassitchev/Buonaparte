@@ -16,7 +16,10 @@ public class MoveOrder implements Order {
     }
 
     @Override
-    public void execute(Force force) {
+    public boolean execute(Force force) {
+        if (force == null) {
+            return false;
+        }
         GraphPath<Hex> hexPath;
         Array<Path> paths = new Array<>();
         Hex start = force.hex;
@@ -37,5 +40,6 @@ public class MoveOrder implements Order {
         for (Path p : force.forcePath) {
             System.out.println(p.fromHex + "   " + p.toHex);
         }
+        return true;
     }
 }

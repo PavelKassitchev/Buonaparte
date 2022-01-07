@@ -10,9 +10,7 @@ import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -27,6 +25,7 @@ import by.pavka.march.configuration.Nation;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.Path;
 import by.pavka.march.order.Order;
+import by.pavka.march.view.ForceRep;
 
 public abstract class Force extends Image {
     public static final String CAV = "cavalry";
@@ -77,6 +76,8 @@ public abstract class Force extends Image {
     MarchConfig marchConfig;
     public boolean hasDayToRest;
 
+    public ForceRep forceRep;
+
     public Force() {
     }
 
@@ -101,13 +102,15 @@ public abstract class Force extends Image {
 
         marchConfig = new MarchConfig(March.REGULAR);
 
-        addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                System.out.println("FORCE!");
-            }
-        });
+        forceRep = new ForceRep(this);
+    }
+
+    public Force findHyperForce() {
+        if (superForce == null) {
+            return this;
+        } else {
+            return superForce.findHyperForce();
+        }
     }
 
     public float findReportDistance(Force force) {
@@ -205,7 +208,9 @@ public abstract class Force extends Image {
                 path.render(shapeRenderer, 0, 0, 1);
             }
             if (visualForcePath != null && !visualForcePath.isEmpty()) {
+                System.out.println("VISUAL PATH DRAWING: " + visualForcePath.size);
                 Path p = visualForcePath.first();
+                System.out.println("PATH DRAWING: " + p);
                 p.render(shapeRenderer, 1, 0, 0);
                 if (showPath) {
                     for (Path path : visualForcePath) {
@@ -278,7 +283,7 @@ public abstract class Force extends Image {
         for (Hex h : reconArea) {
             if (h.enemiesOf(this) != null) {
                 for (Force f : h.enemiesOf(this)) {
-                    if (ReconData.reconEnemy(f) != null) {
+                    if (ForceRep.reconEnemy(f) != null) {
 //                        f.setVisualHex(h);
                         enemies.put(f, h);
                     }
@@ -363,7 +368,7 @@ public abstract class Force extends Image {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if (time > visualTime) {
+                if (time >= visualTime) {
                     Gdx.app.postRunnable(new Runnable() {
 
                         @Override
@@ -567,11 +572,37 @@ public abstract class Force extends Image {
         superForce.remove(this);
         superForce.changeStrength(strength.reverse());
         superForce = null;
-        speed = findSpeed();
+//        speed = findSpeed();
         spirit = findSpirit();
-
+        forceRep.detach();
 
         return true;
     }
+
+    public boolean detach(boolean physical) {
+        if (!physical) {
+            return detach();
+        } else {
+            if (superForce == null) {
+                return false;
+            }
+            setRealHex(findHyperForce().hex);
+            nation = findHyperForce().nation;
+            shapeRenderer = findHyperForce().shapeRenderer;
+            if (findHyperForce().remoteHeadForce == null) {
+                remoteHeadForce = (Formation) findHyperForce();
+            } else {
+                remoteHeadForce = findHyperForce().remoteHeadForce;
+            }
+            detach();
+            forceRep.setRenderer();
+            speed = findSpeed();
+//            spirit = findSpirit();
+            sendReport("detached");
+            return true;
+        }
+    }
+
+
 
 }

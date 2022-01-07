@@ -27,6 +27,23 @@ public class Strength {
 
     public Strength() {}
 
+    public Strength(Strength copy) {
+        this.infantry = copy.infantry;
+        this.engineer = copy.engineer;
+        this.cavalry = copy.cavalry;
+        this.artillery = copy.artillery;
+        this.supply = copy.supply;
+        this.fire = copy.fire;
+        this.charge = copy.charge;
+        this.length = copy.length;
+        this.recon = copy.recon;
+        this.capacity = copy.capacity;
+        this.foodConsumption = copy.foodConsumption;
+        this.ammoConsumption = copy.ammoConsumption;
+        this.food = copy.food;
+        this.ammo = copy.ammo;
+    }
+
     public Strength(int infantry, int engineer, int cavalry, int artillery, int supply, double fire, double charge,
                     double length, double recon, double capacity, double foodConsumption, double ammoConsumption, double food, double ammo) {
         this.infantry = infantry;

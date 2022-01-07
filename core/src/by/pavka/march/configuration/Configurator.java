@@ -41,6 +41,13 @@ public class Configurator {
     public void addForces(PlayScreen playScreen) {
         Force testForce = new Unit(game.getTextureRegion("fr_cav"));
         testForce.setName("X.Cav.Sq.");
+        Formation cavDivision = new Formation(game.getTextureRegion("fr_cav"));
+        cavDivision.setName("IV.Cav.Div.");
+//        cavDivision.attach(testForce);
+        Formation cavRegiment = new Formation(game.getTextureRegion("fr_cav"));
+        cavRegiment.setName("XI.Cav.Reg.");
+        cavRegiment.attach(testForce);
+        cavDivision.attach(cavRegiment);
         Force anotherTestForce = new Unit(game.getTextureRegion("fr_art"));
         anotherTestForce.setName("II.Art.Bttr.");
         Formation headForce = new Formation(game.getTextureRegion("fr_mil"));
@@ -57,9 +64,9 @@ public class Configurator {
         formation1.attach(un);
         formation.attach(formation1);
         headForce.attach(formation);
-        testForce.remoteHeadForce = headForce;
+        cavDivision.remoteHeadForce = headForce;
         anotherTestForce.remoteHeadForce = headForce;
-        testForce.nation = FRANCE;
+        cavDivision.nation = FRANCE;
         anotherTestForce.nation = FRANCE;
         headForce.nation = FRANCE;
 
@@ -69,7 +76,7 @@ public class Configurator {
         enemyHQ.nation = AUSTRIA;
         enemy.remoteHeadForce = enemyHQ;
 
-        addForce(testForce, 2,1, playScreen);
+        addForce(cavDivision, 2,1, playScreen);
         addForce(anotherTestForce, 2,2, playScreen);
         addForce(headForce, 4,6, playScreen);
         addForce(enemy, 9,9, playScreen);
@@ -113,6 +120,7 @@ public class Configurator {
         force.setRealHex(hex);
         force.shapeRenderer = playScreen.shapeRenderer;
         force.playScreen = playScreen;
+        force.forceRep.setRenderer();
 
     }
 

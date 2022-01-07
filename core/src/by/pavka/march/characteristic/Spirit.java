@@ -5,6 +5,12 @@ public class Spirit {
     public double morale;
     public double fatigue;
 
+    public Spirit(Spirit copy) {
+        this.xp = copy.xp;
+        this.morale = copy.morale;
+        this.fatigue = copy.fatigue;
+    }
+
     public Spirit(double xp, double morale, double fatigue) {
         this.xp = xp;
         this.morale = morale;

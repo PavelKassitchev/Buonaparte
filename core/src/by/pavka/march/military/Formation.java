@@ -35,9 +35,9 @@ public class Formation extends Force {
     }
 
     public Formation(TextureRegion region) {
-        super(region, 20000, 2000);
+        super(region, 20000, 6000);
         subForces = new Array<>();
-        speed = 16.0f;
+        speed = 6.0f;
     }
 
     @Override
@@ -175,6 +175,7 @@ public class Formation extends Force {
             force.superForce = this;
             Strength s = force.strength;
             changeStrength(s);
+            forceRep.attach(force.forceRep);
         }
         return this;
     }
