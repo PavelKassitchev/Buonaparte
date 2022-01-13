@@ -13,8 +13,12 @@ public class Formation extends Force {
     General commander;
     HQ hq;
     public Array<Force> subForces;
+    public Array<Force> interForces;
+    public Array<Force> visualForces;
+    public Array<Force> viewForces;
     Array<Force> detachedForces;
     public FormationValidator validator;
+    public boolean structureChanged;
 
     public Formation() {
         subForces = new Array<>();
@@ -37,12 +41,18 @@ public class Formation extends Force {
     public Formation(TextureRegion region) {
         super(region, 20000, 6000);
         subForces = new Array<>();
-        speed = 6.0f;
+        interForces = new Array<>();
+        visualForces = new Array<>();
+        viewForces = new Array<>();
+        speed = 2.0f;
     }
 
     @Override
     public float findSpeed() {
         float speed = MAX_SPEED;
+        if (this.speed < speed) {
+            speed = this.speed;
+        }
         for (Force force : subForces) {
             if (force.findSpeed() < speed) {
                 speed = force.findSpeed();
@@ -152,6 +162,7 @@ public class Formation extends Force {
     }
 
     public boolean remove(Force force) {
+        structureChanged = true;
         return subForces.removeValue(force, true);
     }
 
@@ -172,11 +183,49 @@ public class Formation extends Force {
 //        if (validator.canAttach(force)) {
         if (true){
             add(force);
+
+            viewForces.add(force);
+
+            force.nation = null;
+
             force.superForce = this;
             Strength s = force.strength;
             changeStrength(s);
-            forceRep.attach(force.forceRep);
+            structureChanged = true;
         }
         return this;
+    }
+
+    @Override
+    public void copyStructure() {
+        interStrength = new Strength(strength);
+        interSpirit = new Spirit(spirit);
+        interForces = new Array<>();
+        for (Force force : subForces) {
+            interForces.add(force);
+            force.copyStructure();
+        }
+    }
+
+    @Override
+    public void visualizeStructure() {
+        visualStrength = new Strength(interStrength);
+        visualSpirit = new Spirit(interSpirit);
+        visualForces = new Array<>();
+        for (Force force : interForces) {
+            visualForces.add(force);
+            force.visualizeStructure();
+        }
+    }
+
+    @Override
+    public void setTreeViewStructure() {
+        viewStrength = new Strength(visualStrength);
+        viewSpirit = new Spirit(visualSpirit);
+        viewForces = new Array<>();
+        for (Force force : visualForces) {
+            viewForces.add(force);
+            force.setTreeViewStructure();
+        }
     }
 }

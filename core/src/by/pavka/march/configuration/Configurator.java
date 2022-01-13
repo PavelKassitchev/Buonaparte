@@ -4,9 +4,12 @@ import static by.pavka.march.configuration.Nation.AUSTRIA;
 import static by.pavka.march.configuration.Nation.FRANCE;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.BuonaparteGame;
 import by.pavka.march.PlayScreen;
+import by.pavka.march.characteristic.Spirit;
+import by.pavka.march.characteristic.Strength;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.HexGraph;
 import by.pavka.march.military.Force;
@@ -47,7 +50,10 @@ public class Configurator {
         Formation cavRegiment = new Formation(game.getTextureRegion("fr_cav"));
         cavRegiment.setName("XI.Cav.Reg.");
         cavRegiment.attach(testForce);
-        cavDivision.attach(cavRegiment);
+        Formation cavBrigade = new Formation(game.getTextureRegion("fr_cav"));
+        cavBrigade.setName("XII.Brigade");
+        cavBrigade.attach(cavRegiment);
+        cavDivision.attach(cavBrigade);
         Force anotherTestForce = new Unit(game.getTextureRegion("fr_art"));
         anotherTestForce.setName("II.Art.Bttr.");
         Formation headForce = new Formation(game.getTextureRegion("fr_mil"));
@@ -64,6 +70,10 @@ public class Configurator {
         formation1.attach(un);
         formation.attach(formation1);
         headForce.attach(formation);
+        Formation form = new Formation(game.getTextureRegion("fr_art"));
+        form.setName("Reserve Art.");
+        form.remoteHeadForce = headForce;
+        form.nation = FRANCE;
         cavDivision.remoteHeadForce = headForce;
         anotherTestForce.remoteHeadForce = headForce;
         cavDivision.nation = FRANCE;
@@ -81,6 +91,7 @@ public class Configurator {
         addForce(headForce, 4,6, playScreen);
         addForce(enemy, 9,9, playScreen);
         addForce(enemyHQ, 10, 10, playScreen);
+        addForce(form, 8, 7, playScreen);
 
         addForce(AUSTRIA, 0, 1, playScreen);
 
@@ -120,8 +131,24 @@ public class Configurator {
         force.setRealHex(hex);
         force.shapeRenderer = playScreen.shapeRenderer;
         force.playScreen = playScreen;
-        force.forceRep.setRenderer();
 
+        setInitialViewStructure(force);
+
+        force.setTreeViewStructure();
+    }
+
+    public void setInitialViewStructure(Force force) {
+        force.visualStrength = new Strength(force.strength);
+        force.visualSpirit = new Spirit(force.spirit);
+
+        if (force instanceof Formation) {
+            Formation f = (Formation)force;
+            f.visualForces = new Array<>();
+            for (Force sub : f.subForces) {
+                f.visualForces.add(sub);
+                setInitialViewStructure(sub);
+            }
+        }
     }
 
 //    public HexagonalTiledMapRenderer getHexagonalRenderer() {

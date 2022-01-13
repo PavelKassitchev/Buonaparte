@@ -22,7 +22,7 @@ public class AssignButton extends ImageButton {
         setStyle(resigning);
     }
 
-    void setResigning(boolean resign) {
+    public void setResigning(boolean resign) {
         if (resign) {
             setStyle(resigning);
         } else {

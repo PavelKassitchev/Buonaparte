@@ -14,11 +14,10 @@ import by.pavka.march.military.Formation;
 public class ForceNode extends Tree.Node<ForceNode, Force, ForceView> {
     public ForceNode(final Force f, Skin skin) {
         super(new ForceView(f, skin));
-//        super(new CheckBox(f.getName(), skin));
         setValue(f);
         if (f instanceof Formation) {
             Formation formation = (Formation) f;
-            for (Force force : formation.subForces) {
+            for (Force force : formation.viewForces) {
                 ForceNode fn = new ForceNode(force, skin);
                 add(fn);
             }

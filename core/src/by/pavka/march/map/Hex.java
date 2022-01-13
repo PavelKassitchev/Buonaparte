@@ -68,13 +68,16 @@ public class Hex extends Group {
         return forces;
     }
 
+
     public void addForce(Force force) {
         forces.add(force);
     }
 
+
     public void removeForce(Force force) {
         forces.removeValue(force, true);
     }
+
 
     public Array<Force> enemiesOf(Force force) {
         if (!forces.isEmpty()) {
@@ -90,12 +93,12 @@ public class Hex extends Group {
     }
 
 
-
     class HexListener extends ClickListener {
         @Override
         public void clicked(InputEvent event, float x, float y) {
             if (!playScreen.longPressed) {
                 playScreen.destroyForceWindow();
+                playScreen.destroyTreeWindow();
                 playScreen.setDetailedUi(Hex.this);
 //                playScreen.forceWindow.remove();
             } else if (playScreen.selectedHex != null || !playScreen.selectedForces.isEmpty() ||

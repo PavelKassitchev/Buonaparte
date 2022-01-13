@@ -1,7 +1,25 @@
 package by.pavka.march.configuration;
 
-import by.pavka.march.military.Force;
+import com.badlogic.gdx.utils.Array;
 
-public interface FormationValidator {
-    boolean canAttach(Force force);
+import by.pavka.march.BuonaparteGame;
+import by.pavka.march.military.Force;
+import by.pavka.march.military.Formation;
+
+public class FormationValidator {
+    public static Force createGroup(Array<Force>forces, BuonaparteGame game) {
+        if (forces.size == 1) {
+            return forces.get(0);
+        }
+        Formation formation = new Formation(game.getTextureRegion("fr_cav"));
+        for (Force f : forces) {
+            formation.attach(f);
+        }
+        formation.setName("Battle Group");
+        return formation;
+    }
+
+    public boolean canAttache(Force f) {
+        return true;
+    }
 }

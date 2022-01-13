@@ -75,6 +75,24 @@ public class Unit extends Force {
     }
 
     @Override
+    public void copyStructure() {
+        interStrength = new Strength(strength);
+        interSpirit = new Spirit(spirit);
+    }
+
+    @Override
+    public void visualizeStructure() {
+        visualStrength = new Strength(interStrength);
+        visualSpirit = new Spirit(interSpirit);
+    }
+
+    @Override
+    public void setTreeViewStructure() {
+        viewStrength = new Strength(visualStrength);
+        viewSpirit = new Spirit(visualSpirit);
+    }
+
+    @Override
     public void addWagonToTrain(Array<WagonTrain> train) {
 
     }
