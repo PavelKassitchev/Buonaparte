@@ -66,7 +66,7 @@ public class ForceNode extends Tree.Node<ForceNode, Force, ForceView> {
                         Force assignForce = thisForce.playScreen.resigningForce;
                         thisForce.playScreen.resigningForce = null;
                         assignForce.detach();
-                        ((Formation)thisForce).attach(assignForce);
+                        ((Formation)thisForce).attach(assignForce, true);
                         ForceTree tree = (ForceTree) getTree();
                         ForceNode assignNode = tree.resigningNode;
                         tree.remove(assignNode);

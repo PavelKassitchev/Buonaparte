@@ -45,9 +45,11 @@ import by.pavka.march.map.HexGraph;
 import by.pavka.march.map.Path;
 import by.pavka.march.military.Courier;
 import by.pavka.march.military.Force;
+import by.pavka.march.military.Formation;
 import by.pavka.march.order.DetachOrder;
 import by.pavka.march.structure.ForceNode;
 import by.pavka.march.structure.ForceTree;
+import by.pavka.march.structure.OrderView;
 
 public class PlayScreen extends GestureDetector implements Screen {
     public static final String MAP = "map/small.tmx";
@@ -254,17 +256,17 @@ public class PlayScreen extends GestureDetector implements Screen {
         treeWindow.add(tabTable).left().padLeft(12);
         tabTable.setBounds(0, 0, treeWindow.getWidth(), treeWindow.getHeight() * 0.1f);
         treeWindow.row();
+
         final ForceTree tree = new ForceTree(skin);
         Table table = new Table(skin);
         table.add(tree).padTop(12);
-//        table.row();
 
         final ButtonGroup<ForceButton> trees = new ButtonGroup();
         trees.setMinCheckCount(1);
         trees.setMaxCheckCount(1);
 
-        addTreeTab(f, tree, tabTable, trees);
-        final ForceButton sendOrder = new ForceButton("Send Order", f);
+        final OrderView orderLabel = new OrderView("", skin);
+        addTreeTab(f, tree, tabTable, trees, orderLabel);
         TextButton detach = new TextButton("Detach Checked", skin);
         detach.addListener(new ClickListener() {
             @Override
@@ -272,47 +274,41 @@ public class PlayScreen extends GestureDetector implements Screen {
                 Array<Force> forces = tree.findForcesToDetach();
                 if (!forces.isEmpty()) {
                     for (Force force : forces) {
-                        //TODO Important: send Order to detach!
-//                        Force.sendOrder(force, new DetachOrder());
                         force.superForce.viewForces.removeValue(force, true);
+                        System.out.println("Removed from view: " + force.getName());
                     }
-
-//                final Force force = forces.get(0);
                     Force force = FormationValidator.createGroup(forces, game);
-                    addTreeTab(force, tree, tabTable, trees, sendOrder);
+                    addTreeTab(force, tree, tabTable, trees, orderLabel);
                 }
             }
         });
         table.row();
         table.add(detach).left().padTop(12).padLeft(12);
-//        TextButton undo = new TextButton("Undo Detach", skin);
-//        undo.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-////                f.superForce.viewForces.add(f);
-//                updateTree(tree, f.superForce);
-//            }
-//        });
-//        table.add(undo).padTop(12);
         table.row();
 
-//        ForceButton sendOrder = new ForceButton("Send Order", f);
+        TextButton sendOrder = new TextButton("Send Order", skin);
         sendOrder.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Force f = trees.getChecked().getForce();
+                System.out.println("Send Order Exactly to " + f.getName());
                 Force.sendOrder(f, new DetachOrder());
-                if (trees.getButtons().size > 1) {
-                    System.out.println("SIZE: " + trees.getButtons().size);
+                if (f.remoteHeadForce == null) {
                     ForceButton fb = trees.getChecked();
                     fb.remove();
                     trees.remove(fb);
                     trees.getButtons().get(0).setChecked(true);
+                    orderLabel.clear();
                     Force force = trees.getButtons().get(0).getForce();
                     updateTree(tree, force);
+                } else {
+                    destroyTreeWindow();
                 }
             }
         });
+        table.row();
+        table.add(orderLabel);
+        table.row();
         table.add(sendOrder).left().padTop(12);
 
         ScrollPane scrollPane = new ScrollPane(table, skin);
@@ -343,9 +339,31 @@ public class PlayScreen extends GestureDetector implements Screen {
         updateTree(tree, f);
     }
 
-    private void addTreeTab(final Force f, final ForceTree tree, Table tabTable, ButtonGroup trees, ForceButton order) {
-        addTreeTab(f, tree, tabTable, trees);
-        order.setForce(f);
+    private void addTreeTab(final Force f, final ForceTree tree, Table tabTable, ButtonGroup trees,
+                            final OrderView orderLabel) {
+        ForceButton single = new ForceButton(f.getName(), f);
+        single.setChecked(true);
+        tabTable.add(single).left();
+        trees.add(single);
+        single.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                System.out.println("Click!");
+                updateTree(tree, f, orderLabel);
+            }
+        });
+        updateTree(tree, f, orderLabel);
+    }
+
+    private void updateTree(ForceTree tree, Force force, OrderView orderLabel) {
+        updateTree(tree, force);
+        if (force.superForce != null) {
+            orderLabel.setText("Detach from " + force.findHyperForce().getName());
+        } else if (force.nation == null){
+            orderLabel.setText("Detach from " + ((Formation)force).subForces.get(0).findHyperForce().getName());
+        } else {
+            orderLabel.clear();
+        }
     }
 
     private void updateTree(ForceTree tree, Force force) {
@@ -359,9 +377,6 @@ public class PlayScreen extends GestureDetector implements Screen {
         tree.add(forceNode);
     }
 
-//    private void removeTreeTab(final Force f, final ForceTree tree, Table tabTable, ButtonGroup trees) {
-//
-//    }
 
     public void setGeneralUi() {
         if (group != null) {
@@ -525,6 +540,10 @@ public class PlayScreen extends GestureDetector implements Screen {
             int forceNumber = 0;
             int soldierNumber = 0;
             for (Actor a : forces) {
+                if (a instanceof Formation) {
+                    Formation f = (Formation)a;
+                    System.out.println("Setting force info for " + f + " number = " + f.visualStrength.infantry);
+                }
                 forceNumber++;
                 soldierNumber += ((Force) a).visualStrength.soldiers();
             }

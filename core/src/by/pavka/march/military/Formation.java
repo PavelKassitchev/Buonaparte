@@ -179,16 +179,18 @@ public class Formation extends Force {
         }
     }
 
-    public Formation attach(Force force) {
+    public Formation attach(Force force, boolean physical) {
 //        if (validator.canAttach(force)) {
         if (true){
             add(force);
 
             viewForces.add(force);
 
-            force.nation = null;
+            force.shapeRenderer = null;
 
-            force.superForce = this;
+            if (physical) {
+                force.superForce = this;
+            }
             Strength s = force.strength;
             changeStrength(s);
             structureChanged = true;
@@ -208,6 +210,22 @@ public class Formation extends Force {
     }
 
     @Override
+    public Formation copyForce() {
+        Formation copy = new Formation();
+        Strength interSt = new Strength(strength);
+        Spirit interSp = new Spirit(spirit);
+        copy.strength = interSt;
+        copy.spirit = interSp;
+        Array<Force> interF = new Array<>();
+        copy.subForces = interF;
+        for (Force force : subForces) {
+            interF.add(force);
+            force.copyForce();
+        }
+        return copy;
+    }
+
+    @Override
     public void visualizeStructure() {
         visualStrength = new Strength(interStrength);
         visualSpirit = new Spirit(interSpirit);
@@ -215,6 +233,17 @@ public class Formation extends Force {
         for (Force force : interForces) {
             visualForces.add(force);
             force.visualizeStructure();
+        }
+    }
+
+    @Override
+    public void visualizeCopy(Force copy) {
+        visualStrength = new Strength(copy.strength);
+        visualSpirit = new Spirit(copy.spirit);
+        visualForces = new Array<>();
+        for (Force force : ((Formation)copy).subForces) {
+            visualForces.add(force);
+            force.visualizeCopy(force);
         }
     }
 

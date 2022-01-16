@@ -81,9 +81,25 @@ public class Unit extends Force {
     }
 
     @Override
+    public Force copyForce() {
+        Force copy = new Unit();
+        Strength interSt = new Strength(strength);
+        Spirit interSp = new Spirit(spirit);
+        copy.strength = interSt;
+        copy.spirit = interSp;
+        return copy;
+    }
+
+    @Override
     public void visualizeStructure() {
         visualStrength = new Strength(interStrength);
         visualSpirit = new Spirit(interSpirit);
+    }
+
+    @Override
+    public void visualizeCopy(Force copy) {
+        visualStrength = copy.strength;
+        visualSpirit = copy.spirit;
     }
 
     @Override

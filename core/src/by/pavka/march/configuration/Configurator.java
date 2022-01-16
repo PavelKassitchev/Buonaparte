@@ -49,27 +49,27 @@ public class Configurator {
 //        cavDivision.attach(testForce);
         Formation cavRegiment = new Formation(game.getTextureRegion("fr_cav"));
         cavRegiment.setName("XI.Cav.Reg.");
-        cavRegiment.attach(testForce);
+        cavRegiment.attach(testForce, true);
         Formation cavBrigade = new Formation(game.getTextureRegion("fr_cav"));
         cavBrigade.setName("XII.Brigade");
-        cavBrigade.attach(cavRegiment);
-        cavDivision.attach(cavBrigade);
+        cavBrigade.attach(cavRegiment, true);
+        cavDivision.attach(cavBrigade, true);
         Force anotherTestForce = new Unit(game.getTextureRegion("fr_art"));
         anotherTestForce.setName("II.Art.Bttr.");
         Formation headForce = new Formation(game.getTextureRegion("fr_mil"));
         headForce.setName("IV.Inf.Regmnt.");
         Force unit = new Unit(game.getTextureRegion("fr_inf"));
         unit.setName("I.Inf.Bat.");
-        headForce.attach(unit);
+        headForce.attach(unit, true);
         Formation formation = new Formation(game.getTextureRegion("fr_inf"));
         Formation formation1 = new Formation((game.getTextureRegion("fr_inf")));
         Unit un = new Unit(game.getTextureRegion("fr_inf"));
         formation.setName("I.Division");
         formation1.setName("III.Brigade");
         un.setName("III.Regiment");
-        formation1.attach(un);
-        formation.attach(formation1);
-        headForce.attach(formation);
+        formation1.attach(un, true);
+        formation.attach(formation1, true);
+        headForce.attach(formation, true);
         Formation form = new Formation(game.getTextureRegion("fr_art"));
         form.setName("Reserve Art.");
         form.remoteHeadForce = headForce;
@@ -97,16 +97,17 @@ public class Configurator {
 
     }
 
-    private void setPlayScreenToChildren(Force force, PlayScreen playScreen) {
+    private static void setPlayScreenToChildren(Force force, PlayScreen playScreen) {
         if (force instanceof Formation && !((Formation)force).subForces.isEmpty()) {
             for (Force f : ((Formation)force).subForces) {
                 f.playScreen = playScreen;
+                f.nation = force.nation;
                 setPlayScreenToChildren(f, playScreen);
             }
         }
     }
 
-    private void addForce(Force force, int col, int row, PlayScreen playScreen) {
+    public static void addForce(Force force, int col, int row, PlayScreen playScreen) {
         Hex hex = playScreen.getHexGraph().getHex(col, row);
         force.setVisualHex(hex);
         force.setRealHex(hex);

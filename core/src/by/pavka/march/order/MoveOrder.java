@@ -42,4 +42,15 @@ public class MoveOrder implements Order {
         }
         return true;
     }
+
+    @Override
+    public boolean execute(Array<Force> forces) {
+        if (forces == null || forces.isEmpty()) {
+            return false;
+        }
+        for (Force force : forces) {
+            execute(force);
+        }
+        return true;
+    }
 }
