@@ -5,7 +5,7 @@ import by.pavka.march.map.Hex;
 import by.pavka.march.map.HexGraph;
 
 public class Courier {
-    public static final double MAX_SPEED = 10;
+    public static final double MAX_SPEED = 20;
     public static PlayScreen playScreen;
     public static HexGraph hexGraph;
 

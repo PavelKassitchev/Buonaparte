@@ -296,64 +296,8 @@ public abstract class Force extends Image {
         return reconArea;
     }
 
-//    private void sendReport(float delta) {
-//        //final int delay = findCommandDistance() > 1 ? findCommandDistance() - 1 : 0;
-//        if (findCommandDistance() > 1) {
-//            report += delta;
-//            if (report > TEST_REPORT_PERIOD) {
-//                report = 0;
-//                sendReport();
-//            }
-//        }
-//    }
 
     public void sendReport(final String tag) {
-//        final float delay;
-//        if (remoteHeadForce == null || playScreen.getHexGraph().areNeighbours(remoteHeadForce.hex, hex)) {
-//            delay = 0;
-//        } else {
-//            delay = findCommandDistance();
-//        }
-//        new Thread(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                final Hex delayedHex = hex;
-//                final Array<Path> delayedTail = new Array<>(tail);
-//                final Array<Path> delayedPath = new Array<>(forcePath);
-//                final ObjectMap<Force, Hex> delayedEnemies = new ObjectMap<Force, Hex>(visualEnemies);
-//                final ObjectSet<Hex> delayedArea = reconArea;
-//                final float time = playScreen.time;
-//                final Force copy = copyForce();
-//                try {
-//                    while (playScreen.timer.isChecked()) {
-//                        Thread.sleep(20);
-//                    }
-//                    Thread.sleep((long) delay);
-//                    while (playScreen.timer.isChecked()) {
-//                        Thread.sleep(50);
-//                    }
-//
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                if (time >= visualTime) {
-//                    Gdx.app.postRunnable(new Runnable() {
-//
-//                        @Override
-//                        public void run() {
-//                            visualHex = delayedHex;
-//                            visualTail = delayedTail;
-//                            visualForcePath = delayedPath;
-//                            setVisualHex(visualHex);
-//                            visualTime = time;
-//                            playScreen.updateEnemies(delayedEnemies, delayedArea, visualTime);
-//                            visualizeCopy(copy);
-//                        }
-//                    });
-//                }
-//            }
-//        }).start();
 
         Thread t = new ReportThread(this);
         t.start();

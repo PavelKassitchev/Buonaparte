@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -285,6 +286,10 @@ public class PlayScreen extends GestureDetector implements Screen {
         table.row();
         table.add(detach).left().padTop(12).padLeft(12);
         table.row();
+        SelectBox<String> selectBox = new SelectBox(skin);
+        String[] items = {"one, two two two", "Is there anybody going to listen..."};
+        selectBox.setItems(items);
+        table.add(selectBox).left().padTop(12).padLeft(12);
 
         TextButton sendOrder = new TextButton("Send Order", skin);
         sendOrder.addListener(new ClickListener() {

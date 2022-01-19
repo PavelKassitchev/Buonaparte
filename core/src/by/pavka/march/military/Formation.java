@@ -44,7 +44,7 @@ public class Formation extends Force {
         interForces = new Array<>();
         visualForces = new Array<>();
         viewForces = new Array<>();
-        speed = 2.0f;
+        speed = 3.0f;
     }
 
     @Override
