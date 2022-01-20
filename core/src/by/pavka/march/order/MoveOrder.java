@@ -37,9 +37,6 @@ public class MoveOrder implements Order {
             start = st;
         }
         force.forcePath = paths;
-        for (Path p : force.forcePath) {
-            System.out.println(p.fromHex + "   " + p.toHex);
-        }
         return true;
     }
 
