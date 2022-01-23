@@ -148,7 +148,6 @@ public class Hex extends Group {
 
             Array<Force> forces = playScreen.selectedForces;
             if(!forces.isEmpty()) {
-                System.out.println("CHECKED NOT EMPTY");
                 for (Force f : forces) {
                     Force.sendOrder(f, new MoveOrder(playScreen.destinations));
                 }

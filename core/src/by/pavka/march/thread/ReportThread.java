@@ -8,13 +8,26 @@ import com.badlogic.gdx.utils.ObjectSet;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.Path;
 import by.pavka.march.military.Force;
+import by.pavka.march.order.Order;
 
 public class ReportThread extends Thread {
     private Force force;
     float delay;
+    private Order order;
 
     public ReportThread(Force force) {
         this.force = force;
+        if (force.remoteHeadForce == null || force.playScreen.getHexGraph().areNeighbours(force.remoteHeadForce.hex, force.hex)) {
+            delay = 0;
+        } else {
+            delay = force.findCommandDistance();
+        }
+        setDaemon(true);
+    }
+
+    public ReportThread(Force force, Order order) {
+        this.force = force;
+        this.order = order;
         if (force.remoteHeadForce == null || force.playScreen.getHexGraph().areNeighbours(force.remoteHeadForce.hex, force.hex)) {
             delay = 0;
         } else {
@@ -35,6 +48,8 @@ public class ReportThread extends Thread {
         final float time = force.playScreen.time;
 
         final Force copy = force.copyForce();
+
+        final Order fulfilledOrder = order;
         long beg = 0;
         try {
             while (beg < delay) {
@@ -58,6 +73,9 @@ public class ReportThread extends Thread {
                     force.visualTime = time;
                     force.playScreen.updateEnemies(delayedEnemies, delayedArea, force.visualTime);
                     force.visualizeCopy(copy);
+                    if (fulfilledOrder != null) {
+                        force.visualOrders.removeOrder(fulfilledOrder);
+                    }
                 }
             });
         }

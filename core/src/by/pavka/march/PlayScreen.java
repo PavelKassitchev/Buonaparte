@@ -266,7 +266,8 @@ public class PlayScreen extends GestureDetector implements Screen {
         trees.setMinCheckCount(1);
         trees.setMaxCheckCount(1);
 
-        final OrderView orderLabel = new OrderView("", skin);
+//        final OrderView orderLabel = new OrderView("", skin);
+        final OrderView orderLabel = new OrderView(f, skin);
         addTreeTab(f, tree, tabTable, trees, orderLabel);
         TextButton detach = new TextButton("Detach Checked", skin);
         detach.addListener(new ClickListener() {
@@ -286,6 +287,8 @@ public class PlayScreen extends GestureDetector implements Screen {
         table.row();
         table.add(detach).left().padTop(12).padLeft(12);
         table.row();
+        table.add(orderLabel);
+        table.row();
         SelectBox<String> selectBox = new SelectBox(skin);
         String[] items = {"one, two two two", "Is there anybody going to listen..."};
         selectBox.setItems(items);
@@ -297,7 +300,8 @@ public class PlayScreen extends GestureDetector implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 Force f = trees.getChecked().getForce();
                 System.out.println("Send Order Exactly to " + f.getName());
-                Force.sendOrder(f, new DetachOrder());
+                Force hyperForce = f.nation == null ? ((Formation)f).subForces.get(0).findHyperForce() : f.findHyperForce();
+                Force.sendOrder(f, new DetachOrder(hyperForce));
                 if (f.remoteHeadForce == null) {
                     ForceButton fb = trees.getChecked();
                     fb.remove();
@@ -311,8 +315,8 @@ public class PlayScreen extends GestureDetector implements Screen {
                 }
             }
         });
-        table.row();
-        table.add(orderLabel);
+//        table.row();
+//        table.add(orderLabel);
         table.row();
         table.add(sendOrder).left().padTop(12);
 
@@ -367,7 +371,11 @@ public class PlayScreen extends GestureDetector implements Screen {
         } else if (force.nation == null){
             orderLabel.setText("Detach from " + ((Formation)force).subForces.get(0).findHyperForce().getName());
         } else {
-            orderLabel.clear();
+            if (force.visualOrders.size() == 0) {
+                orderLabel.clear();
+            } else {
+                orderLabel.setText(force.visualOrders.first().toString());
+            }
         }
     }
 

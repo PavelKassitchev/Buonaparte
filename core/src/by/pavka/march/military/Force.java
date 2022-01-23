@@ -24,6 +24,7 @@ import by.pavka.march.configuration.Nation;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.Path;
 import by.pavka.march.order.Order;
+import by.pavka.march.order.OrderList;
 import by.pavka.march.thread.OrderThread;
 import by.pavka.march.thread.ReportThread;
 import by.pavka.march.view.ForceRep;
@@ -69,6 +70,8 @@ public abstract class Force extends Image {
     public Array<Path> visualForcePath;
     public Array<Path> tail;
     public Array<Path> visualTail;
+    public OrderList actualOrders;
+    public OrderList visualOrders;
     //    public ObjectIntMap<Force> visualEnemies;
     public ObjectMap<Force, Hex> visualEnemies;
     public ObjectSet<Hex> reconArea;
@@ -102,6 +105,8 @@ public abstract class Force extends Image {
         visualTail = new Array<>();
         forcePath = new Array<>();
         visualForcePath = new Array<>();
+        actualOrders = new OrderList(this);
+        visualOrders = new OrderList(this);
 //        visualEnemies = new ObjectIntMap<>();
         visualEnemies = new ObjectMap<>();
         reconArea = new ObjectSet<>();
@@ -177,9 +182,7 @@ public abstract class Force extends Image {
                 path.render(shapeRenderer, 0, 0, 1);
             }
             if (visualForcePath != null && !visualForcePath.isEmpty()) {
-                System.out.println("VISUAL PATH DRAWING: " + visualForcePath.size);
                 Path p = visualForcePath.first();
-                System.out.println("PATH DRAWING: " + p);
                 p.render(shapeRenderer, 1, 0, 0);
                 if (showPath) {
                     for (Path path : visualForcePath) {
@@ -303,6 +306,10 @@ public abstract class Force extends Image {
         t.start();
     }
 
+    public void sendReport(Order order) {
+
+    }
+
     private boolean readyToRecon(float delta) {
         report += delta;
         if (report > 3) {
@@ -318,8 +325,11 @@ public abstract class Force extends Image {
             super.act(delta);
             float f = delta * HOURS_IN_SECOND * MarchConfig.REST_FACTOR;
             rest(f);
-            if (forcePath != null && !forcePath.isEmpty() || !tail.isEmpty()) {
-                move(delta);
+//            if (forcePath != null && !forcePath.isEmpty() || !tail.isEmpty()) {
+//                move(delta);
+//            }
+            if (actualOrders.first() != null) {
+                actualOrders.first().execute(this, delta);
             }
             if (!isEnemy() && readyToRecon(delta)) {
                 recon();

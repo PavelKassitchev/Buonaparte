@@ -12,9 +12,34 @@ import by.pavka.march.map.Hex;
 import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
 
-public class DetachOrder implements Order {
+public class DetachOrder extends Order {
+    public Formation hyper;
+    private DetachForceOrder detachForceOrder;
+
+    public DetachOrder(Force force) {
+        hyper = (Formation)force;
+//        detachForceOrder = new DetachForceOrder(force, false);
+        detachForceOrder = new DetachForceOrder(this);
+        hyper.visualOrders.addFirstOrder(detachForceOrder);
+    }
+
     @Override
-    public boolean execute(Force force) {
+    public void set(Force force) {
+//        Force sub = null;
+//        if (force.nation == null) {
+//            Formation group = (Formation) force;
+//            sub = group.subForces.get(0);
+//        } else {
+//            sub = force;
+//        }
+//        hyper = (Formation)sub.findHyperForce();
+//        detachForceOrder = new DetachForceOrder(force, false);
+//        hyper.visualOrders.addFirstOrder(detachForceOrder);
+        execute(force, 0);
+    }
+
+    @Override
+    public boolean execute(Force force, float delta) {
         if (force == null) {
             return false;
         }
@@ -40,6 +65,9 @@ public class DetachOrder implements Order {
         else {
             force.detach(true, true);
         }
+        force.actualOrders.fulfillOrder(this);
+//        hyper.visualOrders.removeOrder(detachForceOrder);
+        hyper.actualOrders.fulfillOrder(detachForceOrder);
         return true;
     }
 
