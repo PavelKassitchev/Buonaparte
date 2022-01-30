@@ -20,6 +20,8 @@ public class BuonaparteGame extends Game {
 	@Override
 	public void create () {
 		textureAtlas = new TextureAtlas("unit/friend.txt");
+//		TextureAtlas atlas = new TextureAtlas("skin/neutralizer/neutralizer-ui.atlas");
+//		skin = new Skin(Gdx.files.internal("skin/neutralizer/neutralizer-ui.json"), atlas);
 		TextureAtlas atlas = new TextureAtlas("skin/clean-crispy/clean-crispy-ui.atlas");
 		skin = new Skin(Gdx.files.internal("skin/clean-crispy/clean-crispy-ui.json"), atlas);
 //		TextureAtlas atlas = new TextureAtlas("skin/golden-ui-skin.atlas");

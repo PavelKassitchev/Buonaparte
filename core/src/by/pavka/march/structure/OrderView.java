@@ -35,7 +35,8 @@ public class OrderView extends Table {
         undo.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (undo.isVisible() && force.visualOrders.first() instanceof DetachForceOrder) {
+                if (undo.isVisible() && force.visualOrders != null &&
+                        force.visualOrders.first() instanceof DetachForceOrder) {
                     System.out.println("COMPLICATED");
                     DetachForceOrder detachForceOrder = (DetachForceOrder) force.visualOrders.first();
                     if (detachForceOrder.detachOrder != null && detachForceOrder.detachOrder.irrevocable == false) {
