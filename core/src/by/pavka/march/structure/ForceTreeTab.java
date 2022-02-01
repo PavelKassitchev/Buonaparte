@@ -28,6 +28,8 @@ public class ForceTreeTab extends Table {
     Array<OrderView> orderLabels = new Array<>();
     SelectBox<String> selectBox;
 
+    final OrderTable orderTable;
+
     public ForceTreeTab(Skin skin, final ForceTreeWindow forceTreeWindow, final ForceTree forceTree,
                         final Force force, final Table tabTable, final ButtonGroup<ForceButton> trees) {
         super(skin);
@@ -38,12 +40,15 @@ public class ForceTreeTab extends Table {
         this.trees = trees;
         singleForce = new ForceButton(force, skin);
 
-        final OrderView orderLabel = new OrderView("", getSkin());
+//        final OrderView orderLabel = new OrderView("", getSkin());
+        orderTable = new OrderTable(force, skin);
+        System.out.println("Order table " + force.visualOrders.first());
 
         singleForce.setChecked(true);
         tabTable.add(singleForce).left();
         trees.add(singleForce);
-        force.playScreen.updateTree(forceTree, force, orderLabel);
+//        force.playScreen.updateTree(forceTree, force, orderLabel);
+        force.playScreen.updateTree(forceTree, force);
         table = new Table(skin);
         fillInTable();
         forceTreeWindow.add(this);
@@ -71,6 +76,9 @@ public class ForceTreeTab extends Table {
         });
         table.row();
         table.add(detach).left().padTop(12).padLeft(12);
+        table.row();
+
+        table.add(orderTable);
         table.row();
 
         singleForce.addListener(new ClickListener() {

@@ -21,7 +21,27 @@ public class OrderView extends Table {
         undo = new ImageButton(skin.getDrawable("button-close-over"));
         add(orderLabel);
         add(undo);
-        undo.setVisible(false);
+//        undo.setVisible(false);
+        undo.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (undo.isVisible() && force.visualOrders != null &&
+                        force.visualOrders.first() instanceof DetachForceOrder) {
+                    System.out.println("COMPLICATED");
+                    DetachForceOrder detachForceOrder = (DetachForceOrder) force.visualOrders.first();
+                    if (detachForceOrder.detachOrder != null && detachForceOrder.detachOrder.irrevocable == false) {
+                        detachForceOrder.detachOrder.canceled = true;
+                    }
+                }
+                if (undo.isVisible() && force.visualOrders.first().irrevocable == false) {
+                    clear();
+                    Order order = force.visualOrders.first();
+                    System.out.println("ORDER:" + order);
+                    force.visualOrders.removeOrder(order);
+                    order.canceled = true;
+                }
+            }
+        });
     }
 
     public OrderView(final Force force, Skin skin) {
@@ -31,7 +51,7 @@ public class OrderView extends Table {
         undo = new ImageButton(skin.getDrawable("button-close-over"));
         add(orderLabel);
         add(undo);
-        undo.setVisible(false);
+//        undo.setVisible(false);
         undo.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

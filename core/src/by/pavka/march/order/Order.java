@@ -23,5 +23,8 @@ public abstract class Order {
 
     public abstract boolean execute(Array<Force> forces);
 
-
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 }

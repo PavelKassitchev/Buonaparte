@@ -5,7 +5,9 @@ import com.badlogic.gdx.utils.Array;
 import by.pavka.march.military.Force;
 import by.pavka.march.thread.ReportThread;
 
-public class OrderList {
+import java.util.Iterator;
+
+public class OrderList implements Iterable<Order> {
     private Array<Order> orders = new Array<>();
     private Force force;
 
@@ -42,5 +44,10 @@ public class OrderList {
             return null;
         }
         return orders.first();
+    }
+
+    @Override
+    public Iterator<Order> iterator() {
+        return orders.iterator();
     }
 }
