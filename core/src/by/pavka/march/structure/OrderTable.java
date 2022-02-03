@@ -15,10 +15,18 @@ public class OrderTable extends VerticalGroup {
     public OrderTable(Force force, Skin skin) {
         this.skin = skin;
         this.force = force;
-        for(Order o : force.visualOrders) {
+        for (Order o : force.visualOrders) {
 //            addActor(new OrderView(o.toString(), skin));
             addActor(new OrderView(force, skin));
         }
 
+    }
+
+    public void update() {
+        for (Order o : force.visualOrders) {
+//            addActor(new OrderView(o.toString(), skin));
+            addActor(new OrderView(force, skin));
+            System.out.println(force.visualOrders.size() + " " + force.visualOrders.first());
+        }
     }
 }

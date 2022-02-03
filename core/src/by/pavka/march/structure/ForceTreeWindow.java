@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import by.pavka.march.PlayScreen;
 import by.pavka.march.military.Force;
+import com.badlogic.gdx.utils.Array;
 
 public class ForceTreeWindow extends Window {
     final PlayScreen playScreen;
@@ -19,11 +20,14 @@ public class ForceTreeWindow extends Window {
     final ForceTree tree;
     final ButtonGroup<ForceButton> trees;
     ScrollPane scrollPane;
+    Array<ForceTreeTab> forceTreeTabs;
 
     public ForceTreeWindow(Force force, Skin skin) {
         super(force.getName(), skin);
         this.force = force;
         this.playScreen = force.playScreen;
+
+        forceTreeTabs = new Array<>();
 
         playScreen.uiStage.addActor(this);
         setBounds(playScreen.uiStage.getWidth() * 0.1f, playScreen.uiStage.getHeight() * 0.1f,
@@ -59,6 +63,7 @@ public class ForceTreeWindow extends Window {
                     ButtonGroup<ForceButton> trees, final OrderView orderLabel) {
         ForceTreeTab forceTreeTab = new ForceTreeTab(getSkin(), this, tree, force, tabTable, trees);
         activateTab(forceTreeTab);
+        forceTreeTabs.add(forceTreeTab);
 
     }
 

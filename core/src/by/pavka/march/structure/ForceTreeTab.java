@@ -104,6 +104,7 @@ public class ForceTreeTab extends Table {
                 Force hyperForce = f.nation == null ? ((Formation) f).subForces.get(0).findHyperForce() : f.findHyperForce();
                 Force.sendOrder(f, new DetachOrder(hyperForce));
                 if (f.remoteHeadForce == null) {
+                    forceTreeWindow.forceTreeTabs.removeValue(ForceTreeTab.this, true);
                     ForceButton fb = trees.getChecked();
                     fb.remove();
                     trees.remove(fb);
@@ -111,6 +112,9 @@ public class ForceTreeTab extends Table {
 //                    orderLabel.clear();
                     Force force = trees.getButtons().get(0).getForce();
                     force.playScreen.updateTree(forceTree, force);
+                    ForceTreeTab forceTab = forceTreeWindow.forceTreeTabs.get(0);
+//                    forceTab.fillInTable();
+                    forceTab.orderTable.update();
                 } else {
                     force.playScreen.destroyTreeWindow();
                 }

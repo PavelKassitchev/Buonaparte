@@ -59,11 +59,11 @@ public class OrderView extends Table {
                         force.visualOrders.first() instanceof DetachForceOrder) {
                     System.out.println("COMPLICATED");
                     DetachForceOrder detachForceOrder = (DetachForceOrder) force.visualOrders.first();
-                    if (detachForceOrder.detachOrder != null && detachForceOrder.detachOrder.irrevocable == false) {
+                    if (detachForceOrder.detachOrder != null && !detachForceOrder.detachOrder.irrevocable) {
                         detachForceOrder.detachOrder.canceled = true;
                     }
                 }
-                if (undo.isVisible() && force.visualOrders.first().irrevocable == false) {
+                if (undo.isVisible() && !force.visualOrders.first().irrevocable) {
                     clear();
                     Order order = force.visualOrders.first();
                     System.out.println("ORDER:" + order);
