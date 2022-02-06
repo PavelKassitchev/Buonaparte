@@ -3,6 +3,7 @@ package by.pavka.march.thread;
 import com.badlogic.gdx.Gdx;
 
 import by.pavka.march.military.Force;
+import by.pavka.march.order.MoveOrder;
 import by.pavka.march.order.Order;
 
 public class OrderThread extends Thread {
@@ -12,7 +13,13 @@ public class OrderThread extends Thread {
     public OrderThread(Force force, Order order) {
         this.force = force;
         this.order = order;
-        force.visualOrders.addOrder(order);
+        if (order instanceof MoveOrder && !((MoveOrder) order).additiveOrder && force.visualOrders.first() instanceof MoveOrder) {
+            ((MoveOrder)(force.visualOrders.first())).setDestinations(((MoveOrder) order).destinations);
+            force.visualOrders.removeMoveOrders();
+        } else {
+            force.visualOrders.addOrder(order);
+        }
+//        force.visualOrders.addOrder(order);
         setDaemon(true);
     }
 

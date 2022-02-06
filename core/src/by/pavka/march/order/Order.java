@@ -9,6 +9,7 @@ public abstract class Order {
     public boolean canceled;
 
     public void receive(Force force) {
+        System.out.println("Received order " + this + " " + canceled);
         if (force != null && !canceled) {
             force.actualOrders.addOrder(this);
             if (force.actualOrders.size() == 1) {

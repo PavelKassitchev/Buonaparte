@@ -92,6 +92,11 @@ public class Hex extends Group {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return " col: " + col + " row: " + row;
+    }
+
 
     class HexListener extends ClickListener {
         @Override
@@ -100,6 +105,7 @@ public class Hex extends Group {
                 playScreen.destroyForceWindow();
                 playScreen.destroyTreeWindow();
                 playScreen.setDetailedUi(Hex.this);
+                playScreen.additiveOrder = false;
 //                playScreen.forceWindow.remove();
             } else if (playScreen.selectedHex != null || !playScreen.selectedForces.isEmpty() ||
                     playScreen.selectedPaths != null) {
@@ -117,6 +123,9 @@ public class Hex extends Group {
         }
 
         private void navigate() {
+            if (!playScreen.destinations.isEmpty()) {
+                playScreen.additiveOrder = true;
+            }
             playScreen.destinations.add(Hex.this);
             GraphPath<Hex> hexPath;
             Array<Path> paths = new Array<>();
@@ -149,11 +158,12 @@ public class Hex extends Group {
             Array<Force> forces = playScreen.selectedForces;
             if(!forces.isEmpty()) {
                 for (Force f : forces) {
-                    Force.sendOrder(f, new MoveOrder(playScreen.destinations));
+                    Force.sendOrder(f, new MoveOrder(playScreen.destinations, playScreen.additiveOrder));
                 }
             }
         }
 
     }
+
 }
 

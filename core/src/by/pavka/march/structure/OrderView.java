@@ -16,27 +16,28 @@ public class OrderView extends Table {
     public ImageButton undo;
     public Force force;
 
-    public OrderView(String text, Skin skin) {
+    public OrderView(final Force force, final Order order, Skin skin) {
+        this.force = force;
+        String text = order.toString();
         orderLabel = new Label(text, skin);
         undo = new ImageButton(skin.getDrawable("button-close-over"));
         add(orderLabel);
         add(undo);
-//        undo.setVisible(false);
+
         undo.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (undo.isVisible() && force.visualOrders != null &&
-                        force.visualOrders.first() instanceof DetachForceOrder) {
-                    System.out.println("COMPLICATED");
-                    DetachForceOrder detachForceOrder = (DetachForceOrder) force.visualOrders.first();
-                    if (detachForceOrder.detachOrder != null && detachForceOrder.detachOrder.irrevocable == false) {
+                        order instanceof DetachForceOrder) {
+                    System.out.println("THIS IS DETACHFORCEORDER");
+                    DetachForceOrder detachForceOrder = (DetachForceOrder) order;
+                    if (detachForceOrder.detachOrder != null && !detachForceOrder.detachOrder.irrevocable) {
                         detachForceOrder.detachOrder.canceled = true;
                     }
                 }
-                if (undo.isVisible() && force.visualOrders.first().irrevocable == false) {
+                if (undo.isVisible() && !order.irrevocable) {
                     clear();
-                    Order order = force.visualOrders.first();
-                    System.out.println("ORDER:" + order);
+                    System.out.println("CANCELLED " + order.hashCode());
                     force.visualOrders.removeOrder(order);
                     order.canceled = true;
                 }
@@ -44,35 +45,7 @@ public class OrderView extends Table {
         });
     }
 
-    public OrderView(final Force force, Skin skin) {
-        this.force = force;
-        String text = force.visualOrders.size() == 0 ? "" : force.visualOrders.first().toString();
-        orderLabel = new Label(text, skin);
-        undo = new ImageButton(skin.getDrawable("button-close-over"));
-        add(orderLabel);
-        add(undo);
-//        undo.setVisible(false);
-        undo.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (undo.isVisible() && force.visualOrders != null &&
-                        force.visualOrders.first() instanceof DetachForceOrder) {
-                    System.out.println("COMPLICATED");
-                    DetachForceOrder detachForceOrder = (DetachForceOrder) force.visualOrders.first();
-                    if (detachForceOrder.detachOrder != null && !detachForceOrder.detachOrder.irrevocable) {
-                        detachForceOrder.detachOrder.canceled = true;
-                    }
-                }
-                if (undo.isVisible() && !force.visualOrders.first().irrevocable) {
-                    clear();
-                    Order order = force.visualOrders.first();
-                    System.out.println("ORDER:" + order);
-                    force.visualOrders.removeOrder(order);
-                    order.canceled = true;
-                }
-            }
-        });
-    }
+
 
     public void setText(String text) {
         orderLabel.setText(text);

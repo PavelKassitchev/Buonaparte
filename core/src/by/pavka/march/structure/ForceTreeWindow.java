@@ -8,10 +8,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.PlayScreen;
 import by.pavka.march.military.Force;
-import com.badlogic.gdx.utils.Array;
 
 public class ForceTreeWindow extends Window {
     final PlayScreen playScreen;
@@ -46,8 +46,7 @@ public class ForceTreeWindow extends Window {
         trees.setMinCheckCount(1);
         trees.setMaxCheckCount(1);
 
-        final OrderView orderLabel = new OrderView(force, skin);
-        addTreeTab(force, tree, tabTable, trees, orderLabel);
+        addTreeTab(force, tree, tabTable, trees);
 
         ImageButton closeButton = new ImageButton(skin.getDrawable("button-close"));
         closeButton.addListener(new ClickListener() {
@@ -60,7 +59,7 @@ public class ForceTreeWindow extends Window {
     }
 
     void addTreeTab(final Force force, final ForceTree tree, Table tabTable,
-                    ButtonGroup<ForceButton> trees, final OrderView orderLabel) {
+                    ButtonGroup<ForceButton> trees) {
         ForceTreeTab forceTreeTab = new ForceTreeTab(getSkin(), this, tree, force, tabTable, trees);
         activateTab(forceTreeTab);
         forceTreeTabs.add(forceTreeTab);
@@ -80,5 +79,7 @@ public class ForceTreeWindow extends Window {
         scrollPane.setScrollingDisabled(true, false);
         row();
         add(scrollPane).left().top();
+        force.playScreen.updateTree(forceTreeTab.forceTree, forceTreeTab.force);
+        forceTreeTab.fillInTable();
     }
 }

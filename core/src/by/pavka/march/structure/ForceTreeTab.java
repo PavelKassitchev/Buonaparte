@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.Array;
 import by.pavka.march.configuration.FormationValidator;
 import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
-import by.pavka.march.order.DetachOrder;
 
 public class ForceTreeTab extends Table {
     ForceTreeWindow forceTreeWindow;
@@ -69,7 +68,7 @@ public class ForceTreeTab extends Table {
                     Force group = FormationValidator.createGroup(forces, force.playScreen.game);
                     //TODO
                     forceTreeWindow.clearTab();
-                    forceTreeWindow.addTreeTab(group, forceTree, tabTable, trees, null);
+                    forceTreeWindow.addTreeTab(group, forceTree, tabTable, trees);
 
                 }
             }
@@ -102,19 +101,21 @@ public class ForceTreeTab extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 Force f = trees.getChecked().getForce();
                 Force hyperForce = f.nation == null ? ((Formation) f).subForces.get(0).findHyperForce() : f.findHyperForce();
-                Force.sendOrder(f, new DetachOrder(hyperForce));
+//                Force.sendOrder(f, new DetachOrder(hyperForce));
+//                Force.sendOrder(f, new DetachOrder(hyperForce, f));
                 if (f.remoteHeadForce == null) {
                     forceTreeWindow.forceTreeTabs.removeValue(ForceTreeTab.this, true);
                     ForceButton fb = trees.getChecked();
                     fb.remove();
                     trees.remove(fb);
                     trees.getButtons().get(0).setChecked(true);
-//                    orderLabel.clear();
                     Force force = trees.getButtons().get(0).getForce();
                     force.playScreen.updateTree(forceTree, force);
-                    ForceTreeTab forceTab = forceTreeWindow.forceTreeTabs.get(0);
-//                    forceTab.fillInTable();
+                    ForceTreeTab forceTab = forceTreeWindow.forceTreeTabs.get(0);;
                     forceTab.orderTable.update();
+                    forceTreeWindow.activateTab(forceTab);
+//                    force.playScreen.updateTree(forceTab.forceTree, forceTab.force);
+//                    forceTab.fillInTable();
                 } else {
                     force.playScreen.destroyTreeWindow();
                 }

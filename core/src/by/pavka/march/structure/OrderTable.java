@@ -1,11 +1,11 @@
 package by.pavka.march.structure;
 
-import by.pavka.march.order.Order;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.military.Force;
+import by.pavka.march.order.Order;
 
 public class OrderTable extends VerticalGroup {
     Force force;
@@ -15,18 +15,14 @@ public class OrderTable extends VerticalGroup {
     public OrderTable(Force force, Skin skin) {
         this.skin = skin;
         this.force = force;
-        for (Order o : force.visualOrders) {
-//            addActor(new OrderView(o.toString(), skin));
-            addActor(new OrderView(force, skin));
-        }
+        update();
 
     }
 
     public void update() {
+        clear();
         for (Order o : force.visualOrders) {
-//            addActor(new OrderView(o.toString(), skin));
-            addActor(new OrderView(force, skin));
-            System.out.println(force.visualOrders.size() + " " + force.visualOrders.first());
+            addActor(new OrderView(force, o, skin));
         }
     }
 }

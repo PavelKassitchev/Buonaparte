@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -72,6 +73,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     public Force resigningForce;
 
     public Array<Hex> destinations;
+    public boolean additiveOrder;
 
     private TiledMap map;
     private TiledMapTileLayer tileLayer;
@@ -161,24 +163,6 @@ public class PlayScreen extends GestureDetector implements Screen {
         }
     }
 
-//    public class ForceButton extends TextButton {
-//        private Force force;
-//
-//        public ForceButton(String name, Force force) {
-//            super(name, skin, "toggle");
-////            super(name, skin, "tab");
-//            this.force = force;
-//        }
-//
-//        public void setForce(Force f) {
-//            force = f;
-//        }
-//
-//        public Force getForce() {
-//            return force;
-//        }
-//    }
-
     private void setLabelInfo(Label label, Force force) {
         String text = String.format("%d soldiers \n  infantry: %d\n  cavalry: %d\n  guns: %d\n  wagons: %d" +
                         "\nmorale-%.1f\nfatigue-%.1f\nxp-%.1f", force.visualStrength.soldiers(), force.visualStrength.infantry,
@@ -247,119 +231,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     }
 
     private void createForceTreeWindow(final Force f) {
-//        treeWindow = new Window(f.getName(), skin);
         treeWindow = new ForceTreeWindow(f, skin);
-//        uiStage.addActor(treeWindow);
-//        treeWindow.setBounds(uiStage.getWidth() * 0.1f, uiStage.getHeight() * 0.1f,
-//                uiStage.getWidth() * 0.8f, uiStage.getHeight() * 0.8f);
-//
-//        final Table tabTable = new Table(skin);
-//        treeWindow.add(tabTable).left().padLeft(12);
-//        tabTable.setBounds(0, 0, treeWindow.getWidth(), treeWindow.getHeight() * 0.1f);
-//        treeWindow.row();
-//
-//        final ForceTree tree = new ForceTree(skin);
-//        Table table = new Table(skin);
-//        table.add(tree).padTop(12);
-//
-//        final ButtonGroup<ForceButton> trees = new ButtonGroup();
-//        trees.setMinCheckCount(1);
-//        trees.setMaxCheckCount(1);
-//
-//        final OrderView orderLabel = new OrderView(f, skin);
-//        addTreeTab(f, tree, tabTable, trees, orderLabel);
-//        TextButton detach = new TextButton("Detach Checked", skin);
-//        detach.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                Array<Force> forces = tree.findForcesToDetach();
-//                if (!forces.isEmpty()) {
-//                    for (Force force : forces) {
-//                        force.superForce.viewForces.removeValue(force, true);
-//                        System.out.println("Removed from view: " + force.getName());
-//                    }
-//                    Force force = FormationValidator.createGroup(forces, game);
-//                    addTreeTab(force, tree, tabTable, trees, orderLabel);
-//                }
-//            }
-//        });
-//        table.row();
-//        table.add(detach).left().padTop(12).padLeft(12);
-//        table.row();
-//        table.add(orderLabel);
-//        table.row();
-//        SelectBox<String> selectBox = new SelectBox(skin);
-//        String[] items = {"one, two two two", "Is there anybody going to listen..."};
-//        selectBox.setItems(items);
-//        table.add(selectBox).left().padTop(12).padLeft(12);
-//
-//        TextButton sendOrder = new TextButton("Send Order", skin);
-//        sendOrder.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                Force f = trees.getChecked().getForce();
-//                System.out.println("Send Order Exactly to " + f.getName());
-//                Force hyperForce = f.nation == null ? ((Formation)f).subForces.get(0).findHyperForce() : f.findHyperForce();
-//                Force.sendOrder(f, new DetachOrder(hyperForce));
-//                if (f.remoteHeadForce == null) {
-//                    ForceButton fb = trees.getChecked();
-//                    fb.remove();
-//                    trees.remove(fb);
-//                    trees.getButtons().get(0).setChecked(true);
-//                    orderLabel.clear();
-//                    Force force = trees.getButtons().get(0).getForce();
-//                    updateTree(tree, force);
-//                } else {
-//                    destroyTreeWindow();
-//                }
-//            }
-//        });
-//
-//        table.row();
-//        table.add(sendOrder).left().padTop(12);
-//
-//        ScrollPane scrollPane = new ScrollPane(table, skin);
-//        scrollPane.setScrollingDisabled(true, false);
-//        treeWindow.add(scrollPane).left().top().width(treeWindow.getWidth());
-//
-//        ImageButton closeButton = new ImageButton(skin.getDrawable("button-close"));
-//        closeButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                destroyTreeWindow();
-//            }
-//        });
-//        treeWindow.getTitleTable().add(closeButton).right();
-    }
-
-    private void addTreeTab(final Force f, final ForceTree tree, Table tabTable, ButtonGroup trees) {
-        ForceButton single = new ForceButton(f, skin);
-        single.setChecked(true);
-        tabTable.add(single).left();
-        trees.add(single);
-        single.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                updateTree(tree, f);
-            }
-        });
-        updateTree(tree, f);
-    }
-
-    public void addTreeTab(final Force f, final ForceTree tree, Table tabTable, ButtonGroup trees,
-                           final OrderView orderLabel) {
-        ForceButton single = new ForceButton(f, skin);
-        single.setChecked(true);
-        tabTable.add(single).left();
-        trees.add(single);
-        single.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                System.out.println("Click!");
-                updateTree(tree, f, orderLabel);
-            }
-        });
-        updateTree(tree, f, orderLabel);
     }
 
     public void updateTree(ForceTree tree, Force force, OrderView orderLabel) {
@@ -418,7 +290,7 @@ public class PlayScreen extends GestureDetector implements Screen {
             }
         });
         group.add(zoom);
-        timer = new ImageTextButton("Time: " + (int) time, skin, "toggle") {
+        timer = new ImageTextButton("Time: " + (int) time, skin, "clock") {
             @Override
             public void act(float delta) {
                 super.act(delta);
@@ -429,16 +301,15 @@ public class PlayScreen extends GestureDetector implements Screen {
             }
         };
         timer.setChecked(true);
-        group.add(timer);
+        group.add(timer).padRight(4);
         group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
         group.left();
         detailedUi = false;
     }
 
-
     public void setDetailedUi(Hex hex) {
         if (!detailedUi) {
-            TextButton cancel = new TextButton("Cancel", skin);
+            ImageButton cancel = new ImageButton(skin, "cancel");
             cancel.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -452,9 +323,8 @@ public class PlayScreen extends GestureDetector implements Screen {
                     show();
                 }
             });
-            group.add(cancel);
 
-            hexButton = new ImageTextButton("", skin, "toggle");
+            hexButton = new ImageTextButton("", skin, "landscape");
             hexButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -472,9 +342,8 @@ public class PlayScreen extends GestureDetector implements Screen {
                     destroyTreeWindow();
                 }
             });
-            group.add(hexButton);
-
-            forceButton = new ImageTextButton("Forces: none", skin, "toggle");
+            group.add(hexButton).padRight(4);
+            forceButton = new ImageTextButton("Forces: none", skin, "shako");
             forceButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -494,6 +363,7 @@ public class PlayScreen extends GestureDetector implements Screen {
                 }
             });
             group.add(forceButton);
+            group.add(cancel);
             detailedUi = true;
         }
         destinations = new Array<>();
@@ -537,7 +407,8 @@ public class PlayScreen extends GestureDetector implements Screen {
     }
 
     public void setHexInfo(Hex hex) {
-        hexButton.setText("Mov.cost = " + hex.cell.getTile().getProperties().get("cost").toString());
+        hexButton.setText("Point " + hex.row + ":" + hex.col + '\n' +
+                "Mov.cost = " + hex.cell.getTile().getProperties().get("cost").toString());
     }
 
     public void setForceInfo(Force force) {
@@ -591,7 +462,7 @@ public class PlayScreen extends GestureDetector implements Screen {
         if (!detailedUi) {
             setGeneralUi();
         }
-        group.setDebug(true, true);
+//        group.setDebug(true, true);
     }
 
     @Override

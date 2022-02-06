@@ -28,6 +28,7 @@ public class ReportThread extends Thread {
     public ReportThread(Force force, Order order) {
         this.force = force;
         this.order = order;
+        System.out.println("REPORT execution " + order);
         if (force.remoteHeadForce == null || force.playScreen.getHexGraph().areNeighbours(force.remoteHeadForce.hex, force.hex)) {
             delay = 0;
         } else {
@@ -75,6 +76,7 @@ public class ReportThread extends Thread {
                     force.visualizeCopy(copy);
                     if (fulfilledOrder != null) {
                         force.visualOrders.removeOrder(fulfilledOrder);
+                        System.out.println("REPORTED EXECUTION " + fulfilledOrder);
                     }
                 }
             });

@@ -61,4 +61,9 @@ public class DetachForceOrder extends Order {
     public boolean execute(Array<Force> forces) {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + detachOrder.detachingForce.getName();
+    }
 }

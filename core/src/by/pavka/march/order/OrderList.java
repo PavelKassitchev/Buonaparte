@@ -2,10 +2,10 @@ package by.pavka.march.order;
 
 import com.badlogic.gdx.utils.Array;
 
+import java.util.Iterator;
+
 import by.pavka.march.military.Force;
 import by.pavka.march.thread.ReportThread;
-
-import java.util.Iterator;
 
 public class OrderList implements Iterable<Order> {
     private Array<Order> orders = new Array<>();
@@ -25,6 +25,22 @@ public class OrderList implements Iterable<Order> {
 
     public void removeOrder(Order order) {
         orders.removeValue(order, true);
+//        if (order instanceof MoveOrder) {
+//            Array<Hex> orderDestinations = ((MoveOrder) order).destinations;
+//            for (Hex h : orderDestinations) {
+//                force.playScreen.destinations.removeValue(h, true);
+//            }
+//        }
+    }
+
+    public void removeMoveOrders() {
+        while (orders.size > 1 && orders.get(1) instanceof MoveOrder) {
+            orders.removeIndex(1);
+        }
+    }
+
+    public void removeFirst() {
+        orders.removeValue(orders.first(), true);
     }
 
     public void fulfillOrder(Order order) {

@@ -13,11 +13,21 @@ import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
 
 public class DetachOrder extends Order {
+    public Force detachingForce;
     public Formation hyper;
     private DetachForceOrder detachForceOrder;
 
     public DetachOrder(Force force) {
         hyper = (Formation)force;
+//        detachForceOrder = new DetachForceOrder(force, false);
+        detachForceOrder = new DetachForceOrder(this);
+        hyper.visualOrders.addFirstOrder(detachForceOrder);
+    }
+
+    public DetachOrder(Force force, Force thisForce) {
+        System.out.println("Strange detach order");
+        hyper = (Formation)force;
+        detachingForce = thisForce;
 //        detachForceOrder = new DetachForceOrder(force, false);
         detachForceOrder = new DetachForceOrder(this);
         hyper.visualOrders.addFirstOrder(detachForceOrder);
@@ -93,5 +103,10 @@ public class DetachOrder extends Order {
         group.shapeRenderer = renderer;
         Configurator.addForce(group, col, row, playScreen);
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " " + detachingForce.getName();
     }
 }

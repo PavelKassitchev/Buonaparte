@@ -9,10 +9,14 @@ import by.pavka.march.military.Force;
 
 public class MoveOrder extends Order {
 
-    private Array<Hex> destinations;
+    public final Hex originalDestination;
+    public Array<Hex> destinations;
+    public boolean additiveOrder;
 
-    public MoveOrder(Array<Hex> destinations) {
-        this.destinations = destinations;
+    public MoveOrder(Array<Hex> destinations, boolean additiveOrder) {
+        this.destinations = new Array<>(destinations);
+        originalDestination = destinations.get(destinations.size - 1);
+        this.additiveOrder = additiveOrder;
     }
 
     public void setDestinations(Array<Hex> dest) {
@@ -22,13 +26,15 @@ public class MoveOrder extends Order {
 
     @Override
     public void receive(Force force) {
-        if (force.actualOrders.first() instanceof MoveOrder && force.actualOrders.size() == 1) {
+        if (!canceled && !additiveOrder && force.actualOrders.first() instanceof MoveOrder) {
             System.out.println("AHA!");
             ((MoveOrder)force.actualOrders.first()).setDestinations(destinations);
             ((MoveOrder)force.actualOrders.first()).set(force);
+            force.actualOrders.removeMoveOrders();
 
         } else {
             super.receive(force);
+            System.out.println("OHO! " + force.actualOrders.size());
         }
     }
 
@@ -95,5 +101,10 @@ public class MoveOrder extends Order {
             execute(force, 0);
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + hashCode() + " " + destinations.get(destinations.size - 1);
     }
 }
