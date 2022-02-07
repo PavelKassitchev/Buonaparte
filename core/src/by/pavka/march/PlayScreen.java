@@ -407,7 +407,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     }
 
     public void setHexInfo(Hex hex) {
-        hexButton.setText("Point " + hex.row + ":" + hex.col + '\n' +
+        hexButton.setText("Point " + hex.col + ":" + hex.row + '\n' +
                 "Mov.cost = " + hex.cell.getTile().getProperties().get("cost").toString());
     }
 

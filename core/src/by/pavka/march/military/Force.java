@@ -379,6 +379,7 @@ public abstract class Force extends Image {
                 if (playScreen.selectedForces.contains(this, true)
                         && playScreen.destinations.contains(toHex, true)) {
                     playScreen.destinations.removeValue(toHex, true);
+                    actualOrders.removeHexFromDestinations(toHex);
                 }
 
                 if (tail.contains(path.reverse(), false)) {

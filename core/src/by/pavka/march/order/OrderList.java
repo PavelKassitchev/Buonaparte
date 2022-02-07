@@ -1,5 +1,6 @@
 package by.pavka.march.order;
 
+import by.pavka.march.map.Hex;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.Iterator;
@@ -36,6 +37,21 @@ public class OrderList implements Iterable<Order> {
     public void removeMoveOrders() {
         while (orders.size > 1 && orders.get(1) instanceof MoveOrder) {
             orders.removeIndex(1);
+        }
+    }
+
+    public void removeHexFromDestinations(Hex hex) {
+        if (!orders.isEmpty()) {
+            int i = 0;
+            Order topOrder = orders.get(i);
+            while (topOrder instanceof MoveOrder) {
+                ((MoveOrder) topOrder).destinations.removeValue(hex,true);
+                i++;
+                if (i > orders.size - 1) {
+                    break;
+                }
+                topOrder = orders.get(i);
+            }
         }
     }
 

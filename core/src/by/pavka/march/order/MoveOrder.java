@@ -105,6 +105,12 @@ public class MoveOrder extends Order {
 
     @Override
     public String toString() {
-        return super.toString() + hashCode() + " " + destinations.get(destinations.size - 1);
+        String d;
+        if (!destinations.isEmpty()) {
+            d = destinations.get(destinations.size - 1).toString();
+        } else {
+            d = "";
+        }
+        return super.toString() + hashCode() + " " + d;
     }
 }

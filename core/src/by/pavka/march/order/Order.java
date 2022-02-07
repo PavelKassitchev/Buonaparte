@@ -18,6 +18,10 @@ public abstract class Order {
         }
     }
 
+    public void cancel() {
+        //TODO
+    }
+
     public abstract void set(Force force);
 
     public abstract boolean execute(Force force, float delta);
