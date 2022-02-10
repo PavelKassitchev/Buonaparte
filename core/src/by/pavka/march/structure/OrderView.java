@@ -35,11 +35,16 @@ public class OrderView extends Table {
                         detachForceOrder.detachOrder.revoked = true;
                     }
                 }
-                if (undo.isVisible() && !order.irrevocable) {
+                if (undo.isVisible()) {
                     clear();
                     System.out.println("CANCELLED " + order.hashCode());
                     force.visualOrders.removeOrder(order);
-                    order.revoked = true;
+                    if (!order.irrevocable) {
+                        order.revoked = true;
+                    } else {
+                        System.out.println("cancellation");
+                        order.cancel(force);
+                    }
                 }
             }
         });

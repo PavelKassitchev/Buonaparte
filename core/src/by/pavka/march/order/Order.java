@@ -17,7 +17,7 @@ public abstract class Order {
         }
     }
 
-    public void cancel() {
+    public void cancel(Force f) {
         //TODO
     }
 

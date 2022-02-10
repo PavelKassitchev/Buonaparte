@@ -16,6 +16,10 @@ public class OrderList implements Iterable<Order> {
         this.force = force;
     }
 
+    public boolean containsOrder(Order o) {
+        return orders.contains(o, true);
+    }
+
     public void addOrder(Order order) {
         orders.add(order);
     }
@@ -40,7 +44,7 @@ public class OrderList implements Iterable<Order> {
             if (!o.irrevocable) {
                 o.revoked = true;
             } else {
-                o.cancel();
+//                o.cancel(force);
             }
             orders.removeIndex(0);
         }
@@ -60,6 +64,26 @@ public class OrderList implements Iterable<Order> {
                 topOrder = orders.get(i);
             }
         }
+    }
+
+    public void removeDestinations(MoveOrder order) {
+        System.out.println("Inside removeDestinations method");
+        if (containsOrder(order)) {
+            System.out.println("Inside removeDestinations method CONTAINS");
+            int index = orders.indexOf(order, true);
+            System.out.println("Inside removeDestinations method CONTAINS " + index + " " + size());
+            if (size() > index + 1) {
+                int i = index + 1;
+                Order next = orders.get(i);
+                System.out.println("Order is " + next.hashCode() + " index = " + i);
+                while (next instanceof MoveOrder && size() > i) {
+                    ((MoveOrder) next).destinations.removeAll(order.destinations, true);
+                    System.out.println("Removing destinations from " + next.hashCode());
+                    i++;
+                }
+            }
+        }
+
     }
 
     public void removeFirst() {

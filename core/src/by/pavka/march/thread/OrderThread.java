@@ -8,6 +8,7 @@ import by.pavka.march.order.Order;
 public class OrderThread extends Thread {
     private Force force;
     private Order order;
+    private long del;
 
     public OrderThread(Force force, Order order) {
         this.force = force;
@@ -16,12 +17,18 @@ public class OrderThread extends Thread {
         setDaemon(true);
     }
 
+    public OrderThread(Force force, Order order, long delay) {
+        this.force = force;
+        this.order = order;
+        this.del = delay;
+        order.visualize(force);
+        setDaemon(true);
+    }
+
     @Override
     public void run() {
-//        force.visualOrders.addOrder(order);
         try {
-            long delay = (long) force.findCommandDistance();
-//            System.out.println("Sending order to " + force + " within " + delay);
+            long delay = (long) force.findCommandDistance() + del;
             long beg = 0;
             while (beg < delay / 3) {
                 Thread.sleep(100);
@@ -32,7 +39,6 @@ public class OrderThread extends Thread {
             if (order != null) {
                 order.irrevocable = true;
             }
-//            System.out.println("IRREVOCABLE!!");
             while (beg < delay) {
                 Thread.sleep(100);
                 if (!force.playScreen.timer.isChecked()) {
@@ -46,8 +52,6 @@ public class OrderThread extends Thread {
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
-//                Formation f = (Formation) force.superForce;
-//                order.execute(force);
                 order.receive(force);
             }
         });

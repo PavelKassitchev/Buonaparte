@@ -173,6 +173,11 @@ public abstract class Force extends Image {
         t.start();
     }
 
+    public static void sendOrder(final Force force, final Order order, long delay) {
+        Thread t = new OrderThread(force, order, delay);
+        t.start();
+    }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         if ((nation == playScreen.game.nation && shapeRenderer != null) || playScreen.enemies.containsKey(this)) {

@@ -12,6 +12,7 @@ public class MoveOrder extends Order {
     public final Hex originalDestination;
     public Array<Hex> destinations;
     public boolean additiveOrder;
+    public boolean isSet;
 
     public MoveOrder(Array<Hex> destinations, boolean additiveOrder) {
         this.destinations = new Array<>(destinations);
@@ -75,6 +76,7 @@ public class MoveOrder extends Order {
             start = st;
         }
         force.forcePath = paths;
+        isSet = true;
     }
 
     @Override
@@ -117,6 +119,12 @@ public class MoveOrder extends Order {
             execute(force, 0);
         }
         return true;
+    }
+
+    @Override
+    public void cancel(Force f) {
+        Force.sendOrder(f, new RemoveDestinationsOrder(this), 50);
+        System.out.println("Sending cancellation " + hashCode());
     }
 
     @Override
