@@ -3,7 +3,6 @@ package by.pavka.march.thread;
 import com.badlogic.gdx.Gdx;
 
 import by.pavka.march.military.Force;
-import by.pavka.march.order.MoveOrder;
 import by.pavka.march.order.Order;
 
 public class OrderThread extends Thread {
@@ -13,13 +12,7 @@ public class OrderThread extends Thread {
     public OrderThread(Force force, Order order) {
         this.force = force;
         this.order = order;
-        if (order instanceof MoveOrder && !((MoveOrder) order).additiveOrder && force.visualOrders.first() instanceof MoveOrder) {
-            ((MoveOrder)(force.visualOrders.first())).setDestinations(((MoveOrder) order).destinations);
-            force.visualOrders.removeMoveOrders();
-        } else {
-            force.visualOrders.addOrder(order);
-        }
-//        force.visualOrders.addOrder(order);
+        order.visualize(force);
         setDaemon(true);
     }
 
@@ -28,7 +21,7 @@ public class OrderThread extends Thread {
 //        force.visualOrders.addOrder(order);
         try {
             long delay = (long) force.findCommandDistance();
-            System.out.println("Sending order to " + force + " within " + delay);
+//            System.out.println("Sending order to " + force + " within " + delay);
             long beg = 0;
             while (beg < delay / 3) {
                 Thread.sleep(100);
@@ -39,7 +32,7 @@ public class OrderThread extends Thread {
             if (order != null) {
                 order.irrevocable = true;
             }
-            System.out.println("IRREVOCABLE!!");
+//            System.out.println("IRREVOCABLE!!");
             while (beg < delay) {
                 Thread.sleep(100);
                 if (!force.playScreen.timer.isChecked()) {

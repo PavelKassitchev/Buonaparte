@@ -23,19 +23,34 @@ public class MoveOrder extends Order {
         destinations = dest;
     }
 
+    @Override
+    public void visualize(Force force) {
+//        Order o = force.visualOrders.first();
+        Order o = force.visualOrders.last();
+        if (o instanceof MoveOrder) {
+            System.out.println("MoveOrder is first visual " + o.hashCode() + " irrevocable: " + o.irrevocable);
+            if (additiveOrder) {
+                System.out.println("MoveOrder is additive " + hashCode() + " irrevocable: " + irrevocable
+                        + " previous irrevocable: " + o.hashCode() + " " + o.irrevocable);
+                if (!o.irrevocable) {
+                    System.out.println("First order is not irrevocable");
+                    force.visualOrders.removeOrder(o);
+                    o.revoked = true;
+                }
+            } else {
+                force.visualOrders.removeMoveOrders();
+            }
+        }
+        System.out.println("Super");
+        super.visualize(force);
+    }
 
     @Override
     public void receive(Force force) {
-        if (!canceled && !additiveOrder && force.actualOrders.first() instanceof MoveOrder) {
-            System.out.println("AHA!");
-            ((MoveOrder)force.actualOrders.first()).setDestinations(destinations);
-            ((MoveOrder)force.actualOrders.first()).set(force);
+        if (!revoked && !additiveOrder && force.actualOrders.first() instanceof MoveOrder) {
             force.actualOrders.removeMoveOrders();
-
-        } else {
-            super.receive(force);
-            System.out.println("OHO! " + force.actualOrders.size());
         }
+        super.receive(force);
     }
 
     @Override
@@ -87,6 +102,7 @@ public class MoveOrder extends Order {
         if (force.forcePath != null && !force.forcePath.isEmpty() || !force.tail.isEmpty()) {
             force.move(delta);
         } else {
+            System.out.println("Fulfilling order " + hashCode());
             force.actualOrders.fulfillOrder(this);
         }
         return true;
@@ -105,12 +121,12 @@ public class MoveOrder extends Order {
 
     @Override
     public String toString() {
-        String d;
-        if (!destinations.isEmpty()) {
-            d = destinations.get(destinations.size - 1).toString();
-        } else {
-            d = "";
-        }
-        return super.toString() + hashCode() + " " + d;
+//        String d;
+//        if (!destinations.isEmpty()) {
+//            d = destinations.get(destinations.size - 1).toString();
+//        } else {
+//            d = "";
+//        }
+        return super.toString() + hashCode() + " " + originalDestination + " " + destinations.size;
     }
 }

@@ -1,10 +1,10 @@
 package by.pavka.march.order;
 
-import by.pavka.march.map.Hex;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.Iterator;
 
+import by.pavka.march.map.Hex;
 import by.pavka.march.military.Force;
 import by.pavka.march.thread.ReportThread;
 
@@ -35,17 +35,24 @@ public class OrderList implements Iterable<Order> {
     }
 
     public void removeMoveOrders() {
-        while (orders.size > 1 && orders.get(1) instanceof MoveOrder) {
-            orders.removeIndex(1);
+        while (orders.size > 0 && orders.get(0) instanceof MoveOrder) {
+            Order o = orders.get(0);
+            if (!o.irrevocable) {
+                o.revoked = true;
+            } else {
+                o.cancel();
+            }
+            orders.removeIndex(0);
         }
     }
+
 
     public void removeHexFromDestinations(Hex hex) {
         if (!orders.isEmpty()) {
             int i = 0;
             Order topOrder = orders.get(i);
             while (topOrder instanceof MoveOrder) {
-                ((MoveOrder) topOrder).destinations.removeValue(hex,true);
+                ((MoveOrder) topOrder).destinations.removeValue(hex, true);
                 i++;
                 if (i > orders.size - 1) {
                     break;
@@ -76,6 +83,13 @@ public class OrderList implements Iterable<Order> {
             return null;
         }
         return orders.first();
+    }
+
+    public Order last() {
+        if (orders.isEmpty()) {
+            return null;
+        }
+        return orders.get(orders.size - 1);
     }
 
     @Override

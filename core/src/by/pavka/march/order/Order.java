@@ -6,11 +6,10 @@ import by.pavka.march.military.Force;
 
 public abstract class Order {
     public boolean irrevocable;
-    public boolean canceled;
+    public boolean revoked;
 
     public void receive(Force force) {
-        System.out.println("Received order " + this + " " + canceled);
-        if (force != null && !canceled) {
+        if (force != null && !revoked) {
             force.actualOrders.addOrder(this);
             if (force.actualOrders.size() == 1) {
                 set(force);
@@ -20,6 +19,10 @@ public abstract class Order {
 
     public void cancel() {
         //TODO
+    }
+
+    public void visualize(Force force) {
+        force.visualOrders.addOrder(this);
     }
 
     public abstract void set(Force force);
