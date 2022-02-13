@@ -71,6 +71,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     public Array<Force> selectedForces;
     public ObjectMap<Force, Hex> enemies;
     public Force resigningForce;
+    public Formation headForce;
 
     public Array<Hex> destinations;
     public boolean additiveOrder;
@@ -81,7 +82,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     private InputMultiplexer inputMultiplexer;
 
     public Window forceWindow;
-    public Window treeWindow;
+    public ForceTreeWindow treeWindow;
 
     private Table group;
     public ImageTextButton timer;
@@ -111,7 +112,7 @@ public class PlayScreen extends GestureDetector implements Screen {
         hexGraph = new HexGraph(map, this);
         Courier.hexGraph = hexGraph;
 
-        configurator.addForces(this);
+        headForce = configurator.addForces(this);
 
         enemies = new ObjectMap<>();
         selectedForces = new Array<>();
@@ -300,6 +301,7 @@ public class PlayScreen extends GestureDetector implements Screen {
                 }
             }
         };
+        timer.getLabelCell().width(96);
         timer.setChecked(true);
         group.add(timer).padRight(4);
         group.setBounds(0, uiStage.getHeight() * 0.9f, uiStage.getWidth(), uiStage.getHeight() * .1f);
@@ -491,6 +493,8 @@ public class PlayScreen extends GestureDetector implements Screen {
         playStage.draw();
         uiStage.act();
         uiStage.draw();
+
+//        System.out.println(treeWindow);
     }
 
     @Override

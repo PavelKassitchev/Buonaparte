@@ -9,19 +9,28 @@ import by.pavka.march.military.Force;
 
 public class MoveOrder extends Order {
 
-    public final Hex originalDestination;
+    public Hex originalDestination;
     public Array<Hex> destinations;
     public boolean additiveOrder;
     public boolean isSet;
 
     public MoveOrder(Array<Hex> destinations, boolean additiveOrder) {
         this.destinations = new Array<>(destinations);
-        originalDestination = destinations.get(destinations.size - 1);
+        if (!destinations.isEmpty()) {
+            originalDestination = destinations.get(destinations.size - 1);
+        }
         this.additiveOrder = additiveOrder;
     }
 
+    public MoveOrder() {
+
+    }
+
     public void setDestinations(Array<Hex> dest) {
-        destinations = dest;
+        destinations = new Array<>(dest);
+        if (!destinations.isEmpty()) {
+            originalDestination = destinations.get(destinations.size - 1);
+        }
     }
 
     @Override
@@ -129,12 +138,6 @@ public class MoveOrder extends Order {
 
     @Override
     public String toString() {
-//        String d;
-//        if (!destinations.isEmpty()) {
-//            d = destinations.get(destinations.size - 1).toString();
-//        } else {
-//            d = "";
-//        }
         return super.toString() + hashCode() + " " + originalDestination + " " + destinations.size;
     }
 }

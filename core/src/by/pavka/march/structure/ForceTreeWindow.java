@@ -80,6 +80,16 @@ public class ForceTreeWindow extends Window {
         row();
         add(scrollPane).left().top();
         force.playScreen.updateTree(forceTreeTab.forceTree, forceTreeTab.force);
-        forceTreeTab.fillInTable();
+//        forceTreeTab.fillInTable();
+
+    }
+
+    public ForceTreeTab getForceTreeTab(Force f) {
+        for (ForceTreeTab tab : forceTreeTabs) {
+            if (tab.force == f) {
+                return tab;
+            }
+        }
+        return null;
     }
 }

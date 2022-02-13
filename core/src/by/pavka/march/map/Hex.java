@@ -116,7 +116,7 @@ public class Hex extends Group {
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
             if (button == Input.Buttons.RIGHT && (playScreen.selectedHex != null
-            || playScreen.selectedPaths != null || !playScreen.selectedForces.isEmpty())) {
+                    || playScreen.selectedPaths != null || !playScreen.selectedForces.isEmpty())) {
                 navigate();
             }
             return super.touchDown(event, x, y, pointer, button);
@@ -156,11 +156,31 @@ public class Hex extends Group {
 
 
             Array<Force> forces = playScreen.selectedForces;
-            if(!forces.isEmpty()) {
+            //WORK with tab
+//            if (!forces.isEmpty()) {
+//                for (Force f : forces) {
+//                    Force.sendOrder(f, new MoveOrder(playScreen.destinations, playScreen.additiveOrder));
+//                }
+//            }
+
+            if (playScreen.treeWindow == null) {
                 for (Force f : forces) {
                     Force.sendOrder(f, new MoveOrder(playScreen.destinations, playScreen.additiveOrder));
                 }
+            } else {
+                Array<Hex> dest = new Array<Hex>();
+                dest.add(Hex.this);
+                for (Force f : forces) {
+//                    MoveOrder mo = new MoveOrder(playScreen.destinations, playScreen.additiveOrder);
+//                    f.futureOrders.addOrder(mo);
+//                    playScreen.treeWindow.getForceTreeTab(f).futureOrderTable.addOrder(mo);
+                    ((MoveOrder)playScreen.treeWindow.getForceTreeTab(f).futureOrderTable.getLastOrder())
+                            .setDestinations(playScreen.destinations);
+                    playScreen.treeWindow.getForceTreeTab(f).futureOrderTable.refreshLabels();
+                }
+                playScreen.treeWindow.setVisible(true);
             }
+
         }
 
     }

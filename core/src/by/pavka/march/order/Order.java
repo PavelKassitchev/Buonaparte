@@ -11,18 +11,21 @@ public abstract class Order {
     public void receive(Force force) {
         if (force != null && !revoked) {
             force.actualOrders.addOrder(this);
+            System.out.println(hashCode() + " received inside Order class");
             if (force.actualOrders.size() == 1) {
                 set(force);
             }
         }
     }
 
-    public void cancel(Force f) {
-        //TODO
-    }
+//    public void cancel(Force f) {
+//        //TODO
+//    }
 
     public void visualize(Force force) {
-        force.visualOrders.addOrder(this);
+        if (!revoked) {
+            force.visualOrders.addOrder(this);
+        }
     }
 
     public abstract void set(Force force);
@@ -30,6 +33,8 @@ public abstract class Order {
     public abstract boolean execute(Force force, float delta);
 
     public abstract boolean execute(Array<Force> forces);
+
+    public abstract void cancel(Force f);
 
     @Override
     public String toString() {

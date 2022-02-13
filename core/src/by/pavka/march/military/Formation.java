@@ -19,8 +19,10 @@ public class Formation extends Force {
     Array<Force> detachedForces;
     public FormationValidator validator;
     public boolean structureChanged;
+    public Formation headForce;
 
-    public Formation() {
+    public Formation(Formation headForce) {
+        this.headForce = headForce;
         subForces = new Array<>();
     }
 
@@ -36,6 +38,16 @@ public class Formation extends Force {
         for (Force force : subForces) {
             force.rest(f);
         }
+    }
+
+    public Formation(Formation headForce, TextureRegion region) {
+        super(region, 20000, 6000);
+        this.headForce = headForce;
+        subForces = new Array<>();
+        interForces = new Array<>();
+        visualForces = new Array<>();
+        viewForces = new Array<>();
+        speed = 3.0f;
     }
 
     public Formation(TextureRegion region) {
@@ -183,11 +195,8 @@ public class Formation extends Force {
 //        if (validator.canAttach(force)) {
         if (true){
             add(force);
-
             viewForces.add(force);
-
             force.shapeRenderer = null;
-
             if (physical) {
                 force.superForce = this;
             }
@@ -211,7 +220,7 @@ public class Formation extends Force {
 
     @Override
     public Formation copyForce() {
-        Formation copy = new Formation();
+        Formation copy = new Formation(headForce);
         Strength interSt = new Strength(strength);
         Spirit interSp = new Spirit(spirit);
         copy.strength = interSt;

@@ -26,6 +26,11 @@ public class OrderList implements Iterable<Order> {
 
     public void addFirstOrder(Order order) {
         orders.insert(0, order);
+        System.out.println("in Order List addFirstOrder " + order.hashCode());
+    }
+
+    public void clear() {
+        orders.clear();
     }
 
     public void removeOrder(Order order) {

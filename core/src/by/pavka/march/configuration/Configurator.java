@@ -18,6 +18,7 @@ import by.pavka.march.military.Unit;
 
 public class Configurator {
     public BuonaparteGame game;
+    public PlayScreen playScreen;
     public Nation nation;
     private Campaign campaign;
     private HexGraph hexGraph;
@@ -41,7 +42,7 @@ public class Configurator {
         return campaign.layerName;
     }
 
-    public void addForces(PlayScreen playScreen) {
+    public Formation addForces(PlayScreen playScreen) {
         Force testForce = new Unit(game.getTextureRegion("fr_cav"));
         testForce.setName("X.Cav.Sq.");
         Formation cavDivision = new Formation(game.getTextureRegion("fr_cav"));
@@ -94,7 +95,7 @@ public class Configurator {
         addForce(form, 8, 7, playScreen);
 
         addForce(AUSTRIA, 0, 1, playScreen);
-
+        return headForce;
     }
 
     private static void setPlayScreenToChildren(Force force, PlayScreen playScreen) {

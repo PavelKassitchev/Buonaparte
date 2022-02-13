@@ -72,6 +72,7 @@ public abstract class Force extends Image {
     public Array<Path> visualTail;
     public OrderList actualOrders;
     public OrderList visualOrders;
+//    public OrderList futureOrders;
     //    public ObjectIntMap<Force> visualEnemies;
     public ObjectMap<Force, Hex> visualEnemies;
     public ObjectSet<Hex> reconArea;
@@ -107,6 +108,7 @@ public abstract class Force extends Image {
         visualForcePath = new Array<>();
         actualOrders = new OrderList(this);
         visualOrders = new OrderList(this);
+//        futureOrders = new OrderList(this);
 //        visualEnemies = new ObjectIntMap<>();
         visualEnemies = new ObjectMap<>();
         reconArea = new ObjectSet<>();
@@ -140,7 +142,10 @@ public abstract class Force extends Image {
     }
 
     public float findCommandDistance() {
-        return findReportDistance(findHyperForce().remoteHeadForce);
+//        System.out.println("Command Distance to " + " " + findHyperForce().getName());
+//        return findReportDistance(findHyperForce().remoteHeadForce);
+        System.out.println("Command Distance is " + findReportDistance(playScreen.headForce));
+        return findReportDistance(playScreen.headForce);
     }
 
     public static void sendOrder(final Array<Force> forces, final Order order) {

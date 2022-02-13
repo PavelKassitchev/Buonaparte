@@ -20,6 +20,12 @@ public class DetachForceOrder extends Order {
 //        this.executable = executable;
     }
 
+    public DetachForceOrder() {}
+
+    public void setForce (Force force) {
+        detachedForce = force;
+    }
+
     @Override
     public void set(Force force) {
         execute(force, 0);
@@ -63,7 +69,16 @@ public class DetachForceOrder extends Order {
     }
 
     @Override
+    public void cancel(Force f) {
+
+    }
+
+    @Override
     public String toString() {
-        return super.toString() + detachOrder.detachingForce.getName();
+        if (detachOrder != null) {
+            return super.toString() + detachOrder.detachingForce.getName();
+        } else {
+            return super.toString();
+        }
     }
 }

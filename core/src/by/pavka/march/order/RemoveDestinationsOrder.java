@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import by.pavka.march.map.Hex;
 import by.pavka.march.military.Force;
 
-public class RemoveDestinationsOrder extends Order {
+public class RemoveDestinationsOrder extends CancellationOrder {
     public MoveOrder parentOrder;
     Array<Hex> destinations;
 
@@ -29,25 +29,5 @@ public class RemoveDestinationsOrder extends Order {
             force.actualOrders.removeOrder(parentOrder);
         }
 
-    }
-
-    @Override
-    public void visualize(Force force) {
-
-    }
-
-    @Override
-    public void set(Force force) {
-
-    }
-
-    @Override
-    public boolean execute(Force force, float delta) {
-        return false;
-    }
-
-    @Override
-    public boolean execute(Array<Force> forces) {
-        return false;
     }
 }

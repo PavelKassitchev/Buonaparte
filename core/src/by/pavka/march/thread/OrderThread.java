@@ -29,6 +29,7 @@ public class OrderThread extends Thread {
     public void run() {
         try {
             long delay = (long) force.findCommandDistance() + del;
+            System.out.println("Order " + order + order.hashCode() + " is sent with delay " + delay);
             long beg = 0;
             while (beg < delay / 3) {
                 Thread.sleep(100);
@@ -52,6 +53,7 @@ public class OrderThread extends Thread {
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
+                System.out.println("Order " + order.hashCode() + " is received");
                 order.receive(force);
             }
         });

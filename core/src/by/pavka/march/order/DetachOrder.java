@@ -3,7 +3,6 @@ package by.pavka.march.order;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 
-import by.pavka.march.BuonaparteGame;
 import by.pavka.march.PlayScreen;
 import by.pavka.march.configuration.Configurator;
 import by.pavka.march.configuration.FormationValidator;
@@ -15,7 +14,7 @@ import by.pavka.march.military.Formation;
 public class DetachOrder extends Order {
     public Force detachingForce;
     public Formation hyper;
-    private DetachForceOrder detachForceOrder;
+    public DetachForceOrder detachForceOrder;
 
     public DetachOrder(Force force) {
         hyper = (Formation)force;
@@ -25,12 +24,12 @@ public class DetachOrder extends Order {
     }
 
     public DetachOrder(Force force, Force thisForce) {
-        System.out.println("Strange detach order");
+        System.out.println("detach order " + hashCode() + " " + thisForce.getName()  + " from " + force.getName());
         hyper = (Formation)force;
         detachingForce = thisForce;
 //        detachForceOrder = new DetachForceOrder(force, false);
         detachForceOrder = new DetachForceOrder(this);
-        hyper.visualOrders.addFirstOrder(detachForceOrder);
+//        hyper.visualOrders.addFirstOrder(detachForceOrder);
     }
 
     @Override
@@ -90,14 +89,14 @@ public class DetachOrder extends Order {
             f.detach(true, true);
         }
         PlayScreen playScreen = forces.get(0).playScreen;
-        BuonaparteGame game = playScreen.game;
+//        BuonaparteGame game = playScreen.game;
         Nation nation = forces.get(0).nation;
         Hex hex = forces.get(0).hex;
         int col = hex.col;
         int row = hex.row;
         Formation hq = forces.get(0).remoteHeadForce;
         ShapeRenderer renderer = forces.get(0).shapeRenderer;
-        Force group = FormationValidator.createGroup(forces, game);
+        Force group = FormationValidator.createGroup(forces, playScreen);
         group.nation = nation;
         group.remoteHeadForce = hq;
         group.shapeRenderer = renderer;
@@ -106,7 +105,12 @@ public class DetachOrder extends Order {
     }
 
     @Override
+    public void cancel(Force f) {
+
+    }
+
+    @Override
     public String toString() {
-        return super.toString() + " " + detachingForce.getName();
+        return super.toString() + " " + detachingForce.getName() + " " + hyper.getName();
     }
 }

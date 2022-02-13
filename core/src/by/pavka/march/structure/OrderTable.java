@@ -11,18 +11,52 @@ public class OrderTable extends VerticalGroup {
     Force force;
     Skin skin;
     Array<OrderView> orderViews = new Array<>();
+    boolean isFutureOrders;
 
-    public OrderTable(Force force, Skin skin) {
+
+    public OrderTable(Force force, Skin skin, boolean isFutureOrders) {
         this.skin = skin;
         this.force = force;
-        update();
-
+        this.isFutureOrders = isFutureOrders;
+        if (!isFutureOrders) {
+            update();
+        }
     }
+
+    public OrderTable(Force force, Skin skin) {
+        this(force, skin, false);
+    }
+
 
     public void update() {
         clear();
         for (Order o : force.visualOrders) {
-            addActor(new OrderView(force, o, skin));
+            addActor(new OrderView(force, o, skin, false));
         }
     }
+
+    public void addOrder(Order order) {
+        OrderView ow = new OrderView(force, order, skin, true);
+        System.out.println("adding order");
+        addActor(ow);
+//        force.futureOrders.addOrder(order);
+        orderViews.add(ow);
+    }
+
+    public void refreshLabels() {
+        for (OrderView ow : orderViews) {
+            ow.updateLabel();
+        }
+
+    }
+
+    public Order getLastOrder() {
+        OrderView last = orderViews.get(orderViews.size - 1);
+        return last.order;
+    }
+
+    public boolean isEmpty() {
+        return orderViews.isEmpty();
+    }
+
 }
