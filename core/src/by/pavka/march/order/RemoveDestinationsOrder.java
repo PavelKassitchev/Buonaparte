@@ -1,5 +1,7 @@
 package by.pavka.march.order;
 
+import static by.pavka.march.characteristic.March.REGULAR;
+
 import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.map.Hex;
@@ -17,8 +19,9 @@ public class RemoveDestinationsOrder extends CancellationOrder {
     @Override
     public void receive(Force force) {
         System.out.println("Cancellation received");
-//        force.visualOrders.removeDestinations(parentOrder);
+        force.visualOrders.removeDestinations(parentOrder);
         force.actualOrders.removeDestinations(parentOrder);
+        force.setMarch(REGULAR);
         System.out.println("Destinations removed: " + parentOrder.destinations.size);
         if (parentOrder.isSet) {
             System.out.println("Cancelling order is set");

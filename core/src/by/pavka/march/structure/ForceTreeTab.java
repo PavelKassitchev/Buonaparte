@@ -65,7 +65,6 @@ public class ForceTreeTab extends Table {
     }
 
     public void fillInTable() {
-        System.out.println("Calling fillInTable " + force.getName());
         table.clear();
         table.add(forceTree).padTop(12);
         detach = new TextButton("Detach Checked", getSkin());
@@ -137,7 +136,9 @@ public class ForceTreeTab extends Table {
                 force.playScreen.additiveOrder = true;
                 if (order != null) {
                     futureOrderTable.addOrder(order);
+
                     //TODO
+
                     force.playScreen.treeWindow.setVisible(false);
                 }
             }
@@ -147,8 +148,10 @@ public class ForceTreeTab extends Table {
         table.add(futureOrderTable).left().padTop(12).padLeft(12);
 
         Force f = trees.getChecked().getForce();
-        System.out.println("FORCE F = " + f.getName());
-        if (f.remoteHeadForce == null) {
+        System.out.println("FORCE F = " + f.getName() + " remote head = "
+                + f.remoteHeadForce + " this is NOT head = " + (f != f.playScreen.headForce));
+        //TODO
+        if (f.remoteHeadForce == null && f != f.playScreen.headForce) {
             Force hyperForce = f.nation == null ? ((Formation) f).subForces.get(0).findHyperForce()
                     : force.findHyperForce();
             futureOrderTable.clear();
@@ -163,7 +166,7 @@ public class ForceTreeTab extends Table {
                 Force f = trees.getChecked().getForce();
 //                Force hyperForce = f.nation == null ? ((Formation) f).subForces.get(0).findHyperForce() : f.findHyperForce();
 //                Force.sendOrder(f, new DetachOrder(hyperForce, f));
-
+                long del = 0;
                 for (OrderView orderView : futureOrderTable.orderViews) {
                     Order order = orderView.order;
                     if (!order.revoked) {
@@ -173,12 +176,13 @@ public class ForceTreeTab extends Table {
                             detOrder.hyper.visualOrders.addFirstOrder(detOrder.detachForceOrder);
                         }
                         System.out.println("On Send Order to " + force.getName() + " " + order);
-                        Force.sendOrder(force, order);
+                        Force.sendOrder(force, order, del);
+                        del += 50;
                     }
                 }
 
 
-                if (f.remoteHeadForce == null) {
+                if (f.remoteHeadForce == null && f.playScreen.headForce != f) {
 //                    Force.sendOrder(f, new DetachOrder(hyperForce, f));
                     forceTreeWindow.forceTreeTabs.removeValue(ForceTreeTab.this, true);
                     ForceButton fb = trees.getChecked();

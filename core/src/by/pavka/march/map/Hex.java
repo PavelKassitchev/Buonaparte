@@ -5,6 +5,7 @@ import com.badlogic.gdx.ai.pfa.GraphPath;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -12,7 +13,9 @@ import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.PlayScreen;
 import by.pavka.march.military.Force;
+import by.pavka.march.order.JoinOrder;
 import by.pavka.march.order.MoveOrder;
+import by.pavka.march.order.Order;
 
 public class Hex extends Group {
 
@@ -78,6 +81,14 @@ public class Hex extends Group {
         forces.removeValue(force, true);
     }
 
+    public boolean hasForces() {
+        for (Actor a : getChildren()) {
+            if (a instanceof Force) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public Array<Force> enemiesOf(Force force) {
         if (!forces.isEmpty()) {
@@ -104,6 +115,7 @@ public class Hex extends Group {
             if (!playScreen.longPressed) {
                 playScreen.destroyForceWindow();
                 playScreen.destroyTreeWindow();
+                playScreen.destroySelectBox();
                 playScreen.setDetailedUi(Hex.this);
                 playScreen.additiveOrder = false;
 //                playScreen.forceWindow.remove();
@@ -132,7 +144,6 @@ public class Hex extends Group {
             if (playScreen.selectedPaths == null && playScreen.selectedHex != null) {
                 hexPath = playScreen.getHexGraph().findPath(playScreen.selectedHex, Hex.this);
             } else if (playScreen.selectedPaths == null && !playScreen.selectedForces.isEmpty()) {
-//                hexPath = playScreen.getHexGraph().findPath(playScreen.selectedForce.visualHex, Hex.this);
                 hexPath = playScreen.getHexGraph().findPath(playScreen.selectedForces.get(0).visualHex, Hex.this);
             } else {
                 Hex begin = playScreen.selectedPaths.peek().toHex;
@@ -149,36 +160,61 @@ public class Hex extends Group {
                 start = h;
                 playScreen.selectedPaths = paths;
             }
-//            if (playScreen.selectedForce != null) {
-////                Force.sendMoveOrder(playScreen.selectedForce, playScreen.destinations);
-//                Force.sendOrder(playScreen.selectedForce, new MoveOrder(playScreen.destinations));
-//            }
 
 
             Array<Force> forces = playScreen.selectedForces;
-            //WORK with tab
-//            if (!forces.isEmpty()) {
-//                for (Force f : forces) {
-//                    Force.sendOrder(f, new MoveOrder(playScreen.destinations, playScreen.additiveOrder));
-//                }
-//            }
 
             if (playScreen.treeWindow == null) {
                 for (Force f : forces) {
                     Force.sendOrder(f, new MoveOrder(playScreen.destinations, playScreen.additiveOrder));
                 }
             } else {
+                //TODO
                 Array<Hex> dest = new Array<Hex>();
                 dest.add(Hex.this);
-                for (Force f : forces) {
-//                    MoveOrder mo = new MoveOrder(playScreen.destinations, playScreen.additiveOrder);
-//                    f.futureOrders.addOrder(mo);
-//                    playScreen.treeWindow.getForceTreeTab(f).futureOrderTable.addOrder(mo);
-                    ((MoveOrder)playScreen.treeWindow.getForceTreeTab(f).futureOrderTable.getLastOrder())
+
+
+                Force frc = playScreen.treeWindow.getActiveForce();
+                Order order = playScreen.treeWindow.getForceTreeTab(frc).futureOrderTable.getLastOrder();
+                if (order instanceof JoinOrder && !Hex.this.getForces().isEmpty()) {
+                    JoinOrder jOrder = (JoinOrder) order;
+//                    jOrder.setTargetForce((Formation)Hex.this.getForces().first());
+
+
+//                    Array<Force> allies = frc.getAllies(Hex.this);
+//                    SelectBox selectForce = new SelectBox<Force>(frc.playScreen.game.getSkin());
+//                    selectForce.setItems(allies);
+//                    playScreen.addActorToPlayStage(selectForce);
+//                    selectForce.setBounds(Hex.this.getX(), Hex.this.getY(), 120, 20);
+                    playScreen.activateSelectBox(frc, Hex.this, jOrder);
+
+                } else {
+                    ((MoveOrder)playScreen.treeWindow.getForceTreeTab(frc).futureOrderTable.getLastOrder())
                             .setDestinations(playScreen.destinations);
+                    playScreen.treeWindow.setVisible(true);
+                }
+                playScreen.treeWindow.getForceTreeTab(frc).futureOrderTable.refreshLabels();
+
+
+                /*
+
+                for (Force f : forces) {
+                    Order order = playScreen.treeWindow.getForceTreeTab(f).futureOrderTable.getLastOrder();
+                    if (order instanceof JoinOrder && !Hex.this.getForces().isEmpty()) {
+                        JoinOrder jOrder = (JoinOrder) order;
+                        jOrder.setTargetForce((Formation)Hex.this.getForces().first());
+                    } else {
+                        ((MoveOrder)playScreen.treeWindow.getForceTreeTab(f).futureOrderTable.getLastOrder())
+                                .setDestinations(playScreen.destinations);
+                    }
+
+//                    ((MoveOrder)playScreen.treeWindow.getForceTreeTab(f).futureOrderTable.getLastOrder())
+//                            .setDestinations(playScreen.destinations);
                     playScreen.treeWindow.getForceTreeTab(f).futureOrderTable.refreshLabels();
                 }
-                playScreen.treeWindow.setVisible(true);
+
+                */
+//                playScreen.treeWindow.setVisible(true);
             }
 
         }

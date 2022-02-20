@@ -43,7 +43,7 @@ public class MoveOrder extends Order {
                 System.out.println("MoveOrder is additive " + hashCode() + " irrevocable: " + irrevocable
                         + " previous irrevocable: " + o.hashCode() + " " + o.irrevocable);
                 if (!o.irrevocable) {
-                    System.out.println("First order is not irrevocable");
+                    System.out.println("First order is not irrevocable " + o.getClass() + " " + getClass());
                     force.visualOrders.removeOrder(o);
                     o.revoked = true;
                 }
@@ -53,6 +53,14 @@ public class MoveOrder extends Order {
         }
         System.out.println("Super");
         super.visualize(force);
+    }
+
+    @Override
+    public boolean isExecutable(Force force) {
+        if (force.hex != null) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -71,6 +79,7 @@ public class MoveOrder extends Order {
         GraphPath<Hex> hexPath;
         Array<Path> paths = new Array<>();
         Hex start = force.hex;
+        System.out.println("IN MOVE ORDER number od destinations is " + destinations.size);
         for (Hex h : destinations) {
             hexPath = force.playScreen.getHexGraph().findPath(start, h);
             Hex st = null;
@@ -113,7 +122,7 @@ public class MoveOrder extends Order {
         if (force.forcePath != null && !force.forcePath.isEmpty() || !force.tail.isEmpty()) {
             force.move(delta);
         } else {
-            System.out.println("Fulfilling order " + hashCode());
+            System.out.println("Fulfilling move order " + hashCode());
             force.actualOrders.fulfillOrder(this);
         }
         return true;

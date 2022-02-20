@@ -27,6 +27,11 @@ public class DetachForceOrder extends Order {
     }
 
     @Override
+    public boolean isExecutable(Force force) {
+        return true;
+    }
+
+    @Override
     public void set(Force force) {
         execute(force, 0);
     }
@@ -70,7 +75,8 @@ public class DetachForceOrder extends Order {
 
     @Override
     public void cancel(Force f) {
-
+        Force.sendOrder(detachedForce, new JoinOrder((Formation)f));
+        System.out.println("Canceling detach");
     }
 
     @Override

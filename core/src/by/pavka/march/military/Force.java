@@ -5,10 +5,10 @@ import static by.pavka.march.BuonaparteGame.TILE_SIZE_PX;
 import static by.pavka.march.PlayScreen.HOURS_IN_SECOND;
 import static by.pavka.march.characteristic.Stock.NORMAL_FOOD_STOCK_DAYS;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -135,43 +135,18 @@ public abstract class Force extends Image {
     public float findReportDistance(Force force) {
         float delay = 0;
         Hex h = hex == null? findHyperForce().hex : hex;
-        if (force != null) {
+        if (force != null && force.hex != h) {
             delay = (float) Courier.courierDelay(force.hex, h) * 1000 / HOURS_IN_SECOND;
         }
         return delay;
     }
 
     public float findCommandDistance() {
-//        System.out.println("Command Distance to " + " " + findHyperForce().getName());
+
 //        return findReportDistance(findHyperForce().remoteHeadForce);
-        System.out.println("Command Distance is " + findReportDistance(playScreen.headForce));
         return findReportDistance(playScreen.headForce);
     }
 
-    public static void sendOrder(final Array<Force> forces, final Order order) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (forces.get(0).playScreen.timer.isChecked()) {
-                        Thread.sleep(20);
-                    }
-                    Thread.sleep((long) forces.get(0).findCommandDistance());
-                    while (forces.get(0).playScreen.timer.isChecked()) {
-                        Thread.sleep(20);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        order.execute(forces);
-                    }
-                });
-            }
-        }).start();
-    }
 
     public static void sendOrder(final Force force, final Order order) {
         Thread t = new OrderThread(force, order);
@@ -237,13 +212,6 @@ public abstract class Force extends Image {
 
     }
 
-    public void unvisualize() {
-        if (visualHex != null) {
-            visualHex.removeActor(this);
-        }
-        visualHex = null;
-    }
-
 
     public void mark() {
         setColor(getColor().b, getColor().g, getColor().r, 1);
@@ -257,6 +225,45 @@ public abstract class Force extends Image {
 
     public boolean isEnemy() {
         return nation != playScreen.game.nation;
+    }
+
+    public Array<Force> getAllies(Hex hex) {
+        Array<Force> allies = new Array<>();
+        if (hex.hasChildren()) {
+            for (Actor a : hex.getChildren()) {
+                Force f = (Force) a;
+                if (this != f && f.nation == nation) {
+                    allies.add(f);
+                }
+            }
+        }
+        return allies;
+    }
+
+    public Array<Formation> getAllyFormations(Hex hex) {
+        Array<Formation> allies = new Array<>();
+        if (hex.hasChildren()) {
+            for (Actor a : hex.getChildren()) {
+                Force f = (Force) a;
+                if (this != f && f.nation == nation && f instanceof Formation) {
+                    allies.add((Formation)f);
+                }
+            }
+        }
+        return allies;
+    }
+
+    public Array<Force> getEnemies(Hex hex) {
+        Array<Force> allies = new Array<>();
+        if (hex.hasChildren()) {
+            for (Actor a : hex.getChildren()) {
+                Force f = (Force) a;
+                if (f.nation != nation) {
+                    allies.add(f);
+                }
+            }
+        }
+        return allies;
     }
 
     public void recon() {
@@ -316,13 +323,22 @@ public abstract class Force extends Image {
         t.start();
     }
 
+    public void sendReport(final String tag, long delay) {
+        Thread t = new ReportThread(this , delay);
+        t.start();
+    }
+
     public void sendReport(Order order) {
 
     }
 
     private boolean readyToRecon(float delta) {
+        if (hex == null) {
+            return false;
+        }
         report += delta;
         if (report > 3) {
+//            System.out.println(getName() + " ready to recon");
             report = 0;
             return true;
         }
@@ -416,6 +432,10 @@ public abstract class Force extends Image {
 
             camp(delta, timeToCamp);
         }
+    }
+
+    public void setMarch(March march) {
+        marchConfig.setMarch(march);
     }
 
     public abstract void rest(float f);
@@ -523,9 +543,6 @@ public abstract class Force extends Image {
         superForce.changeStrength(strength.reverse());
 
         superForce.viewForces.removeValue(this, true);
-//        superForce.sendReport("");
-//        superForce = null;
-//        speed = findSpeed();
         spirit = findSpirit();
 
         return true;
@@ -538,6 +555,8 @@ public abstract class Force extends Image {
             if (superForce == null) {
                 return false;
             }
+            actualOrders.clear();
+            visualOrders.clear();
             setRealHex(findHyperForce().hex);
             nation = findHyperForce().nation;
             shapeRenderer = findHyperForce().shapeRenderer;
@@ -549,7 +568,7 @@ public abstract class Force extends Image {
             detach();
 
             speed = findSpeed();
-            System.out.println(superForce);
+//            System.out.println(superForce);
             findHyperForce().sendReport("detached");
 //            spirit = findSpirit();
             if (needsReport) {

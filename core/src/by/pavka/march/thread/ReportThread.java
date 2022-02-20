@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.Path;
 import by.pavka.march.military.Force;
+import by.pavka.march.order.JoinOrder;
 import by.pavka.march.order.Order;
 
 public class ReportThread extends Thread {
@@ -17,28 +18,48 @@ public class ReportThread extends Thread {
 
     public ReportThread(Force force) {
         this.force = force;
+//        if (force.remoteHeadForce == null || force.playScreen.getHexGraph().areNeighbours(force.remoteHeadForce.hex, force.hex)) {
+//            delay = 0;
+//        } else {
+//            delay = force.findCommandDistance();
+//        }
+        delay = force.findCommandDistance();
+        setDaemon(true);
+    }
+
+    public ReportThread(Force force, long d) {
+        this.force = force;
         if (force.remoteHeadForce == null || force.playScreen.getHexGraph().areNeighbours(force.remoteHeadForce.hex, force.hex)) {
             delay = 0;
         } else {
             delay = force.findCommandDistance();
         }
+        delay += d;
         setDaemon(true);
     }
 
     public ReportThread(Force force, Order order) {
         this.force = force;
         this.order = order;
-        System.out.println("REPORT execution " + order);
-        if (force.remoteHeadForce == null || force.playScreen.getHexGraph().areNeighbours(force.remoteHeadForce.hex, force.hex)) {
-            delay = 0;
-        } else {
-            delay = force.findCommandDistance();
-        }
+//        if (force.remoteHeadForce == null || force.playScreen.getHexGraph().areNeighbours(force.remoteHeadForce.hex, force.hex)) {
+//            delay = 0;
+//        } else {
+//            delay = force.findCommandDistance();
+//        }
+        delay = force.findCommandDistance();
+
+        System.out.println("REPORT execution " + order + " with delay " + delay);
         setDaemon(true);
     }
 
     @Override
     public void run() {
+        String d = "";
+        if (order != null) {
+            d += delay;
+            System.out.println("REPORT RUNNING " + order + " with delay " + d);
+        }
+
         final Hex delayedHex = force.hex;
 
         final Array<Path> delayedTail = new Array<>(force.tail);
@@ -51,11 +72,17 @@ public class ReportThread extends Thread {
         final Force copy = force.copyForce();
 
         final Order fulfilledOrder = order;
+        if (force.getName().equals("II.Art.Bttr.")) {
+            System.out.println("FulfilledOrder is " + fulfilledOrder + " thread " + hashCode());
+        }
         long beg = 0;
         try {
             while (beg < delay) {
                 Thread.sleep(100);
-                if(!force.playScreen.timer.isChecked()) {
+                if (!force.playScreen.timer.isChecked()) {
+                    if (fulfilledOrder instanceof JoinOrder) {
+                        System.out.println("Hey");
+                    }
                     beg += 100;
                 }
             }
@@ -67,16 +94,46 @@ public class ReportThread extends Thread {
 
                 @Override
                 public void run() {
-                    force.visualHex = delayedHex;
-                    force.visualTail = delayedTail;
-                    force.visualForcePath = delayedPath;
-                    force.setVisualHex(force.visualHex);
-                    force.visualTime = time;
-                    force.playScreen.updateEnemies(delayedEnemies, delayedArea, force.visualTime);
-                    force.visualizeCopy(copy);
-                    if (fulfilledOrder != null) {
+
+//                    force.visualHex = delayedHex;
+//                    force.visualTail = delayedTail;
+//                    force.visualForcePath = delayedPath;
+//                    force.setVisualHex(delayedHex);
+//                    force.visualTime = time;
+//                    force.playScreen.updateEnemies(delayedEnemies, delayedArea, force.visualTime);
+//                    force.visualizeCopy(copy);
+//                    if (fulfilledOrder != null) {
+//                        System.out.println("Order not null");
+//                        force.visualOrders.removeOrder(fulfilledOrder);
+//                        if (fulfilledOrder instanceof JoinOrder) {
+//                            System.out.println("Order Join Order");
+//                            force.visualHex.removeActor(force);
+//                            force.visualHex = null;
+//                            force.hex = null;
+//                            force.shapeRenderer = null;
+//                            force.nation = null;
+//                        } else {
+//
+//                        }
+//                        System.out.println("REPORTED EXECUTION " + fulfilledOrder);
+//                    }
+
+                    if (!(fulfilledOrder instanceof JoinOrder)) {
+                        force.visualTail = delayedTail;
+                        force.visualForcePath = delayedPath;
+                        force.setVisualHex(delayedHex);
+                        force.visualTime = time;
+                        force.playScreen.updateEnemies(delayedEnemies, delayedArea, force.visualTime);
+                        force.visualizeCopy(copy);
                         force.visualOrders.removeOrder(fulfilledOrder);
-                        System.out.println("REPORTED EXECUTION " + fulfilledOrder);
+                    } else {
+                        force.visualHex.removeActor(force);
+                        force.visualHex = null;
+                        force.shapeRenderer = null;
+//                        force.nation = null;
+                        force.visualOrders.clear();
+                        force.actualOrders.clear();
+                        force.forcePath.clear();
                     }
                 }
             });

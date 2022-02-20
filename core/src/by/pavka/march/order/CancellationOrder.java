@@ -17,6 +17,11 @@ public abstract class CancellationOrder extends Order {
     }
 
     @Override
+    public boolean isExecutable(Force force) {
+        return true;
+    }
+
+    @Override
     public boolean execute(Force force, float delta) {
         return false;
     }

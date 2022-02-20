@@ -8,6 +8,8 @@ public abstract class Order {
     public boolean irrevocable;
     public boolean revoked;
 
+    public abstract boolean isExecutable(Force force);
+
     public void receive(Force force) {
         if (force != null && !revoked) {
             force.actualOrders.addOrder(this);

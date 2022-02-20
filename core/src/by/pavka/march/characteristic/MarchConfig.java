@@ -56,6 +56,14 @@ public class MarchConfig {
         this.march = march;
     }
 
+    public void setMarch(March march) {
+        this.march = march;
+    }
+
+    public March getMarch() {
+        return march;
+    }
+
     public float fatigueFactor() {
         return march.fatigueFactor;
     }

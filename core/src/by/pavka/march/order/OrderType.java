@@ -22,6 +22,18 @@ public enum OrderType {
             return new MoveOrder(new Array<Hex>(), true);
         }
     },
+    QUICK_MOVE_ORDER {
+        @Override
+        public Order getOrder() {
+            return new QuickMoveOrder(new Array<Hex>(), true);
+        }
+    },
+    JOIN_ORDER {
+        @Override
+        public Order getOrder() {
+            return new JoinOrder();
+        }
+    },
     DETACH_FORCE_ORDER {
         @Override
         public Order getOrder() {

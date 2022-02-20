@@ -38,6 +38,8 @@ public class OrderView extends Table {
                             detachForceOrder.detachOrder.revoked = true;
                             detachForceOrder.detachOrder.detachingForce.visualOrders.removeOrder(detachForceOrder.detachOrder);
                             System.out.println("DetachOrder revoked " + detachForceOrder.detachOrder.hashCode());
+                        } else {
+                            detachForceOrder.cancel(force);
                         }
                     }
                     if (undo.isVisible()) {

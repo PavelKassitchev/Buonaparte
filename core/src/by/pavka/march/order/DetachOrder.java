@@ -33,6 +33,11 @@ public class DetachOrder extends Order {
     }
 
     @Override
+    public boolean isExecutable(Force force) {
+        return true;
+    }
+
+    @Override
     public void set(Force force) {
 //        Force sub = null;
 //        if (force.nation == null) {

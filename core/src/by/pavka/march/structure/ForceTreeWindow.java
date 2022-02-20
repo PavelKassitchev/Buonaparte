@@ -92,4 +92,8 @@ public class ForceTreeWindow extends Window {
         }
         return null;
     }
+
+    public Force getActiveForce() {
+        return trees.getChecked().getForce();
+    }
 }

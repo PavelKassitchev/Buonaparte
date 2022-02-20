@@ -184,6 +184,7 @@ public class Formation extends Force {
 
     public void changeStrength(Strength strength) {
         this.strength.change(strength);
+        //TODO RESTORE or reformat
         speed = findSpeed();
         spirit = findSpirit();
         if (superForce != null) {
@@ -196,14 +197,22 @@ public class Formation extends Force {
         if (true){
             add(force);
             viewForces.add(force);
-            force.shapeRenderer = null;
+//            force.shapeRenderer = null;
             if (physical) {
                 force.superForce = this;
+                force.remoteHeadForce = null;
+                if (force.hex != null) {
+                    force.hex.getForces().removeValue(force, true);
+                }
+                force.hex = null;
+//                force.actualOrders.clear();
+//                System.out.println("Force is attached");
             }
             Strength s = force.strength;
             changeStrength(s);
             structureChanged = true;
         }
+        System.out.println("INSIDE ATTACH visual hex = " + force.visualHex);
         return this;
     }
 

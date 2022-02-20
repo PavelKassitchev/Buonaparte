@@ -22,10 +22,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
@@ -44,6 +46,7 @@ import by.pavka.march.map.Path;
 import by.pavka.march.military.Courier;
 import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
+import by.pavka.march.order.JoinOrder;
 import by.pavka.march.structure.ForceButton;
 import by.pavka.march.structure.ForceNode;
 import by.pavka.march.structure.ForceTree;
@@ -162,6 +165,32 @@ public class PlayScreen extends GestureDetector implements Screen {
             treeWindow.remove();
             treeWindow = null;
         }
+    }
+
+    public void destroySelectBox() {
+        if (playStage.selectForce != null) {
+            playStage.selectForce.remove();
+            playStage.selectForce = null;
+        }
+    }
+
+    public void activateSelectBox(Force frc, Hex hex, final JoinOrder jOrder) {
+        Array<Formation> allies = frc.getAllyFormations(hex);
+        final SelectBox<Formation> selectForce = new SelectBox<Formation>(frc.playScreen.game.getSkin());
+        selectForce.setItems(allies);
+        addActorToPlayStage(selectForce);
+        playStage.selectForce = selectForce;
+        selectForce.setBounds(hex.getX(), hex.getY(), 120, 20);
+        selectForce.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                Formation target = selectForce.getSelected();
+                jOrder.setTargetForce(target);
+                destroySelectBox();
+                treeWindow.setVisible(true);
+            }
+        });
     }
 
     private void setLabelInfo(Label label, Force force) {
@@ -419,14 +448,13 @@ public class PlayScreen extends GestureDetector implements Screen {
     }
 
     public void setForceInfo(Hex hex) {
-        if (hex.hasChildren()) {
+        if (hex.hasForces()) {
             SnapshotArray<Actor> forces = hex.getChildren();
             int forceNumber = 0;
             int soldierNumber = 0;
             for (Actor a : forces) {
                 if (a instanceof Formation) {
                     Formation f = (Formation)a;
-                    System.out.println("Setting force info for " + f + " number = " + f.visualStrength.infantry);
                 }
                 forceNumber++;
                 soldierNumber += ((Force) a).visualStrength.soldiers();
@@ -570,6 +598,8 @@ public class PlayScreen extends GestureDetector implements Screen {
     }
 
     public class PlayStage extends Stage {
+
+        private SelectBox<Formation> selectForce;
 
         public PlayStage(Viewport viewport) {
             super(viewport);

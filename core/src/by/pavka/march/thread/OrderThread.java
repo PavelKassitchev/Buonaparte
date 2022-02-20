@@ -40,7 +40,7 @@ public class OrderThread extends Thread {
             if (order != null) {
                 order.irrevocable = true;
             }
-            while (beg < delay) {
+            while (beg < delay || !order.isExecutable(force)) {
                 Thread.sleep(100);
                 if (!force.playScreen.timer.isChecked()) {
                     beg += 100;

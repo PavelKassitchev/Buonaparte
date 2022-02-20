@@ -35,12 +35,6 @@ public class OrderList implements Iterable<Order> {
 
     public void removeOrder(Order order) {
         orders.removeValue(order, true);
-//        if (order instanceof MoveOrder) {
-//            Array<Hex> orderDestinations = ((MoveOrder) order).destinations;
-//            for (Hex h : orderDestinations) {
-//                force.playScreen.destinations.removeValue(h, true);
-//            }
-//        }
     }
 
     public void removeMoveOrders() {
@@ -72,19 +66,26 @@ public class OrderList implements Iterable<Order> {
     }
 
     public void removeDestinations(MoveOrder order) {
-        System.out.println("Inside removeDestinations method");
         if (containsOrder(order)) {
-            System.out.println("Inside removeDestinations method CONTAINS");
             int index = orders.indexOf(order, true);
             System.out.println("Inside removeDestinations method CONTAINS " + index + " " + size());
             if (size() > index + 1) {
-                int i = index + 1;
+                int i = index;
                 Order next = orders.get(i);
                 System.out.println("Order is " + next.hashCode() + " index = " + i);
-                while (next instanceof MoveOrder && size() > i) {
-                    ((MoveOrder) next).destinations.removeAll(order.destinations, true);
-                    System.out.println("Removing destinations from " + next.hashCode());
-                    i++;
+                while (size() > i + 1) {
+                    next = orders.get(++i);
+                    if (next instanceof MoveOrder) {
+                        ((MoveOrder) next).destinations.removeAll(order.destinations, true);
+                        System.out.println("Removing destinations from " + next.hashCode());
+                    } else {
+                        break;
+                    }
+//                    ((MoveOrder) next).destinations.removeAll(order.destinations, true);
+//                    System.out.println("Removing destinations from " + next.hashCode());
+//                    i++;
+//                    order = (MoveOrder)orders.get(i);
+//                    System.out.println("At the end of while i = " + i + " order = " + order.hashCode());
                 }
             }
         }
