@@ -137,6 +137,7 @@ public class Hex extends Group {
         private void navigate() {
             if (!playScreen.destinations.isEmpty()) {
                 playScreen.additiveOrder = true;
+                System.out.println("Making Order additive while destination size is " + playScreen.destinations.size);
             }
             playScreen.destinations.add(Hex.this);
             GraphPath<Hex> hexPath;
@@ -146,7 +147,13 @@ public class Hex extends Group {
             } else if (playScreen.selectedPaths == null && !playScreen.selectedForces.isEmpty()) {
                 hexPath = playScreen.getHexGraph().findPath(playScreen.selectedForces.get(0).visualHex, Hex.this);
             } else {
-                Hex begin = playScreen.selectedPaths.peek().toHex;
+                System.out.println("Peeking from " + playScreen.selectedPaths.size);
+                Hex begin;
+                if (!playScreen.selectedPaths.isEmpty()) {
+                    begin = playScreen.selectedPaths.peek().toHex;
+                } else {
+                    begin = Hex.this;
+                }
                 hexPath = playScreen.getHexGraph().findPath(begin, Hex.this);
                 paths = new Array<>(playScreen.selectedPaths);
             }

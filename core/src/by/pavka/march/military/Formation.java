@@ -200,13 +200,13 @@ public class Formation extends Force {
 //            force.shapeRenderer = null;
             if (physical) {
                 force.superForce = this;
-                force.remoteHeadForce = null;
+//                force.remoteHeadForce = null;
                 if (force.hex != null) {
                     force.hex.getForces().removeValue(force, true);
                 }
                 force.hex = null;
 //                force.actualOrders.clear();
-//                System.out.println("Force is attached");
+                System.out.println("Force is attached");
             }
             Strength s = force.strength;
             changeStrength(s);

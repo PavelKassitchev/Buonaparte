@@ -104,6 +104,16 @@ public class OrderList implements Iterable<Order> {
         }
     }
 
+    public void fulfillOrder(Order order, boolean isReporting) {
+        removeOrder(order);
+        if (isReporting) {
+            new ReportThread(force, order).start();
+        }
+        if (!orders.isEmpty()) {
+            first().set(force);
+        }
+    }
+
     public int size() {
         return orders.size;
     }

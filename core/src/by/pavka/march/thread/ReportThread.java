@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.Path;
 import by.pavka.march.military.Force;
+import by.pavka.march.order.DetachOrder;
 import by.pavka.march.order.JoinOrder;
 import by.pavka.march.order.Order;
 
@@ -48,7 +49,7 @@ public class ReportThread extends Thread {
 //        }
         delay = force.findCommandDistance();
 
-        System.out.println("REPORT execution " + order + " with delay " + delay);
+//        System.out.println("REPORT execution " + order + " with delay " + delay);
         setDaemon(true);
     }
 
@@ -80,9 +81,6 @@ public class ReportThread extends Thread {
             while (beg < delay) {
                 Thread.sleep(100);
                 if (!force.playScreen.timer.isChecked()) {
-                    if (fulfilledOrder instanceof JoinOrder) {
-                        System.out.println("Hey");
-                    }
                     beg += 100;
                 }
             }
@@ -115,10 +113,16 @@ public class ReportThread extends Thread {
 //                        } else {
 //
 //                        }
-//                        System.out.println("REPORTED EXECUTION " + fulfilledOrder);
+                    if (force.getName().equals("II.Art.Bttr.")) {
+                        System.out.println("REPORTED EXECUTION " + fulfilledOrder);
+                    }
+
 //                    }
 
                     if (!(fulfilledOrder instanceof JoinOrder)) {
+                        if (force.getName().equals("II.Art.Bttr.")) {
+                            System.out.println("Force " + force + " head " + force.remoteHeadForce + " order " + fulfilledOrder);
+                        }
                         force.visualTail = delayedTail;
                         force.visualForcePath = delayedPath;
                         force.setVisualHex(delayedHex);
@@ -126,6 +130,10 @@ public class ReportThread extends Thread {
                         force.playScreen.updateEnemies(delayedEnemies, delayedArea, force.visualTime);
                         force.visualizeCopy(copy);
                         force.visualOrders.removeOrder(fulfilledOrder);
+                        if (fulfilledOrder instanceof DetachOrder) {
+                            force.remoteHeadForce = force.playScreen.headForce;
+                            force.shapeRenderer = force.playScreen.shapeRenderer;
+                        }
                     } else {
                         force.visualHex.removeActor(force);
                         force.visualHex = null;
@@ -134,6 +142,7 @@ public class ReportThread extends Thread {
                         force.visualOrders.clear();
                         force.actualOrders.clear();
                         force.forcePath.clear();
+                        force.remoteHeadForce = null;
                     }
                 }
             });

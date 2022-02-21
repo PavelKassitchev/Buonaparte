@@ -15,6 +15,7 @@ public class DetachOrder extends Order {
     public Force detachingForce;
     public Formation hyper;
     public DetachForceOrder detachForceOrder;
+    public boolean isCancel;
 
     public DetachOrder(Force force) {
         hyper = (Formation)force;
@@ -24,12 +25,29 @@ public class DetachOrder extends Order {
     }
 
     public DetachOrder(Force force, Force thisForce) {
-        System.out.println("detach order " + hashCode() + " " + thisForce.getName()  + " from " + force.getName());
-        hyper = (Formation)force;
+        if (force != null) {
+            hyper = (Formation)force;
+        }
         detachingForce = thisForce;
 //        detachForceOrder = new DetachForceOrder(force, false);
         detachForceOrder = new DetachForceOrder(this);
 //        hyper.visualOrders.addFirstOrder(detachForceOrder);
+    }
+
+    public DetachOrder(Force force, Force thisForce, boolean isCancel) {
+        if (force != null) {
+            hyper = (Formation)force;
+        }
+        detachingForce = thisForce;
+        detachForceOrder = new DetachForceOrder(this);
+        this.isCancel = isCancel;
+    }
+
+    @Override
+    public void visualize(Force force) {
+        if (!isCancel) {
+            super.visualize(force);
+        }
     }
 
     @Override
@@ -49,12 +67,16 @@ public class DetachOrder extends Order {
 //        hyper = (Formation)sub.findHyperForce();
 //        detachForceOrder = new DetachForceOrder(force, false);
 //        hyper.visualOrders.addFirstOrder(detachForceOrder);
+        if (isCancel && hyper == null) {
+            hyper = detachingForce.superForce;
+            System.out.println("Setting Hyper Force " + hyper + " for " + detachingForce);
+        }
         execute(force, 0);
     }
 
     @Override
     public boolean execute(Force force, float delta) {
-        if (force == null) {
+        if (force == null || hyper == null) {
             return false;
         }
         if (force.nation == null) {
@@ -114,8 +136,8 @@ public class DetachOrder extends Order {
 
     }
 
-    @Override
-    public String toString() {
-        return super.toString() + " " + detachingForce.getName() + " " + hyper.getName();
-    }
+//    @Override
+//    public String toString() {
+//        return super.toString() + " " + detachingForce.getName() + " " + hyper.getName();
+//    }
 }

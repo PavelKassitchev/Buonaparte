@@ -51,7 +51,7 @@ public class ForceTreeTab extends Table {
 //        final OrderView orderLabel = new OrderView("", getSkin());
         orderTable = new OrderTable(force, skin);
         futureOrderTable = new OrderTable(force, skin, true);
-        System.out.println("Order table " + force.visualOrders.first());
+//        System.out.println("Future Order table " + futureOrderTable.getLastOrder());
 
         singleForce.setChecked(true);
         tabTable.add(singleForce).left();
@@ -178,6 +178,7 @@ public class ForceTreeTab extends Table {
                         System.out.println("On Send Order to " + force.getName() + " " + order);
                         Force.sendOrder(force, order, del);
                         del += 50;
+//                        futureOrderTable.clear();
                     }
                 }
 
@@ -198,32 +199,9 @@ public class ForceTreeTab extends Table {
 //                    force.playScreen.updateTree(forceTab.forceTree, forceTab.force);
 //                    forceTab.fillInTable();
                 } else {
-                    //WORK with tab
-//                    if (force.futureOrders.size() != 0) {
-//                        System.out.println("Future Orders size " + force.futureOrders.size());
-//                        Hex h = force.playScreen.getHexGraph().getHex(5, 6);
-//                        Array<Hex> d = new Array<>();
-//                        d.add(h);
-//
-//                        for (Order order : force.futureOrders) {
-//                            MoveOrder mo = (MoveOrder) order;
-//                            mo.setDestinations(d);
-//                            Hex hx = force.playScreen.getHexGraph().getHex(h.col + 1, h.row - 1);
-//                            d.add(hx);
-//                            System.out.println("Before sending");
-//                            Force.sendOrder(force, mo);
-//                        }
-//                        force.futureOrders.clear();
-//                    }
-
-//                    for (OrderView orderView : futureOrderTable.orderViews) {
-//                        Order order = orderView.order;
-//                        Force.sendOrder(force, order);
-//                    }
-//                    force.futureOrders.clear();
-
                     force.playScreen.destroyTreeWindow();
                 }
+
             }
         });
         table.row();

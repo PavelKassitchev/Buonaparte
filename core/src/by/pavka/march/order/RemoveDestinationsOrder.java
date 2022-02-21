@@ -26,7 +26,7 @@ public class RemoveDestinationsOrder extends CancellationOrder {
         if (parentOrder.isSet) {
             System.out.println("Cancelling order is set");
             force.forcePath.clear();
-            force.actualOrders.fulfillOrder(parentOrder);
+            force.actualOrders.fulfillOrder(parentOrder, false);
         } else {
             System.out.println("Cancelling order is NOT set");
             force.actualOrders.removeOrder(parentOrder);

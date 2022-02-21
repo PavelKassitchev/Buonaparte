@@ -12,7 +12,7 @@ public class DetachForceOrder extends Order {
 
     public DetachForceOrder(DetachOrder order) {
         detachOrder = order;
-//        executable = false;
+        detachedForce = detachOrder.detachingForce;
     }
 
     public DetachForceOrder(Force detachedForce) {
@@ -75,8 +75,8 @@ public class DetachForceOrder extends Order {
 
     @Override
     public void cancel(Force f) {
-        Force.sendOrder(detachedForce, new JoinOrder((Formation)f));
-        System.out.println("Canceling detach");
+        Force.sendOrder(detachedForce, new JoinOrder((Formation)f, true));
+        System.out.println("Canceling detach " + detachedForce);
     }
 
     @Override

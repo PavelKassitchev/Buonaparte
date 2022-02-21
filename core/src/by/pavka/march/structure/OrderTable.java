@@ -18,8 +18,11 @@ public class OrderTable extends VerticalGroup {
         this.skin = skin;
         this.force = force;
         this.isFutureOrders = isFutureOrders;
+        System.out.println("Inside Order Table Constructor force = " + force + " is Future " + isFutureOrders);
         if (!isFutureOrders) {
             update();
+        } else {
+
         }
     }
 

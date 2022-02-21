@@ -559,12 +559,14 @@ public abstract class Force extends Image {
             visualOrders.clear();
             setRealHex(findHyperForce().hex);
             nation = findHyperForce().nation;
-            shapeRenderer = findHyperForce().shapeRenderer;
-            if (findHyperForce().remoteHeadForce == null) {
-                remoteHeadForce = (Formation) findHyperForce();
-            } else {
-                remoteHeadForce = findHyperForce().remoteHeadForce;
-            }
+//            shapeRenderer = findHyperForce().shapeRenderer;
+//            if (findHyperForce().remoteHeadForce == null) {
+//                remoteHeadForce = (Formation) findHyperForce();
+//            } else {
+//                remoteHeadForce = findHyperForce().remoteHeadForce;
+//            }
+//            remoteHeadForce = playScreen.headForce;
+//            System.out.println("INSIDE DETACH force = " + this.getName() + " REMOTE HEAD = " + remoteHeadForce.getName());
             detach();
 
             speed = findSpeed();

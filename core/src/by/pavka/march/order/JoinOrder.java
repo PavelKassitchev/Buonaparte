@@ -11,10 +11,16 @@ import by.pavka.march.military.Formation;
 public class JoinOrder extends MoveOrder {
     public Formation target;
     public Force thisForce;
+    private boolean isCancel;
 
     public JoinOrder(Formation target) {
         this.target = target;
         destinations = new Array<>();
+    }
+
+    public JoinOrder(Formation target, boolean isCancel) {
+        this(target);
+        this.isCancel = isCancel;
     }
 
     public JoinOrder() {
@@ -56,7 +62,7 @@ public class JoinOrder extends MoveOrder {
     @Override
     public void visualize(Force force) {
 
-        if (force != null) {
+        if (force != null && !isCancel) {
             Order o = force.visualOrders.last();
             if (o instanceof MoveOrder) {
                 System.out.println("MoveOrder is first visual " + o.hashCode() + " irrevocable: " + o.irrevocable);
@@ -124,6 +130,7 @@ public class JoinOrder extends MoveOrder {
     public void cancel(Force f) {
         Force.sendOrder(f, new RemoveDestinationsOrder(this), 50);
         System.out.println("Sending cancellation " + hashCode());
+        Force.sendOrder(f, new DetachOrder(f.superForce, f, true));
     }
 
     @Override
