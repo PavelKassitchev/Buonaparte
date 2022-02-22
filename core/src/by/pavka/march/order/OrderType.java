@@ -34,6 +34,12 @@ public enum OrderType {
             return new JoinOrder();
         }
     },
+    FOLLOW_ORDER {
+        @Override
+        public Order getOrder() {
+            return new FollowOrder();
+        }
+    },
     GAIN_ORDER {
         @Override
         public Order getOrder() {

@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.PlayScreen;
 import by.pavka.march.military.Force;
-import by.pavka.march.order.JoinOrder;
+import by.pavka.march.order.FollowOrder;
 import by.pavka.march.order.MoveOrder;
 import by.pavka.march.order.Order;
 
@@ -147,7 +147,6 @@ public class Hex extends Group {
             } else if (playScreen.selectedPaths == null && !playScreen.selectedForces.isEmpty()) {
                 hexPath = playScreen.getHexGraph().findPath(playScreen.selectedForces.get(0).visualHex, Hex.this);
             } else {
-                System.out.println("Peeking from " + playScreen.selectedPaths.size);
                 Hex begin;
                 if (!playScreen.selectedPaths.isEmpty()) {
                     begin = playScreen.selectedPaths.peek().toHex;
@@ -183,8 +182,8 @@ public class Hex extends Group {
 
                 Force frc = playScreen.treeWindow.getActiveForce();
                 Order order = playScreen.treeWindow.getForceTreeTab(frc).futureOrderTable.getLastOrder();
-                if (order instanceof JoinOrder && !Hex.this.getForces().isEmpty()) {
-                    JoinOrder jOrder = (JoinOrder) order;
+                if (order instanceof FollowOrder && !Hex.this.getForces().isEmpty()) {
+                    FollowOrder jOrder = (FollowOrder) order;
 //                    jOrder.setTargetForce((Formation)Hex.this.getForces().first());
 
 

@@ -46,7 +46,7 @@ import by.pavka.march.map.Path;
 import by.pavka.march.military.Courier;
 import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
-import by.pavka.march.order.JoinOrder;
+import by.pavka.march.order.FollowOrder;
 import by.pavka.march.structure.ForceButton;
 import by.pavka.march.structure.ForceNode;
 import by.pavka.march.structure.ForceTree;
@@ -174,9 +174,9 @@ public class PlayScreen extends GestureDetector implements Screen {
         }
     }
 
-    public void activateSelectBox(Force frc, Hex hex, final JoinOrder jOrder) {
+    public void activateSelectBox(Force frc, Hex hex, final FollowOrder jOrder) {
         Array<Formation> allies = frc.getAllyFormations(hex);
-        final SelectBox<Formation> selectForce = new SelectBox<Formation>(frc.playScreen.game.getSkin());
+        final SelectBox<Formation> selectForce = new SelectBox<>(frc.playScreen.game.getSkin());
         selectForce.setItems(allies);
         addActorToPlayStage(selectForce);
         playStage.selectForce = selectForce;
@@ -186,7 +186,9 @@ public class PlayScreen extends GestureDetector implements Screen {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
                 Formation target = selectForce.getSelected();
+                System.out.println("Setting TARGET = " + target);
                 jOrder.setTargetForce(target);
+                System.out.println("JORDER TARGET = " + jOrder.target);
                 destroySelectBox();
                 treeWindow.setVisible(true);
             }

@@ -8,7 +8,7 @@ import by.pavka.march.map.Path;
 import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
 
-public class GainOrder extends MoveOrder {
+public class GainOrder extends JoinOrder {
     public Hex originalDestination;
     public Array<Hex> destinations;
     public boolean additiveOrder;

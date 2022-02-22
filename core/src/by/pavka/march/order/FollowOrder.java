@@ -6,33 +6,27 @@ import com.badlogic.gdx.utils.Array;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.Path;
 import by.pavka.march.military.Force;
-import by.pavka.march.military.Formation;
 
-public class JoinOrder extends FollowOrder {
-    public Formation target;
+public class FollowOrder extends MoveOrder {
+
+    public Force target;
     public Force thisForce;
-    private boolean isCancel;
 
-    public JoinOrder(Formation target) {
+    public FollowOrder(Force target) {
         this.target = target;
         destinations = new Array<>();
     }
 
-    public JoinOrder(Formation target, boolean isCancel) {
-        this(target);
-        this.isCancel = isCancel;
-    }
 
-    public JoinOrder() {
+    public FollowOrder() {
         destinations = new Array<>();
     }
 
-    @Override
     public void setTargetForce(Force target) {
-        this.target = (Formation)target;
+        this.target = target;
     }
 
-    @Override
+
     public void setDestination() {
         destinations.clear();
         System.out.println("Target = " + target);
@@ -60,7 +54,8 @@ public class JoinOrder extends FollowOrder {
 
     @Override
     public void visualize(Force force) {
-        if (force != null && !isCancel) {
+
+        if (force != null) {
             Order o = force.visualOrders.last();
             if (o instanceof MoveOrder) {
                 if (additiveOrder) {
@@ -76,13 +71,12 @@ public class JoinOrder extends FollowOrder {
         }
     }
 
-
-
     @Override
     public void receive(Force force) {
         if (!revoked && !additiveOrder && force.actualOrders.first() instanceof MoveOrder) {
             force.actualOrders.removeMoveOrders();
         }
+        System.out.println(this + " Follow Order received with target " + target);
         super.receive(force);
     }
 
@@ -96,6 +90,14 @@ public class JoinOrder extends FollowOrder {
         setDestination();
     }
 
+
+    @Override
+    public String toString() {
+        String name = target == null? "" : target.getName();
+        return super.toString() + " follow " + name;
+    }
+
+
     @Override
     public boolean execute(Force force, float delta) {
         if (force == null) {
@@ -105,18 +107,8 @@ public class JoinOrder extends FollowOrder {
 
         if (force.hex != target.hex && force.forcePath != null && !force.forcePath.isEmpty() || !force.tail.isEmpty()) {
             force.move(delta);
-            setDestination();
-        } else {
-            System.out.println("Fulfilling join order in visual hex " + force.visualHex);
-
-            force.actualOrders.fulfillOrder(this);
-
-            target.attach(thisForce, true);
-            target.sendReport("attach");
-//            force.actualOrders.fulfillOrder(this);
-//            force.actualOrders.clear();
-            System.out.println("Completing join order in visual hex " + force.visualHex);
         }
+        setDestination();
         return true;
     }
 
@@ -124,14 +116,5 @@ public class JoinOrder extends FollowOrder {
     @Override
     public void cancel(Force f) {
         Force.sendOrder(f, new RemoveDestinationsOrder(this), 50);
-        System.out.println("Sending cancellation " + hashCode());
-        Force.sendOrder(f, new DetachOrder(f.superForce, f, true));
-    }
-
-    @Override
-    public String toString() {
-        String name = target == null? "" : target.getName();
-        return super.toString() + " follow " + name;
     }
 }
-
