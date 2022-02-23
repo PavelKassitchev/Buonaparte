@@ -175,9 +175,29 @@ public class PlayScreen extends GestureDetector implements Screen {
     }
 
     public void activateSelectBox(Force frc, Hex hex, final FollowOrder jOrder) {
-        Array<Formation> allies = frc.getAllyFormations(hex);
-        final SelectBox<Formation> selectForce = new SelectBox<>(frc.playScreen.game.getSkin());
-        selectForce.setItems(allies);
+//        Array<Formation> allies = frc.getAllyFormations(hex);
+//        final SelectBox<Formation> selectForce = new SelectBox<>(frc.playScreen.game.getSkin());
+//        selectForce.setItems(allies);
+//        addActorToPlayStage(selectForce);
+//        playStage.selectForce = selectForce;
+//        selectForce.setBounds(hex.getX(), hex.getY(), 120, 20);
+//        selectForce.addListener(new ChangeListener() {
+//
+//            @Override
+//            public void changed(ChangeEvent changeEvent, Actor actor) {
+//                Formation target = selectForce.getSelected();
+//                System.out.println("Setting TARGET = " + target);
+//                jOrder.setTargetForce(target);
+//                System.out.println("JORDER TARGET = " + jOrder.target);
+//                destroySelectBox();
+//                treeWindow.setVisible(true);
+//            }
+//        });
+
+        final SelectBox<? extends Force> selectForce = jOrder.createSelectBox(frc, hex);
+//        Array<Formation> allies = frc.getAllyFormations(hex);
+//        final SelectBox<Formation> selectForce = new SelectBox<>(frc.playScreen.game.getSkin());
+//        selectForce.setItems(allies);
         addActorToPlayStage(selectForce);
         playStage.selectForce = selectForce;
         selectForce.setBounds(hex.getX(), hex.getY(), 120, 20);
@@ -185,7 +205,8 @@ public class PlayScreen extends GestureDetector implements Screen {
 
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
-                Formation target = selectForce.getSelected();
+//                Formation target = selectForce.getSelected();
+                Force target = selectForce.getSelected();
                 System.out.println("Setting TARGET = " + target);
                 jOrder.setTargetForce(target);
                 System.out.println("JORDER TARGET = " + jOrder.target);
@@ -601,7 +622,7 @@ public class PlayScreen extends GestureDetector implements Screen {
 
     public class PlayStage extends Stage {
 
-        private SelectBox<Formation> selectForce;
+        private SelectBox<? extends Force> selectForce;
 
         public PlayStage(Viewport viewport) {
             super(viewport);

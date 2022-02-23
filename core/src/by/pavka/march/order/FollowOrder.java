@@ -1,6 +1,7 @@
 package by.pavka.march.order;
 
 import com.badlogic.gdx.ai.pfa.GraphPath;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.map.Hex;
@@ -116,5 +117,12 @@ public class FollowOrder extends MoveOrder {
     @Override
     public void cancel(Force f) {
         Force.sendOrder(f, new RemoveDestinationsOrder(this), 50);
+    }
+
+    public SelectBox<? extends Force> createSelectBox(Force frc, Hex hex) {
+        SelectBox<Force> selectForce = new SelectBox<>(frc.playScreen.game.getSkin());
+        Array<Force> allies = frc.getAllies(hex);
+        selectForce.setItems(allies);
+        return selectForce;
     }
 }
