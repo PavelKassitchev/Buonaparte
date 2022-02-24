@@ -83,8 +83,10 @@ public class Configurator {
 
         Force enemy = new Unit(game.getTextureRegion("hostile"));
         enemy.nation = AUSTRIA;
+        enemy.setName("Enemy small");
         Formation enemyHQ = new Formation(game.getTextureRegion("hostile"));
         enemyHQ.nation = AUSTRIA;
+        enemyHQ.setName("Enemy HQ");
         enemy.remoteHeadForce = enemyHQ;
 
         addForce(cavDivision, 2,1, playScreen);

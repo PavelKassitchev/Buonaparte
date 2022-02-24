@@ -3,6 +3,7 @@ package by.pavka.march.order;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.utils.Array;
 
+import by.pavka.march.characteristic.March;
 import by.pavka.march.map.Hex;
 import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
@@ -103,6 +104,9 @@ public class JoinOrder extends FollowOrder {
 //TODO
 
         if (force.hex != target.hex && force.forcePath != null && !force.forcePath.isEmpty() || !force.tail.isEmpty()) {
+            if (target.getReconArea().contains(force.hex) || force.getReconArea().contains(target.hex)) {
+                force.setMarch(March.QUICK);
+            }
             force.move(delta);
             setDestination();
         } else {
@@ -122,7 +126,8 @@ public class JoinOrder extends FollowOrder {
 
     @Override
     public void cancel(Force f) {
-        Force.sendOrder(f, new RemoveDestinationsOrder(this), 50);
+//        Force.sendOrder(f, new RemoveDestinationsOrder(this), 50);
+        super.cancel(f);
         Force.sendOrder(f, new DetachOrder(f.superForce, f, true));
     }
 

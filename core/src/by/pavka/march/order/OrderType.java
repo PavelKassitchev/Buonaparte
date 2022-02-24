@@ -40,6 +40,12 @@ public enum OrderType {
             return new FollowOrder();
         }
     },
+    ATTACK_ORDER {
+        @Override
+        public Order getOrder() {
+            return new AttackOrder();
+        }
+    },
     GAIN_ORDER {
         @Override
         public Order getOrder() {
