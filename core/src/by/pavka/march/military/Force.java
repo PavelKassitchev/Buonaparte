@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectFloatMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 
@@ -76,6 +77,7 @@ public abstract class Force extends Image {
     //    public ObjectIntMap<Force> visualEnemies;
     public ObjectMap<Force, Hex> visualEnemies;
     public ObjectSet<Hex> reconArea;
+    public ObjectFloatMap<Hex> scoutMap;
     public float visualTime;
     public int sections;
     public int currentSections;
@@ -112,6 +114,7 @@ public abstract class Force extends Image {
 //        visualEnemies = new ObjectIntMap<>();
         visualEnemies = new ObjectMap<>();
         reconArea = new ObjectSet<>();
+        scoutMap = new ObjectFloatMap<>();
 
         spirit = new Spirit(0, 1, 0);
 
@@ -269,7 +272,9 @@ public abstract class Force extends Image {
     public void recon() {
         final ObjectMap<Force, Hex> enemies = new ObjectMap<>();
         reconArea = getReconArea();
-        for (Hex h : reconArea) {
+        scoutMap = getScoutMap();
+//        for (Hex h : reconArea) {
+        for (Hex h : scoutMap.keys()) {
             if (h.enemiesOf(this) != null) {
                 for (Force f : h.enemiesOf(this)) {
                     if (ForceRep.reconEnemy(f) != null) {
@@ -291,6 +296,33 @@ public abstract class Force extends Image {
             }
         }
         visualEnemies.putAll(enemies);
+    }
+
+    public ObjectFloatMap<Hex> getScoutMap() {
+        int radius;
+        if (strength.recon <= 6) {
+            radius = 1;
+        } else if (strength.recon <= 18) {
+            radius = 2;
+        } else if (strength.recon <= 36) {
+            radius = 3;
+        } else if (strength.recon <= 60) {
+            radius = 4;
+        } else {
+            radius = 5;
+        }
+        ObjectSet<Hex> reconArea = playScreen.getHexGraph().getArea(hex, radius, new ObjectSet<Hex>());
+        if (radius > 1) {
+            if (forcePath != null && forcePath.size > radius) {
+                Hex h = forcePath.get(radius).toHex;
+                reconArea.add(h);
+            }
+        }
+        ObjectFloatMap<Hex> scoutMap = new ObjectFloatMap<>();
+        for (Hex h : reconArea) {
+            scoutMap.put(h, h.crop);
+        }
+        return scoutMap;
     }
 
     public ObjectSet<Hex> getReconArea() {
@@ -349,6 +381,9 @@ public abstract class Force extends Image {
     public void act(float delta) {
         if (!playScreen.timer.isChecked()) {
             super.act(delta);
+//            eat(delta);
+            feed(delta);
+            flatten();
             float f = delta * HOURS_IN_SECOND * MarchConfig.REST_FACTOR;
             rest(f);
 //            if (forcePath != null && !forcePath.isEmpty() || !tail.isEmpty()) {
@@ -361,6 +396,15 @@ public abstract class Force extends Image {
                 recon();
                 sendReport("JUST RECON");
             }
+        }
+    }
+
+    public void feed(float delta) {
+        double f = strength.foodConsumption * delta * HOURS_IN_SECOND / 24;
+        if (hex.crop > f) {
+            hex.crop -= f;
+        } else {
+            eat(delta);
         }
     }
 
@@ -453,10 +497,6 @@ public abstract class Force extends Image {
             } else if (prepareToCamp() > 0) {
                 camp(delta, prepareToCamp());
             }
-//            else {
-//                float f = delta * HOURS_IN_SECOND * MarchConfig.REST_FACTOR;
-//                rest(f);
-//            }
         }
     }
 
@@ -464,9 +504,31 @@ public abstract class Force extends Image {
 
     public abstract Spirit findSpirit();
 
+    public abstract void eat(float delta);
+
     public abstract Stock changeStockDescending(Stock stock, int mode);
 
+    public void reduceFoodAscending(double food) {
+        strength.food -= food;
+        if (superForce != null) {
+            superForce.reduceFoodAscending(food);
+        }
+    }
+
     public abstract Stock emptyStock();
+
+    public void flatten() {
+        Stock stock = emptyStock();
+        if (getName() != null && getName().equals("IV.Cav.Div.")) {
+            System.out.println("Emptied Stock is " + stock.food + " capacity is " + strength.capacity);
+        }
+        double fRatio = stock.food / strength.capacity;
+        double aRatio = stock.ammo / strength.capacity;
+
+        flattenClearAll(fRatio, aRatio);
+    }
+
+    public abstract void flattenClearAll(double fRatio, double aRatio);
 
     public Stock flattenEmptiedStock(Stock stock, int mode) {
         double foodRequest = strength.foodConsumption * NORMAL_FOOD_STOCK_DAYS;

@@ -2,6 +2,7 @@ package by.pavka.march.thread;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectFloatMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 
@@ -68,6 +69,7 @@ public class ReportThread extends Thread {
 
         final ObjectMap<Force, Hex> delayedEnemies = new ObjectMap<Force, Hex>(force.visualEnemies);
         final ObjectSet<Hex> delayedArea = force.reconArea;
+        final ObjectFloatMap<Hex> delayedMap = force.scoutMap;
         final float time = force.playScreen.time;
 
         final Force copy = force.copyForce();
@@ -127,7 +129,10 @@ public class ReportThread extends Thread {
                         force.visualForcePath = delayedPath;
                         force.setVisualHex(delayedHex);
                         force.visualTime = time;
-                        force.playScreen.updateEnemies(delayedEnemies, delayedArea, force.visualTime);
+//                        force.playScreen.updateEnemies(delayedEnemies, delayedArea, force.visualTime);
+                        //Important scouting hexes!
+                        force.playScreen.updateEnemies(delayedEnemies, delayedMap, force.visualTime);
+                        //
                         force.visualizeCopy(copy);
                         force.visualOrders.removeOrder(fulfilledOrder);
                         if (fulfilledOrder instanceof DetachOrder) {

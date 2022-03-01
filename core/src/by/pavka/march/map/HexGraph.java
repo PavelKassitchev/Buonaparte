@@ -48,8 +48,9 @@ public class HexGraph implements IndexedGraph<Hex> {
         Hex hex;
         for (int i = 0; i < cols; i++) {
             for (int j = 0; j < rows; j++) {
-                TiledMapTileLayer.Cell cell = tileLayer.getCell(i, j);
-                hex = new Hex(map, tileLayer, cell, j, i, screen);
+//                TiledMapTileLayer.Cell cell = tileLayer.getCell(i, j);
+//                hex = new Hex(map, tileLayer, cell, j, i, screen);
+                hex = new Hex(map, tileLayer, j, i, screen);
                 addHex(hex);
                 float x0 = hex.getRelX() - tileLayer.getTileWidth() * 0.375f;
                 float y0 = hex.getRelY() - tileLayer.getTileHeight() * 0.5f;

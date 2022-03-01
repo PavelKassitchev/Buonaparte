@@ -31,8 +31,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectFloatMap;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -218,9 +218,9 @@ public class PlayScreen extends GestureDetector implements Screen {
 
     private void setLabelInfo(Label label, Force force) {
         String text = String.format("%d soldiers \n  infantry: %d\n  cavalry: %d\n  guns: %d\n  wagons: %d" +
-                        "\nmorale-%.1f\nfatigue-%.1f\nxp-%.1f", force.visualStrength.soldiers(), force.visualStrength.infantry,
+                        "\nmorale-%.1f\nfatigue-%.1f\nxp-%.1f\nfood-%.1f", force.visualStrength.soldiers(), force.visualStrength.infantry,
                 force.visualStrength.cavalry, force.visualStrength.artillery, force.visualStrength.supply, force.visualSpirit.morale,
-                force.visualSpirit.fatigue, force.visualSpirit.xp);
+                force.visualSpirit.fatigue, force.visualSpirit.xp, force.visualStrength.food);
         label.setText(text);
     }
 
@@ -462,7 +462,8 @@ public class PlayScreen extends GestureDetector implements Screen {
 
     public void setHexInfo(Hex hex) {
         hexButton.setText("Point " + hex.col + ":" + hex.row + '\n' +
-                "Mov.cost = " + hex.cell.getTile().getProperties().get("cost").toString());
+                "Mov.cost " + hex.cell.getTile().getProperties().get("cost").toString() + '\n' +
+                String.format("Crop %.1f", hex.visualCrop));
     }
 
     public void setForceInfo(Force force) {
@@ -588,14 +589,36 @@ public class PlayScreen extends GestureDetector implements Screen {
         return 22 - getPlayTime();
     }
 
-    public void updateEnemies(ObjectMap<Force, Hex> visualEnemies, ObjectSet<Hex> reconArea, float visualTime) {
-        for (Hex h : reconArea) {
+//    public void updateEnemies(ObjectMap<Force, Hex> visualEnemies, ObjectSet<Hex> reconArea, float visualTime) {
+//        for (Hex h : reconArea) {
+//            Array<Actor> enem = h.getChildren();
+//            for (Actor ac : enem) {
+//                Force f = (Force) ac;
+//                if (f.isEnemy() && f.visualTime <= visualTime && !visualEnemies.containsKey(f)) {
+//                    enemies.remove(f);
+//                }
+//            }
+//        }
+//        for (Force f : visualEnemies.keys()) {
+//            if (!enemies.containsKey(f) || f.visualTime <= visualTime) {
+//                f.visualTime = visualTime;
+//                Hex h = visualEnemies.get(f);
+//                f.setVisualHex(h);
+//                f.visualStrength = new Strength(f.interStrength);
+//                f.visualSpirit = new Spirit(f.interSpirit);
+//                enemies.put(f, h);
+//            }
+//        }
+//    }
+
+    public void updateEnemies(ObjectMap<Force, Hex> visualEnemies, ObjectFloatMap<Hex> scoutMap, float visualTime) {
+        for (Hex h : scoutMap.keys()) {
+            h.visualCrop = scoutMap.get(h, 0);
             Array<Actor> enem = h.getChildren();
             for (Actor ac : enem) {
                 Force f = (Force) ac;
                 if (f.isEnemy() && f.visualTime <= visualTime && !visualEnemies.containsKey(f)) {
                     enemies.remove(f);
-//                    f.unvisualize();
                 }
             }
         }

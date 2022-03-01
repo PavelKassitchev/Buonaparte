@@ -23,6 +23,8 @@ public class Hex extends Group {
     public int row;
     public int col;
     public int index;
+    public float crop;
+    public float visualCrop;
     public TiledMapTileLayer.Cell cell;
     public PlayScreen playScreen;
     private TiledMap tiledMap;
@@ -42,6 +44,24 @@ public class Hex extends Group {
         this.cell = tiledLayer.getCell(col, row);
         playScreen = screen;
         forces = new Array<>();
+        crop = Float.parseFloat(cell.getTile().getProperties().get("crop").toString());
+        visualCrop = crop;
+        setDebug(true);
+    }
+
+    public Hex(TiledMap tiledMap, TiledMapTileLayer tiledLayer, int row, int col, PlayScreen screen) {
+        this.tiledMap = tiledMap;
+        this.tiledLayer = tiledLayer;
+        markLayer = (TiledMapTileLayer) tiledMap.getLayers().get("TileLayer2");
+        tile = (StaticTiledMapTile) tiledMap.getTileSets().getTile(20);
+        addListener(new HexListener());
+        this.row = row;
+        this.col = col;
+        this.cell = tiledLayer.getCell(col, row);
+        playScreen = screen;
+        forces = new Array<>();
+        crop = Float.parseFloat(cell.getTile().getProperties().get("crop").toString());
+        visualCrop = crop;
         setDebug(true);
     }
 

@@ -48,6 +48,7 @@ public class Formation extends Force {
         visualForces = new Array<>();
         viewForces = new Array<>();
         speed = 3.0f;
+
     }
 
     public Formation(TextureRegion region) {
@@ -57,6 +58,7 @@ public class Formation extends Force {
         visualForces = new Array<>();
         viewForces = new Array<>();
         speed = 3.0f;
+//        strength.capacity = 1;
     }
 
     @Override
@@ -90,9 +92,16 @@ public class Formation extends Force {
         return new Spirit(totalXp / soldiers, totalMorale / soldiers, totalFatigue / soldiers);
     }
 
+    @Override
+    public void eat(float delta) {
+        for (Force sub : subForces) {
+            sub.eat(delta);
+        }
+//        flatten();
+    }
+
     public void changeStockAscending(Stock stock) {
         strength.food += strength.food;
-        ;
         strength.ammo += strength.ammo;
         if (superForce != null) {
             superForce.changeStockAscending(stock);
@@ -113,7 +122,17 @@ public class Formation extends Force {
         for (Force force : subForces) {
             force.emptyStock();
         }
+//        System.out.println(getName() + " food stock emptied = " + stock.food);
         return stock;
+    }
+
+    @Override
+    public void flattenClearAll(double fRatio, double aRatio) {
+        strength.food = fRatio * strength.capacity;
+        strength.ammo = aRatio * strength.capacity;
+        for (Force sub : subForces) {
+            sub.flattenClearAll(fRatio, aRatio);
+        }
     }
 
     @Override
@@ -211,6 +230,9 @@ public class Formation extends Force {
             Strength s = force.strength;
             changeStrength(s);
             structureChanged = true;
+//            if (getName().equals("IV.Cav.Div.")) {
+//                System.out.println("Capacity: " + strength.capacity + " Food: " + strength.food);
+//            }
         }
         System.out.println("INSIDE ATTACH visual hex = " + force.visualHex);
         return this;

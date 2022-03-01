@@ -1,5 +1,7 @@
 package by.pavka.march.military;
 
+import static by.pavka.march.PlayScreen.HOURS_IN_SECOND;
+
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
@@ -36,6 +38,9 @@ public class Unit extends Force {
         super(region, 840, 1000);
         strength.recon = 20;
         speed = 4.0f;
+        strength.food = 3;
+        strength.foodConsumption = 1;
+        strength.capacity = 5;
         //TODO Delete it
 //        strength = new Strength();
 //        strength.infantry = 855;
@@ -55,6 +60,17 @@ public class Unit extends Force {
     }
 
     @Override
+    public void eat(float delta) {
+        double f = delta * HOURS_IN_SECOND / 24 * strength.foodConsumption;
+        if (strength.food >= f) {
+            reduceFoodAscending(f);
+        } else {
+            reduceFoodAscending(strength.food);
+                    //TODO
+        }
+    }
+
+    @Override
     public Stock changeStockDescending(Stock stock, int mode) {
         return strength.changeStock(stock, mode);
     }
@@ -67,6 +83,13 @@ public class Unit extends Force {
         strength.ammo = 0;
         return new Stock(food, ammo);
     }
+
+    @Override
+    public void flattenClearAll(double fRatio, double aRatio) {
+        strength.food = strength.capacity * fRatio;
+        strength.ammo = strength.capacity * aRatio;
+    }
+
 
     @Override
     public void flatten(double foodRatio, double ammoRatio) {

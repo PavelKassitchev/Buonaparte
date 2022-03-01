@@ -89,9 +89,11 @@ public class Configurator {
         enemyHQ.setName("Enemy HQ");
         enemy.remoteHeadForce = enemyHQ;
 
+        addForce(headForce, 4,6, playScreen);
+//        headForce.sendReport("initial");
         addForce(cavDivision, 2,1, playScreen);
         addForce(anotherTestForce, 2,2, playScreen);
-        addForce(headForce, 4,6, playScreen);
+//        addForce(headForce, 4,6, playScreen);
         addForce(enemy, 9,9, playScreen);
         addForce(enemyHQ, 10, 10, playScreen);
         addForce(form, 8, 7, playScreen);
@@ -117,6 +119,7 @@ public class Configurator {
         force.shapeRenderer = playScreen.shapeRenderer;
         force.playScreen = playScreen;
         setPlayScreenToChildren(force, playScreen);
+        force.sendReport("initial");
     }
 
     private void addForce(Nation nation, int col, int row, PlayScreen playScreen) {
