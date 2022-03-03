@@ -93,6 +93,10 @@ public abstract class Force extends Image {
     public Force() {
     }
 
+    public Force (TextureRegion region) {
+        super(region);
+    }
+
     public Force(TextureRegion region, int inf, float len) {
         super(region);
         unmark();

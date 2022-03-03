@@ -7,6 +7,7 @@ import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
 
 public class FormationValidator {
+
     public static Force createGroup(Array<Force> forces, PlayScreen playScreen) {
         if (forces.size == 1) {
             return forces.get(0);

@@ -15,6 +15,7 @@ import by.pavka.march.map.HexGraph;
 import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
 import by.pavka.march.military.Unit;
+import by.pavka.march.military.UnitType;
 
 public class Configurator {
     public BuonaparteGame game;
@@ -64,7 +65,8 @@ public class Configurator {
         headForce.attach(unit, true);
         Formation formation = new Formation(game.getTextureRegion("fr_inf"));
         Formation formation1 = new Formation((game.getTextureRegion("fr_inf")));
-        Unit un = new Unit(game.getTextureRegion("fr_inf"));
+//        Unit un = new Unit(game.getTextureRegion("fr_inf"));
+        Unit un = new Unit(game.getTextureRegion("fr_inf"), UnitType.INFANTRY);
         formation.setName("I.Division");
         formation1.setName("III.Brigade");
         un.setName("III.Regiment");

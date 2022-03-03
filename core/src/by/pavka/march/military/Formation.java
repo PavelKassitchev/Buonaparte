@@ -234,7 +234,6 @@ public class Formation extends Force {
 //                System.out.println("Capacity: " + strength.capacity + " Food: " + strength.food);
 //            }
         }
-        System.out.println("INSIDE ATTACH visual hex = " + force.visualHex);
         return this;
     }
 

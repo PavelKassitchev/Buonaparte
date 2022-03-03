@@ -4,11 +4,17 @@ import static by.pavka.march.PlayScreen.HOURS_IN_SECOND;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectFloatMap;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 
+import by.pavka.march.characteristic.March;
+import by.pavka.march.characteristic.MarchConfig;
 import by.pavka.march.characteristic.Quality;
 import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
+import by.pavka.march.order.OrderList;
 
 public class Unit extends Force {
     Quality quality;
@@ -45,6 +51,32 @@ public class Unit extends Force {
 //        strength = new Strength();
 //        strength.infantry = 855;
 //        strength.length = 150;
+    }
+
+    public Unit(TextureRegion region, UnitType unitType) {
+        super(region);
+        strength = unitType.getInitialStrength();
+        unmark();
+        visualStrength = new Strength(strength);
+        currentSections = 1;
+        tail = new Array<>();
+        visualTail = new Array<>();
+        forcePath = new Array<>();
+        visualForcePath = new Array<>();
+        actualOrders = new OrderList(this);
+        visualOrders = new OrderList(this);
+        visualEnemies = new ObjectMap<>();
+        reconArea = new ObjectSet<>();
+        scoutMap = new ObjectFloatMap<>();
+
+        spirit = new Spirit(0, 1, 0);
+
+        visualSpirit = new Spirit(spirit);
+
+        viewStrength = new Strength(strength);
+        viewSpirit = new Spirit(spirit);
+
+        marchConfig = new MarchConfig(March.REGULAR);
     }
 
 
