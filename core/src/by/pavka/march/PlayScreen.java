@@ -218,9 +218,9 @@ public class PlayScreen extends GestureDetector implements Screen {
 
     private void setLabelInfo(Label label, Force force) {
         String text = String.format("%d soldiers \n  infantry: %d\n  cavalry: %d\n  guns: %d\n  wagons: %d" +
-                        "\nmorale-%.1f\nfatigue-%.1f\nxp-%.1f\nfood-%.1f", force.visualStrength.soldiers(), force.visualStrength.infantry,
+                        "\nmorale-%.1f\nfatigue-%.1f\nxp-%.1f\nfood-%.2f\nammo-%.2f", force.visualStrength.soldiers(), force.visualStrength.infantry,
                 force.visualStrength.cavalry, force.visualStrength.artillery, force.visualStrength.supply, force.visualSpirit.morale,
-                force.visualSpirit.fatigue, force.visualSpirit.xp, force.visualStrength.food);
+                force.visualSpirit.fatigue, force.visualSpirit.xp, force.visualStrength.food, force.visualStrength.ammo);
         label.setText(text);
     }
 

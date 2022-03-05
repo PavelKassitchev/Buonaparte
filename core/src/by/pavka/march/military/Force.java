@@ -91,6 +91,32 @@ public abstract class Force extends Image {
     public ForceRep forceRep;
 
     public Force() {
+        unmark();
+
+//        visualStrength = new Strength(strength);
+
+        //sections = (int) len / 3500;
+        currentSections = 1;
+        tail = new Array<>();
+        visualTail = new Array<>();
+        forcePath = new Array<>();
+        visualForcePath = new Array<>();
+        actualOrders = new OrderList(this);
+        visualOrders = new OrderList(this);
+//        futureOrders = new OrderList(this);
+//        visualEnemies = new ObjectIntMap<>();
+        visualEnemies = new ObjectMap<>();
+        reconArea = new ObjectSet<>();
+        scoutMap = new ObjectFloatMap<>();
+
+        spirit = new Spirit(0, 1, 0);
+
+        visualSpirit = new Spirit(spirit);
+
+//        viewStrength = new Strength(strength);
+        viewSpirit = new Spirit(spirit);
+
+        marchConfig = new MarchConfig(March.REGULAR);
     }
 
     public Force (TextureRegion region) {
@@ -130,6 +156,8 @@ public abstract class Force extends Image {
         marchConfig = new MarchConfig(March.REGULAR);
 
     }
+
+    public abstract String image();
 
     public Force findHyperForce() {
         if (superForce == null) {
@@ -593,12 +621,18 @@ public abstract class Force extends Image {
 
     public abstract double findFoodNeed();
 
-    public abstract int getLevel();
+    public abstract Unitable getType();
+
+//    public abstract int getLevel();
 
     public void resign() {
         if (superForce != null) {
 
         }
+    }
+
+    public boolean isDetachable() {
+        return true;
     }
 
     public boolean detach() {
@@ -625,25 +659,14 @@ public abstract class Force extends Image {
             visualOrders.clear();
             setRealHex(findHyperForce().hex);
             nation = findHyperForce().nation;
-//            shapeRenderer = findHyperForce().shapeRenderer;
-//            if (findHyperForce().remoteHeadForce == null) {
-//                remoteHeadForce = (Formation) findHyperForce();
-//            } else {
-//                remoteHeadForce = findHyperForce().remoteHeadForce;
-//            }
-//            remoteHeadForce = playScreen.headForce;
-//            System.out.println("INSIDE DETACH force = " + this.getName() + " REMOTE HEAD = " + remoteHeadForce.getName());
             detach();
-
             speed = findSpeed();
-//            System.out.println(superForce);
             findHyperForce().sendReport("detached");
 //            spirit = findSpirit();
             if (needsReport) {
                 sendReport("detached");
             }
             superForce = null;
-            System.out.println("Remote head Force = " + remoteHeadForce);
             return true;
         }
     }

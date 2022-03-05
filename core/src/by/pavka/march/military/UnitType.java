@@ -8,74 +8,23 @@ import static by.pavka.march.military.Force.SUP;
 
 import by.pavka.march.characteristic.Strength;
 
-public enum UnitType {
-
-    TROOP(3, CAV) {
-        @Override
-        public Strength getInitialStrength() {
-            return new Strength();
-        }
-    },
-    INFANTRY_REGIMENT_HQ(3, CAV) {
-        @Override
-        public Strength getInitialStrength() {
-            return new Strength();
-        }
-    },
-    CAVALRY_REGIMENT_HQ(3, CAV) {
-        @Override
-        public Strength getInitialStrength() {
-            return new Strength();
-        }
-    },
-    INFANTRY_BRIGADE_HQ(3, CAV) {
-        @Override
-        public Strength getInitialStrength() {
-            return new Strength();
-        }
-    },
-    CAVALRY_BRIGADE_HQ(3, CAV) {
-        @Override
-        public Strength getInitialStrength() {
-            return new Strength();
-        }
-    },
-    DIVISION_HQ(3, CAV) {
-        @Override
-        public Strength getInitialStrength() {
-            return new Strength();
-        }
-    },
-    CAVALRY_DIVISION_HQ(3, CAV) {
-        @Override
-        public Strength getInitialStrength() {
-            return new Strength();
-        }
-    },
-    CORPS_HQ(3, CAV) {
-        @Override
-        public Strength getInitialStrength() {
-            return new Strength();
-        }
-    },
-    CAVALRY_CORPS_HQ(3, CAV) {
-        @Override
-        public Strength getInitialStrength() {
-            return new Strength();
-        }
-    },
-    ARMY_HQ(3, CAV) {
-        @Override
-        public Strength getInitialStrength() {
-            return new Strength();
-        }
-    },
+public enum UnitType implements Unitable {
 
     INFANTRY(1, INF) {
         @Override
         public Strength getInitialStrength() {
             return new Strength(840, 0, 0, 0, 0, 1, 1,
-                    120, 1, 6, 1, 1, 3, 3);
+                    120, 1, 5, 1, 0.5, 3, 2);
+        }
+
+        @Override
+        public String image() {
+            return "fr_inf";
+        }
+
+        @Override
+        public float speed() {
+            return 4.0f;
         }
     },
     LIGHT_INFANTRY(1, INF) {
@@ -131,7 +80,18 @@ public enum UnitType {
     CAVALRY(1, CAV) {
         @Override
         public Strength getInitialStrength() {
-            return new Strength();
+            return new Strength(0, 0, 200, 0, 0, 0.08, 0.4,
+                    100, 4, 3.15, 0.8, 0.04, 3, 0.15);
+        }
+
+        @Override
+        public String image() {
+            return "fr_cav";
+        }
+
+        @Override
+        public float speed() {
+            return 6.0f;
         }
     },
     HEAVY_CAVALRY(1, CAV) {
@@ -215,5 +175,27 @@ public enum UnitType {
         return type;
     }
 
+    public String image() {
+        return null;
+    }
+
+    @Override
+    public int getLevel() {
+        return 0;
+    }
+
+    public float speed() {
+        return 0;
+    }
+
+
+    @Override
     public abstract Strength getInitialStrength();
+
+    @Override
+    public boolean canAttach(int size, Unitable unitable) {
+        return false;
+    }
+
+
 }

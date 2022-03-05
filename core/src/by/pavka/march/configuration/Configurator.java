@@ -4,6 +4,7 @@ import static by.pavka.march.configuration.Nation.AUSTRIA;
 import static by.pavka.march.configuration.Nation.FRANCE;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 
 import by.pavka.march.BuonaparteGame;
@@ -14,6 +15,7 @@ import by.pavka.march.map.Hex;
 import by.pavka.march.map.HexGraph;
 import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
+import by.pavka.march.military.HQType;
 import by.pavka.march.military.Unit;
 import by.pavka.march.military.UnitType;
 
@@ -34,6 +36,10 @@ public class Configurator {
 //    public TiledMap getMap() {
 //        return campaign.map;
 //    }
+
+    public Drawable getDrawable(String name) {
+        return game.getDrawable(name);
+    }
 
     public String getMapName() {
         return campaign.mapName;
@@ -64,12 +70,15 @@ public class Configurator {
         unit.setName("I.Inf.Bat.");
         headForce.attach(unit, true);
         Formation formation = new Formation(game.getTextureRegion("fr_inf"));
-        Formation formation1 = new Formation((game.getTextureRegion("fr_inf")));
+//        Formation formation1 = new Formation((game.getTextureRegion("fr_inf")));
+        Formation formation1 = new Formation(HQType.INFANTRY_REGIMENT_HQ);
+        formation1.setDrawable(getDrawable(formation1.image()));
 //        Unit un = new Unit(game.getTextureRegion("fr_inf"));
-        Unit un = new Unit(game.getTextureRegion("fr_inf"), UnitType.INFANTRY);
+        Unit un = new Unit(UnitType.INFANTRY);
+        un.setDrawable(getDrawable(un.image()));
         formation.setName("I.Division");
-        formation1.setName("III.Brigade");
-        un.setName("III.Regiment");
+        formation1.setName("III.Inf.Reg");
+        un.setName("III.Inf.Bat");
         formation1.attach(un, true);
         formation.attach(formation1, true);
         headForce.attach(formation, true);

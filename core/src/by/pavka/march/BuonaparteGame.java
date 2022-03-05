@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import by.pavka.march.configuration.Nation;
 
@@ -31,6 +33,10 @@ public class BuonaparteGame extends Game {
 
 	public TextureRegion getTextureRegion(String name) {
 		return textureAtlas.findRegion(name);
+	}
+
+	public Drawable getDrawable(String name) {
+		return new TextureRegionDrawable(textureAtlas.findRegion(name));
 	}
 
 	public Skin getSkin() {

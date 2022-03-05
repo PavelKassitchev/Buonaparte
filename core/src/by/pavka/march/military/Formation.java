@@ -12,6 +12,7 @@ public class Formation extends Force {
 
     General commander;
     HQ hq;
+    Unitable type;
     public Array<Force> subForces;
     public Array<Force> interForces;
     public Array<Force> visualForces;
@@ -59,6 +60,31 @@ public class Formation extends Force {
         viewForces = new Array<>();
         speed = 3.0f;
 //        strength.capacity = 1;
+    }
+
+    public Formation(HQType hqType) {
+        super();
+        subForces = new Array<>();
+        interForces = new Array<>();
+        visualForces = new Array<>();
+        viewForces = new Array<>();
+        strength = new Strength();
+//        hq = new HQ(hqType, this);
+        hq = new HQ(hqType);
+        type = hqType;
+        speed = hqType.speed();
+//        strength = hqType.getInitialStrength();
+//        speed = hqType.speed();
+//        visualStrength = new Strength(strength);
+//        viewStrength = new Strength(strength);
+        attach(hq, true);
+        visualStrength = new Strength(strength);
+        viewStrength = new Strength(strength);
+    }
+
+    @Override
+    public String image() {
+        return type.image();
     }
 
     @Override
@@ -151,28 +177,28 @@ public class Formation extends Force {
         }
     }
 
-    @Override
-    public int getLevel() {
-        switch (hq.quality.unitType) {
-            case INFANTRY_REGIMENT_HQ:
-            case CAVALRY_REGIMENT_HQ:
-                return 1;
-            case INFANTRY_BRIGADE_HQ:
-            case CAVALRY_BRIGADE_HQ:
-                return 2;
-            case DIVISION_HQ:
-            case CAVALRY_DIVISION_HQ:
-                return 3;
-            case CORPS_HQ:
-            case CAVALRY_CORPS_HQ:
-            case TROOP:
-                return 4;
-            case ARMY_HQ:
-                return 5;
-            default:
-                return 0;
-        }
-    }
+//    @Override
+//    public int getLevel() {
+//        switch (hq.quality.unitType) {
+//            case INFANTRY_REGIMENT_HQ:
+//            case CAVALRY_REGIMENT_HQ:
+//                return 1;
+//            case INFANTRY_BRIGADE_HQ:
+//            case CAVALRY_BRIGADE_HQ:
+//                return 2;
+//            case DIVISION_HQ:
+//            case CAVALRY_DIVISION_HQ:
+//                return 3;
+//            case CORPS_HQ:
+//            case CAVALRY_CORPS_HQ:
+//            case TROOP:
+//                return 4;
+//            case ARMY_HQ:
+//                return 5;
+//            default:
+//                return 0;
+//        }
+//    }
 
     @Override
     public double findAmmoNeed() {
@@ -190,6 +216,11 @@ public class Formation extends Force {
             need += force.findFoodNeed();
         }
         return need;
+    }
+
+    @Override
+    public Unitable getType() {
+        return type;
     }
 
     public boolean remove(Force force) {
@@ -211,9 +242,13 @@ public class Formation extends Force {
         }
     }
 
+    public boolean canAttach(Force force) {
+        return type.canAttach(subForces.size, force.getType());
+    }
+
     public Formation attach(Force force, boolean physical) {
-//        if (validator.canAttach(force)) {
-        if (true){
+//        if (true) {
+        if (type == null || canAttach(force)) {
             add(force);
             viewForces.add(force);
 //            force.shapeRenderer = null;

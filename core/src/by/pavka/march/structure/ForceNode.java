@@ -18,8 +18,10 @@ public class ForceNode extends Tree.Node<ForceNode, Force, ForceView> {
         if (f instanceof Formation) {
             Formation formation = (Formation) f;
             for (Force force : formation.viewForces) {
-                ForceNode fn = new ForceNode(force, skin);
-                add(fn);
+                if (force.isDetachable()) {
+                    ForceNode fn = new ForceNode(force, skin);
+                    add(fn);
+                }
             }
         }
 

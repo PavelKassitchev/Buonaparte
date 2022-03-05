@@ -18,6 +18,7 @@ import by.pavka.march.order.OrderList;
 
 public class Unit extends Force {
     Quality quality;
+    Unitable unitType;
 
 
     public Unit() {
@@ -53,6 +54,11 @@ public class Unit extends Force {
 //        strength.length = 150;
     }
 
+    @Override
+    public String image() {
+        return unitType.image();
+    }
+
     public Unit(TextureRegion region, UnitType unitType) {
         super(region);
         strength = unitType.getInitialStrength();
@@ -78,6 +84,38 @@ public class Unit extends Force {
 
         marchConfig = new MarchConfig(March.REGULAR);
     }
+
+    public Unit(Unitable unitType) {
+        super();
+        this.unitType = unitType;
+//        super(playScreen.game.getTextureRegion(unitType.image()));
+//        setImage(unitType.image());
+        strength = unitType.getInitialStrength();
+        speed = unitType.speed();
+        visualStrength = new Strength(strength);
+        viewStrength = new Strength(strength);
+        unmark();
+
+//        currentSections = 1;
+//        tail = new Array<>();
+//        visualTail = new Array<>();
+//        forcePath = new Array<>();
+//        visualForcePath = new Array<>();
+//        actualOrders = new OrderList(this);
+//        visualOrders = new OrderList(this);
+//        visualEnemies = new ObjectMap<>();
+//        reconArea = new ObjectSet<>();
+//        scoutMap = new ObjectFloatMap<>();
+//
+//        spirit = new Spirit(0, 1, 0);
+//
+//        visualSpirit = new Spirit(spirit);
+//
+//        viewSpirit = new Spirit(spirit);
+//
+//        marchConfig = new MarchConfig(March.REGULAR);
+    }
+
 
 
 
@@ -168,10 +206,10 @@ public class Unit extends Force {
 
     }
 
-    @Override
-    public int getLevel() {
-        return 0;
-    }
+//    @Override
+//    public int getLevel() {
+//        return 0;
+//    }
 
     @Override
     public double findAmmoNeed() {
@@ -181,6 +219,11 @@ public class Unit extends Force {
     @Override
     public double findFoodNeed() {
         return strength.foodConsumption;
+    }
+
+    @Override
+    public Unitable getType() {
+        return unitType;
     }
 
     public Stock changeStockAscending(Stock stock, int mode) {
