@@ -5,6 +5,10 @@ import com.badlogic.gdx.utils.Array;
 import by.pavka.march.military.Force;
 
 public abstract class Order {
+    public static final int SAFE = -1;
+    public final static int DEFAULT = 0;
+    public final static int OFFENSIVE = 1;
+
     public boolean irrevocable;
     public boolean revoked;
 

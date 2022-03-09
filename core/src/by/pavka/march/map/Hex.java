@@ -25,6 +25,7 @@ public class Hex extends Group {
     public int index;
     public float crop;
     public float visualCrop;
+    public boolean hasBattle;
     public TiledMapTileLayer.Cell cell;
     public PlayScreen playScreen;
     private TiledMap tiledMap;

@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectFloatMap;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
 
 import by.pavka.march.characteristic.March;
 import by.pavka.march.characteristic.MarchConfig;
@@ -14,6 +13,8 @@ import by.pavka.march.characteristic.Quality;
 import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
+import by.pavka.march.configuration.Configurator;
+import by.pavka.march.map.Hex;
 import by.pavka.march.order.OrderList;
 
 public class Unit extends Force {
@@ -59,6 +60,21 @@ public class Unit extends Force {
         return unitType.image();
     }
 
+    @Override
+    public void startBattle(Hex hex) {
+        //TODO
+    }
+
+    @Override
+    public void joinBattle(Hex hex) {
+        //TODO
+    }
+
+    @Override
+    public boolean canAttach(Force force) {
+        return false;
+    }
+
     public Unit(TextureRegion region, UnitType unitType) {
         super(region);
         strength = unitType.getInitialStrength();
@@ -72,8 +88,8 @@ public class Unit extends Force {
         actualOrders = new OrderList(this);
         visualOrders = new OrderList(this);
         visualEnemies = new ObjectMap<>();
-        reconArea = new ObjectSet<>();
-        scoutMap = new ObjectFloatMap<>();
+//        reconArea = new ObjectSet<>();
+        reconMap = new ObjectFloatMap<>();
 
         spirit = new Spirit(0, 1, 0);
 
@@ -94,7 +110,7 @@ public class Unit extends Force {
         speed = unitType.speed();
         visualStrength = new Strength(strength);
         viewStrength = new Strength(strength);
-        unmark();
+        setDrawable(Configurator.getImage(unitType.image()));
 
 //        currentSections = 1;
 //        tail = new Array<>();

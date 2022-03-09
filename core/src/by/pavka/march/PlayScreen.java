@@ -174,7 +174,7 @@ public class PlayScreen extends GestureDetector implements Screen {
         }
     }
 
-    public void activateSelectBox(Force frc, Hex hex, final FollowOrder jOrder) {
+    public void activateSelectBox(Force frc, Hex hex, final FollowOrder fOrder) {
 //        Array<Formation> allies = frc.getAllyFormations(hex);
 //        final SelectBox<Formation> selectForce = new SelectBox<>(frc.playScreen.game.getSkin());
 //        selectForce.setItems(allies);
@@ -194,7 +194,7 @@ public class PlayScreen extends GestureDetector implements Screen {
 //            }
 //        });
 
-        final SelectBox<? extends Force> selectForce = jOrder.createSelectBox(frc, hex);
+        final SelectBox<? extends Force> selectForce = fOrder.createSelectBox(frc, hex);
 //        Array<Formation> allies = frc.getAllyFormations(hex);
 //        final SelectBox<Formation> selectForce = new SelectBox<>(frc.playScreen.game.getSkin());
 //        selectForce.setItems(allies);
@@ -207,9 +207,7 @@ public class PlayScreen extends GestureDetector implements Screen {
             public void changed(ChangeEvent changeEvent, Actor actor) {
 //                Formation target = selectForce.getSelected();
                 Force target = selectForce.getSelected();
-                System.out.println("Setting TARGET = " + target);
-                jOrder.setTargetForce(target);
-                System.out.println("JORDER TARGET = " + jOrder.target);
+                fOrder.setTargetForce(target);
                 destroySelectBox();
                 treeWindow.setVisible(true);
             }
@@ -218,9 +216,9 @@ public class PlayScreen extends GestureDetector implements Screen {
 
     private void setLabelInfo(Label label, Force force) {
         String text = String.format("%d soldiers \n  infantry: %d\n  cavalry: %d\n  guns: %d\n  wagons: %d" +
-                        "\nmorale-%.1f\nfatigue-%.1f\nxp-%.1f\nfood-%.2f\nammo-%.2f", force.visualStrength.soldiers(), force.visualStrength.infantry,
-                force.visualStrength.cavalry, force.visualStrength.artillery, force.visualStrength.supply, force.visualSpirit.morale,
-                force.visualSpirit.fatigue, force.visualSpirit.xp, force.visualStrength.food, force.visualStrength.ammo);
+                        "\nmorale-%.1f\nfatigue-%.1f\nxp-%.1f\nfood-%.2f\nammo-%.2f\nspeed-%.1f", force.visualStrength.soldiers(), force.visualStrength.infantry,
+                force.visualStrength.cavalry, force.visualStrength.artillery / 15, force.visualStrength.supply, force.visualSpirit.morale,
+                force.visualSpirit.fatigue, force.visualSpirit.xp, force.visualStrength.food, force.visualStrength.ammo, force.speed);
         label.setText(text);
     }
 

@@ -95,7 +95,7 @@ public class Strength {
     public Strength change(int soldiers, UnitType unitType) {
         Strength strength = new Strength();
         double ratio;
-        switch(unitType.type()) {
+        switch(unitType.getTroopType()) {
             case INF:
                 ratio = (soldiers + 0.0) / infantry;
                 strength.infantry = soldiers;

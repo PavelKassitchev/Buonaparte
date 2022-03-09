@@ -8,4 +8,5 @@ public interface Unitable {
     float speed();
     String image();
     int getLevel();
+    String getTroopType();
 }

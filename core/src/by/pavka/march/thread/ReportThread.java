@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectFloatMap;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
 
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.Path;
@@ -59,7 +58,6 @@ public class ReportThread extends Thread {
         String d = "";
         if (order != null) {
             d += delay;
-            System.out.println("REPORT RUNNING " + order + " with delay " + d);
         }
 
         final Hex delayedHex = force.hex;
@@ -68,16 +66,16 @@ public class ReportThread extends Thread {
         final Array<Path> delayedPath = new Array<>(force.forcePath);
 
         final ObjectMap<Force, Hex> delayedEnemies = new ObjectMap<Force, Hex>(force.visualEnemies);
-        final ObjectSet<Hex> delayedArea = force.reconArea;
-        final ObjectFloatMap<Hex> delayedMap = force.scoutMap;
+//        final ObjectSet<Hex> delayedArea = force.reconArea;
+        final ObjectFloatMap<Hex> delayedMap = force.reconMap;
         final float time = force.playScreen.time;
 
         final Force copy = force.copyForce();
 
         final Order fulfilledOrder = order;
-        if (force.getName().equals("II.Art.Bttr.")) {
-            System.out.println("FulfilledOrder is " + fulfilledOrder + " thread " + hashCode());
-        }
+//        if (force.getName().equals("II.Art.Bttr.")) {
+//            System.out.println("FulfilledOrder is " + fulfilledOrder + " thread " + hashCode());
+//        }
         long beg = 0;
         try {
             while (beg < delay) {
@@ -115,16 +113,16 @@ public class ReportThread extends Thread {
 //                        } else {
 //
 //                        }
-                    if (force.getName().equals("II.Art.Bttr.")) {
-                        System.out.println("REPORTED EXECUTION " + fulfilledOrder);
-                    }
+//                    if (force.getName().equals("II.Art.Bttr.")) {
+//                        System.out.println("REPORTED EXECUTION " + fulfilledOrder);
+//                    }
 
 //                    }
 
                     if (!(fulfilledOrder instanceof JoinOrder)) {
-                        if (force.getName().equals("II.Art.Bttr.")) {
-                            System.out.println("Force " + force + " head " + force.remoteHeadForce + " order " + fulfilledOrder);
-                        }
+//                        if (force.getName().equals("II.Art.Bttr.")) {
+//                            System.out.println("Force " + force + " head " + force.remoteHeadForce + " order " + fulfilledOrder);
+//                        }
                         force.visualTail = delayedTail;
                         force.visualForcePath = delayedPath;
                         force.setVisualHex(delayedHex);

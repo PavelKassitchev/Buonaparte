@@ -104,13 +104,14 @@ public class JoinOrder extends FollowOrder {
 //TODO
 
         if (force.hex != target.hex && force.forcePath != null && !force.forcePath.isEmpty() || !force.tail.isEmpty()) {
-            if (target.getReconArea().contains(force.hex) || force.getReconArea().contains(target.hex)) {
+            if (target.getReconMap().containsKey(force.hex) || force.getReconMap().containsKey(target.hex)) {
+//            if (target.getReconArea().contains(force.hex) || force.getReconArea().contains(target.hex)) {
                 force.setMarch(March.QUICK);
             }
             force.move(delta);
             setDestination();
         } else {
-            System.out.println("Fulfilling join order in visual hex " + force.visualHex);
+//            System.out.println("Fulfilling join order in visual hex " + force.visualHex);
 
             force.actualOrders.fulfillOrder(this);
 
@@ -118,7 +119,7 @@ public class JoinOrder extends FollowOrder {
             target.sendReport("attach");
 //            force.actualOrders.fulfillOrder(this);
 //            force.actualOrders.clear();
-            System.out.println("Completing join order in visual hex " + force.visualHex);
+//            System.out.println("Completing join order in visual hex " + force.visualHex);
         }
         return true;
     }
@@ -140,7 +141,7 @@ public class JoinOrder extends FollowOrder {
     @Override
     public SelectBox<? extends Force> createSelectBox(Force frc, Hex hex) {
         SelectBox<Formation> selectForce = new SelectBox<>(frc.playScreen.game.getSkin());
-        Array<Formation> allies = frc.getAllyFormations(hex);
+        Array<Formation> allies = frc.getAttachFormations(hex);
         selectForce.setItems(allies);
         return selectForce;
     }

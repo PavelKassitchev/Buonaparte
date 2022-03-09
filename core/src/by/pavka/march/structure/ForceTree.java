@@ -44,7 +44,8 @@ public class ForceTree extends Tree<ForceNode, Force> {
     private void setReadyToAssign(ForceNode rootNode, ForceNode node) {
         if (rootNode != node) {
             //TODO add validator
-            if (rootNode.getValue() instanceof Formation && true) {
+            if (rootNode.getValue() instanceof Formation && ((Formation) rootNode.getValue()).canAttach(node.getValue())) {
+//            if (rootNode.getValue() instanceof Formation && true) {
                 rootNode.getActor().assignButton.setResigning(false);
             } else {
                 rootNode.getActor().assignButton.setResigning(false);

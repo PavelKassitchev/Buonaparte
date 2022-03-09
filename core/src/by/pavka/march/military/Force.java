@@ -38,6 +38,10 @@ public abstract class Force extends Image {
     public static final String SUP = "supply";
     public static final float MAX_SPEED = 36.0f;
 
+    public static final int DISORDERED = -1;
+    public static final int DEFAULT = 0;
+    public static final int IN_BATTLE = 1;
+
     public static final int TEST_SPEED = 2;
     public static final int TEST_REPORT_PERIOD = 1;
     public static final int TEST_REPORT_SPEED = 1;
@@ -55,7 +59,8 @@ public abstract class Force extends Image {
     public Strength viewStrength;
     public Spirit viewSpirit;
 
-    float speed;
+    public float speed;
+    public int state = DEFAULT;
 
     public Formation superForce;
     public Formation remoteHeadForce;
@@ -73,11 +78,11 @@ public abstract class Force extends Image {
     public Array<Path> visualTail;
     public OrderList actualOrders;
     public OrderList visualOrders;
-//    public OrderList futureOrders;
+    //    public OrderList futureOrders;
     //    public ObjectIntMap<Force> visualEnemies;
     public ObjectMap<Force, Hex> visualEnemies;
-    public ObjectSet<Hex> reconArea;
-    public ObjectFloatMap<Hex> scoutMap;
+    //    public ObjectSet<Hex> reconArea;
+    public ObjectFloatMap<Hex> reconMap;
     public float visualTime;
     public int sections;
     public int currentSections;
@@ -106,8 +111,8 @@ public abstract class Force extends Image {
 //        futureOrders = new OrderList(this);
 //        visualEnemies = new ObjectIntMap<>();
         visualEnemies = new ObjectMap<>();
-        reconArea = new ObjectSet<>();
-        scoutMap = new ObjectFloatMap<>();
+//        reconArea = new ObjectSet<>();
+        reconMap = new ObjectFloatMap<>();
 
         spirit = new Spirit(0, 1, 0);
 
@@ -119,7 +124,7 @@ public abstract class Force extends Image {
         marchConfig = new MarchConfig(March.REGULAR);
     }
 
-    public Force (TextureRegion region) {
+    public Force(TextureRegion region) {
         super(region);
     }
 
@@ -143,8 +148,8 @@ public abstract class Force extends Image {
 //        futureOrders = new OrderList(this);
 //        visualEnemies = new ObjectIntMap<>();
         visualEnemies = new ObjectMap<>();
-        reconArea = new ObjectSet<>();
-        scoutMap = new ObjectFloatMap<>();
+//        reconArea = new ObjectSet<>();
+        reconMap = new ObjectFloatMap<>();
 
         spirit = new Spirit(0, 1, 0);
 
@@ -159,6 +164,12 @@ public abstract class Force extends Image {
 
     public abstract String image();
 
+    public abstract void startBattle(Hex hex);
+
+    public abstract void joinBattle(Hex hex);
+
+    public abstract boolean canAttach(Force force);
+
     public Force findHyperForce() {
         if (superForce == null) {
             return this;
@@ -169,7 +180,7 @@ public abstract class Force extends Image {
 
     public float findReportDistance(Force force) {
         float delay = 0;
-        Hex h = hex == null? findHyperForce().hex : hex;
+        Hex h = hex == null ? findHyperForce().hex : hex;
         if (force != null && force.hex != h) {
             delay = (float) Courier.courierDelay(force.hex, h) * 1000 / HOURS_IN_SECOND;
         }
@@ -275,13 +286,13 @@ public abstract class Force extends Image {
         return allies;
     }
 
-    public Array<Formation> getAllyFormations(Hex hex) {
+    public Array<Formation> getAttachFormations(Hex hex) {
         Array<Formation> allies = new Array<>();
         if (hex.hasChildren()) {
             for (Actor a : hex.getChildren()) {
                 Force f = (Force) a;
-                if (this != f && f.nation == nation && f instanceof Formation) {
-                    allies.add((Formation)f);
+                if (this != f && f.nation == nation && f.canAttach(this)) {
+                    allies.add((Formation) f);
                 }
             }
         }
@@ -303,10 +314,10 @@ public abstract class Force extends Image {
 
     public void recon() {
         final ObjectMap<Force, Hex> enemies = new ObjectMap<>();
-        reconArea = getReconArea();
-        scoutMap = getScoutMap();
+//        reconArea = getReconArea();
+        reconMap = getReconMap();
 //        for (Hex h : reconArea) {
-        for (Hex h : scoutMap.keys()) {
+        for (Hex h : reconMap.keys()) {
             if (h.enemiesOf(this) != null) {
                 for (Force f : h.enemiesOf(this)) {
                     if (ForceRep.reconEnemy(f) != null) {
@@ -330,7 +341,7 @@ public abstract class Force extends Image {
         visualEnemies.putAll(enemies);
     }
 
-    public ObjectFloatMap<Hex> getScoutMap() {
+    public ObjectFloatMap<Hex> getReconMap() {
         int radius;
         if (strength.recon <= 6) {
             radius = 1;
@@ -357,28 +368,28 @@ public abstract class Force extends Image {
         return scoutMap;
     }
 
-    public ObjectSet<Hex> getReconArea() {
-        int radius;
-        if (strength.recon <= 6) {
-            radius = 1;
-        } else if (strength.recon <= 18) {
-            radius = 2;
-        } else if (strength.recon <= 36) {
-            radius = 3;
-        } else if (strength.recon <= 60) {
-            radius = 4;
-        } else {
-            radius = 5;
-        }
-        ObjectSet<Hex> reconArea = playScreen.getHexGraph().getArea(hex, radius, new ObjectSet<Hex>());
-        if (radius > 1) {
-            if (forcePath != null && forcePath.size > radius) {
-                Hex h = forcePath.get(radius).toHex;
-                reconArea.add(h);
-            }
-        }
-        return reconArea;
-    }
+//    public ObjectSet<Hex> getReconArea() {
+//        int radius;
+//        if (strength.recon <= 6) {
+//            radius = 1;
+//        } else if (strength.recon <= 18) {
+//            radius = 2;
+//        } else if (strength.recon <= 36) {
+//            radius = 3;
+//        } else if (strength.recon <= 60) {
+//            radius = 4;
+//        } else {
+//            radius = 5;
+//        }
+//        ObjectSet<Hex> reconArea = playScreen.getHexGraph().getArea(hex, radius, new ObjectSet<Hex>());
+//        if (radius > 1) {
+//            if (forcePath != null && forcePath.size > radius) {
+//                Hex h = forcePath.get(radius).toHex;
+//                reconArea.add(h);
+//            }
+//        }
+//        return reconArea;
+//    }
 
 
     public void sendReport(final String tag) {
@@ -388,7 +399,7 @@ public abstract class Force extends Image {
     }
 
     public void sendReport(final String tag, long delay) {
-        Thread t = new ReportThread(this , delay);
+        Thread t = new ReportThread(this, delay);
         t.start();
     }
 
@@ -413,30 +424,33 @@ public abstract class Force extends Image {
     public void act(float delta) {
         if (!playScreen.timer.isChecked()) {
             super.act(delta);
-//            eat(delta);
             feed(delta);
             flatten();
             float f = delta * HOURS_IN_SECOND * MarchConfig.REST_FACTOR;
             rest(f);
-//            if (forcePath != null && !forcePath.isEmpty() || !tail.isEmpty()) {
-//                move(delta);
-//            }
-            if (actualOrders.first() != null) {
-                actualOrders.first().execute(this, delta);
-            }
-            if (!isEnemy() && readyToRecon(delta)) {
-                recon();
-                sendReport("JUST RECON");
+
+            switch (state) {
+                case DEFAULT:
+                    if (actualOrders.first() != null) {
+                        actualOrders.first().execute(this, delta);
+                    }
+                    if (!isEnemy() && readyToRecon(delta)) {
+                        recon();
+                        sendReport("JUST RECON");
+                    }
             }
         }
+
     }
 
     public void feed(float delta) {
         double f = strength.foodConsumption * delta * HOURS_IN_SECOND / 24;
-        if (hex.crop > f) {
-            hex.crop -= f;
-        } else {
-            eat(delta);
+        if (hex != null) {
+            if (hex.crop > f) {
+                hex.crop -= f;
+            } else {
+                eat(delta);
+            }
         }
     }
 
@@ -473,6 +487,10 @@ public abstract class Force extends Image {
             Path path = forcePath.get(0);
             float timeToCross = Hex.SIZE * path.getCost() / (speed * marchConfig.speedFactor());
             if (start > timeToCross / HOURS_IN_SECOND) {
+//                if (getName().equals("II.Art.Bttr.") || getName().equals("IV.Cav.Div.")) {
+//                    System.out.println(getName() + "time to cross " + timeToCross * 2 + " speed " + speed * marchConfig.speedFactor()
+//                    + " current time " + start + " fatigue " + spirit.fatigue + " speed factor " + marchConfig.speedFactor());
+//                }
                 start = 0;
                 forcePath.removeIndex(0);
                 Hex toHex = path.getToNode();
@@ -500,6 +518,13 @@ public abstract class Force extends Image {
                 if (!isEnemy()) {
                     recon();
                     sendReport("IN MOVEMENT");
+                }
+                if (!hex.enemiesOf(this).isEmpty()) {
+                    if (hex.hasBattle) {
+                        joinBattle(hex);
+                    } else {
+                        startBattle(hex);
+                    }
                 }
             }
         } else {
@@ -551,9 +576,9 @@ public abstract class Force extends Image {
 
     public void flatten() {
         Stock stock = emptyStock();
-        if (getName() != null && getName().equals("IV.Cav.Div.")) {
-            System.out.println("Emptied Stock is " + stock.food + " capacity is " + strength.capacity);
-        }
+//        if (getName() != null && getName().equals("IV.Cav.Div.")) {
+//            System.out.println("Emptied Stock is " + stock.food + " capacity is " + strength.capacity);
+//        }
         double fRatio = stock.food / strength.capacity;
         double aRatio = stock.ammo / strength.capacity;
 
@@ -641,9 +666,9 @@ public abstract class Force extends Image {
         }
         superForce.remove(this);
         superForce.changeStrength(strength.reverse());
-
         superForce.viewForces.removeValue(this, true);
         spirit = findSpirit();
+        marchConfig.setMarch(March.REGULAR);
 
         return true;
     }
@@ -661,15 +686,18 @@ public abstract class Force extends Image {
             nation = findHyperForce().nation;
             detach();
             speed = findSpeed();
+            findHyperForce().speed = findHyperForce().findSpeed();
+            System.out.println("Hyper Force size is " + ((Formation) findHyperForce()).subForces.size + " speed "
+                    + findHyperForce().speed);
             findHyperForce().sendReport("detached");
 //            spirit = findSpirit();
             if (needsReport) {
                 sendReport("detached");
             }
+//            superForce.speed = superForce.findSpeed();
+//            System.out.println("Super Force speed = " + superForce.speed);
             superForce = null;
             return true;
         }
     }
-
-
 }

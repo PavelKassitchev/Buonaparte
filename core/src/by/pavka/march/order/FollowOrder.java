@@ -30,7 +30,7 @@ public class FollowOrder extends MoveOrder {
 
     public void setDestination() {
         destinations.clear();
-        System.out.println("Target = " + target);
+//        System.out.println("Target = " + target);
         destinations.add(target.hex);
 
         GraphPath<Hex> hexPath;
@@ -77,7 +77,7 @@ public class FollowOrder extends MoveOrder {
         if (!revoked && !additiveOrder && force.actualOrders.first() instanceof MoveOrder) {
             force.actualOrders.removeMoveOrders();
         }
-        System.out.println(this + " Follow Order received with target " + target);
+//        System.out.println(this + " Follow Order received with target " + target);
         super.receive(force);
     }
 

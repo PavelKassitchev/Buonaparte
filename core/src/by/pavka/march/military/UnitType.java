@@ -122,7 +122,18 @@ public enum UnitType implements Unitable {
     ARTILLERY(1, ART) {
         @Override
         public Strength getInitialStrength() {
-            return new Strength();
+            return new Strength(0, 0, 0, 120, 0, 3, 0.01,
+                    80, 0.2, 5, 0.4, 1.5, 1.4, 3.6);
+        }
+
+        @Override
+        public String image() {
+            return "fr_art";
+        }
+
+        @Override
+        public float speed() {
+            return 3.9f;
         }
     },
     LIGHT_ARTILLERY_PLATOON(1, ART) {
@@ -131,7 +142,7 @@ public enum UnitType implements Unitable {
             return new Strength();
         }
     },
-    HORSE_ARTILLERY(1, ART) {
+    HORSE_ARTILLERY(1, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
@@ -171,7 +182,7 @@ public enum UnitType implements Unitable {
     public int fightRank() {
         return fightRank;
     }
-    public String type() {
+    public String getTroopType() {
         return type;
     }
 

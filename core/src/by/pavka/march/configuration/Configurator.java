@@ -20,7 +20,7 @@ import by.pavka.march.military.Unit;
 import by.pavka.march.military.UnitType;
 
 public class Configurator {
-    public BuonaparteGame game;
+    public static BuonaparteGame game;
     public PlayScreen playScreen;
     public Nation nation;
     private Campaign campaign;
@@ -37,6 +37,9 @@ public class Configurator {
 //        return campaign.map;
 //    }
 
+    public static Drawable getImage(String name) {
+        return game.getDrawable(name);
+    }
     public Drawable getDrawable(String name) {
         return game.getDrawable(name);
     }
@@ -50,35 +53,45 @@ public class Configurator {
     }
 
     public Formation addForces(PlayScreen playScreen) {
-        Force testForce = new Unit(game.getTextureRegion("fr_cav"));
+//        Force testForce = new Unit(game.getTextureRegion("fr_cav"));
+        Force testForce = new Unit(UnitType.CAVALRY);
         testForce.setName("X.Cav.Sq.");
-        Formation cavDivision = new Formation(game.getTextureRegion("fr_cav"));
+//        Formation cavDivision = new Formation(game.getTextureRegion("fr_cav"));
+        Formation cavDivision = new Formation(HQType.DIVISION_HQ);
         cavDivision.setName("IV.Cav.Div.");
-//        cavDivision.attach(testForce);
-        Formation cavRegiment = new Formation(game.getTextureRegion("fr_cav"));
-        cavRegiment.setName("XI.Cav.Reg.");
+//        Formation cavRegiment = new Formation(game.getTextureRegion("fr_cav"));
+        Formation cavRegiment = new Formation(HQType.CAVALRY_REGIMENT_HQ);
+        cavRegiment.setName("XI.Cav.Regmnt.");
         cavRegiment.attach(testForce, true);
-        Formation cavBrigade = new Formation(game.getTextureRegion("fr_cav"));
+//        Formation cavBrigade = new Formation(game.getTextureRegion("fr_cav"));
+        Formation cavBrigade = new Formation(HQType.CAVALRY_BRIGADE_HQ);
         cavBrigade.setName("XII.Brigade");
         cavBrigade.attach(cavRegiment, true);
         cavDivision.attach(cavBrigade, true);
-        Force anotherTestForce = new Unit(game.getTextureRegion("fr_art"));
+//        Force anotherTestForce = new Unit(game.getTextureRegion("fr_art"));
+        Force anotherTestForce = new Unit(UnitType.ARTILLERY);
         anotherTestForce.setName("II.Art.Bttr.");
-        Formation headForce = new Formation(game.getTextureRegion("fr_mil"));
-        headForce.setName("IV.Inf.Regmnt.");
-        Force unit = new Unit(game.getTextureRegion("fr_inf"));
+//        Formation headForce = new Formation(game.getTextureRegion("fr_mil"));
+        Formation headForce = new Formation(HQType.DIVISION_HQ);
+//        headForce.setDrawable(getDrawable(headForce.image()));
+        headForce.setName("IV.Inf.Division.");
+//        Force unit = new Unit(game.getTextureRegion("fr_inf"));
+        Unit unit = new Unit(UnitType.INFANTRY);
+//        unit.setDrawable(getDrawable(unit.image()));
         unit.setName("I.Inf.Bat.");
         headForce.attach(unit, true);
-        Formation formation = new Formation(game.getTextureRegion("fr_inf"));
+//        Formation formation = new Formation(game.getTextureRegion("fr_inf"));
+        Formation formation = new Formation(HQType.INFANTRY_BRIGADE_HQ);
+//        formation.setDrawable(getDrawable(formation.image()));
 //        Formation formation1 = new Formation((game.getTextureRegion("fr_inf")));
         Formation formation1 = new Formation(HQType.INFANTRY_REGIMENT_HQ);
-        formation1.setDrawable(getDrawable(formation1.image()));
+//        formation1.setDrawable(getDrawable(formation1.image()));
 //        Unit un = new Unit(game.getTextureRegion("fr_inf"));
         Unit un = new Unit(UnitType.INFANTRY);
-        un.setDrawable(getDrawable(un.image()));
-        formation.setName("I.Division");
-        formation1.setName("III.Inf.Reg");
-        un.setName("III.Inf.Bat");
+//        un.setDrawable(getDrawable(un.image()));
+        formation.setName("I.Inf.Brigade");
+        formation1.setName("III.Inf.Regmnt.");
+        un.setName("III.Inf.Bat.");
         formation1.attach(un, true);
         formation.attach(formation1, true);
         headForce.attach(formation, true);

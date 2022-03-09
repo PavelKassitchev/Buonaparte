@@ -6,7 +6,9 @@ import com.badlogic.gdx.utils.Array;
 import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
+import by.pavka.march.configuration.Configurator;
 import by.pavka.march.configuration.FormationValidator;
+import by.pavka.march.map.Hex;
 
 public class Formation extends Force {
 
@@ -32,6 +34,7 @@ public class Formation extends Force {
         for (Force force : subForces) {
             force.fatigue(f);
         }
+        spirit = findSpirit();
     }
 
     @Override
@@ -80,6 +83,7 @@ public class Formation extends Force {
         attach(hq, true);
         visualStrength = new Strength(strength);
         viewStrength = new Strength(strength);
+        setDrawable(Configurator.getImage(type.image()));
     }
 
     @Override
@@ -88,11 +92,21 @@ public class Formation extends Force {
     }
 
     @Override
+    public void startBattle(Hex hex) {
+        //TODO
+    }
+
+    @Override
+    public void joinBattle(Hex hex) {
+        //TODO
+    }
+
+    @Override
     public float findSpeed() {
         float speed = MAX_SPEED;
-        if (this.speed < speed) {
-            speed = this.speed;
-        }
+//        if (this.speed < speed) {
+//            speed = this.speed;
+//        }
         for (Force force : subForces) {
             if (force.findSpeed() < speed) {
                 speed = force.findSpeed();
@@ -242,13 +256,14 @@ public class Formation extends Force {
         }
     }
 
+    @Override
     public boolean canAttach(Force force) {
         return type.canAttach(subForces.size, force.getType());
     }
 
     public Formation attach(Force force, boolean physical) {
-//        if (true) {
-        if (type == null || canAttach(force)) {
+        if (canAttach(force) || !force.isDetachable()) {
+//        if (type == null || canAttach(force)) {
             add(force);
             viewForces.add(force);
 //            force.shapeRenderer = null;
