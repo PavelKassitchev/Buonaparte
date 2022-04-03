@@ -5,14 +5,16 @@ import static by.pavka.march.military.Force.*;
 import by.pavka.march.military.UnitType;
 
 public class Strength {
+    public static final Strength EMPTY_STRENGTH = new Strength(0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0);
     public int infantry;
     public int engineer;
     public int cavalry;
     public int artillery;
     public int supply;
 
-    double fire;
-    double charge;
+    public double fire;
+    public double charge;
 
     //double speed;
     public double length;
@@ -172,5 +174,83 @@ public class Strength {
             ammoResult = 0;
         }
         return new Stock(foodResult, ammoResult);
+    }
+
+    public Strength sufferLosses(double factor) {
+//        int initialSoldiers = soldiers();
+//        double initialFire = fire;
+        factor *= 0.5 + Math.random();
+//        System.out.println("Inside Strength factor becomes " + factor);
+        if (factor > 0.99) {
+            factor = 0.99;
+        }
+        int losses = (int) (soldiers() * factor);
+//        System.out.println("Inside Strength raw losses = " + losses + " without rounding " + soldiers() * factor);
+        if (losses < 1) {
+            double rand = Math.random();
+//            System.out.println("Random = " + rand);
+            if (rand < soldiers() * factor) {
+                losses = 1;
+            }
+        }
+        double effectiveFactor = losses / (soldiers() + 0.0);
+        int infLosses = infantry == 0 ? 0 : losses;
+        infantry -= infLosses;
+        int engLosses = engineer == 0 ? 0 : losses;
+        engineer -= engLosses;
+        int cavLosses = cavalry == 0 ? 0 : losses;
+        cavalry -= cavLosses;
+        int artLosses = artillery == 0 ? 0 : losses;
+        artillery -= artLosses;
+        int supLosses = supply == 0 ? 0 : losses;
+        supply -= supLosses;
+        double fireLosses = fire * effectiveFactor;
+        fire -= fireLosses;
+        double chargeLosses = charge * effectiveFactor;
+        charge -= chargeLosses;
+        double lengthLosses = length * effectiveFactor;
+        length -= lengthLosses;
+        double reconLosses = recon * effectiveFactor;
+        recon -= reconLosses;
+        double capacityLosses = capacity * effectiveFactor;
+        capacity -= capacityLosses;
+        double foodConsumptionLosses = foodConsumption * effectiveFactor;
+        foodConsumption -= foodConsumptionLosses;
+        double ammoConsumptionLosses = ammoConsumption * effectiveFactor;
+        ammoConsumption -= ammoConsumptionLosses;
+        double foodLosses = food * effectiveFactor;
+        food -= foodLosses;
+        double ammoLosses = ammo * effectiveFactor;
+        ammo -= ammoLosses;
+
+//        System.out.println("Inside Strength initial Soldiers = " + initialSoldiers +
+//                " initial Fire = " + initialFire + " end soldiers = " + soldiers() + " end fire = " + fire +
+//                " inRatio " + initialFire / initialSoldiers + " outRatio " + fire / soldiers());
+        return new Strength(infLosses, engLosses, cavLosses, artLosses, supLosses, fireLosses, chargeLosses, lengthLosses,
+                reconLosses, capacityLosses, foodConsumptionLosses, ammoConsumptionLosses, foodLosses, ammoLosses);
+    }
+
+    public Strength plus(Strength str) {
+        int infantry = this.infantry + str.infantry;
+        int engineer = this.engineer + str.engineer;
+        int cavalry = this.cavalry + str.cavalry;
+        int artillery = this.artillery + str.artillery;
+        int supply = this.supply + str.supply;
+        double fire = this.fire + str.fire;
+        double charge = this.charge + str.charge;
+        double length = this.length + str.length;
+        double recon = this.recon + str.recon;
+        double capacity = this.capacity + str.capacity;
+        double foodConsumption = this.foodConsumption + str.foodConsumption;
+        double ammoConsumption = this.ammoConsumption + str.ammoConsumption;
+        double food = this.food + str.food;
+        double ammo = this.ammo + str.ammo;
+        return new Strength(infantry, engineer, cavalry, artillery, supply, fire, charge, length, recon,
+                capacity, foodConsumption, ammoConsumption, food, ammo);
+    }
+
+    @Override
+    public String toString() {
+        return "Soldiers " + soldiers() + " fire " + fire;
     }
 }

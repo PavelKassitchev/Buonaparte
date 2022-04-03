@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import by.pavka.march.configuration.Nation;
 
 public class BuonaparteGame extends Game {
+	public static BuonaparteGame game;
 	public static final int TILE_SIZE_PX = 72;
 	public static final int HEX_SIZE_M = 3500;
 //	public static final Nation nation = FRANCE;
@@ -18,6 +19,10 @@ public class BuonaparteGame extends Game {
 	private Skin skin;
 
 	public Nation nation;
+
+	public static BuonaparteGame getGame() {
+		return game;
+	}
 	
 	@Override
 	public void create () {
@@ -29,6 +34,7 @@ public class BuonaparteGame extends Game {
 //		TextureAtlas atlas = new TextureAtlas("skin/golden-ui-skin.atlas");
 //		skin = new Skin(Gdx.files.internal("skin/golden-ui-skin.json"), atlas);
 		setScreen(new MenuScreen(this));
+		game = this;
 	}
 
 	public TextureRegion getTextureRegion(String name) {

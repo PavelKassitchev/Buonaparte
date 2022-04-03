@@ -22,6 +22,8 @@ import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
 import by.pavka.march.configuration.Nation;
+import by.pavka.march.fight.Fight;
+import by.pavka.march.fight.impl.Battle;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.Path;
 import by.pavka.march.order.Order;
@@ -38,14 +40,18 @@ public abstract class Force extends Image {
     public static final String SUP = "supply";
     public static final float MAX_SPEED = 36.0f;
 
-    public static final int DISORDERED = -1;
-    public static final int DEFAULT = 0;
-    public static final int IN_BATTLE = 1;
+//    public static final int DISORDERED = -1;
+//    public static final int DEFAULT = 0;
+//    public static final int IN_BATTLE = 1;
 
     public static final int TEST_SPEED = 2;
     public static final int TEST_REPORT_PERIOD = 1;
     public static final int TEST_REPORT_SPEED = 1;
     public static final int TEST_ORDER_SPEED = 5;
+
+    public static final double MORALE_RESTORE_HOUR = 0.1;
+    public static final double MIN_MORALE = -20;
+    public static double REORDER_MORALE = 0.3;
 
     public Nation nation;
     String name;
@@ -60,8 +66,9 @@ public abstract class Force extends Image {
     public Spirit viewSpirit;
 
     public float speed;
-    public int state = DEFAULT;
-
+    //    public int state = DEFAULT;
+    public boolean isDisordered;
+    public Fight fight;
     public Formation superForce;
     public Formation remoteHeadForce;
 
@@ -164,9 +171,11 @@ public abstract class Force extends Image {
 
     public abstract String image();
 
-    public abstract void startBattle(Hex hex);
+    public void startFight(Hex hex) {
+        new Battle(hex, this.nation);
+    }
 
-    public abstract void joinBattle(Hex hex);
+    public abstract void joinFight(Hex hex);
 
     public abstract boolean canAttach(Force force);
 
@@ -422,25 +431,48 @@ public abstract class Force extends Image {
 
     @Override
     public void act(float delta) {
-        if (!playScreen.timer.isChecked()) {
+        //TODO remove playScreen == null after testing battle
+        if (playScreen == null || !playScreen.timer.isChecked()) {
             super.act(delta);
             feed(delta);
             flatten();
             float f = delta * HOURS_IN_SECOND * MarchConfig.REST_FACTOR;
             rest(f);
-
-            switch (state) {
-                case DEFAULT:
-                    if (actualOrders.first() != null) {
-                        actualOrders.first().execute(this, delta);
-                    }
+            restoreMorale(delta);
+            if (fight != null) {
+                fight(delta);
+//                if (!isDisordered) {
+//                    fight.affect(this, delta);
+//                }
+            } else {
+                if (actualOrders.first() != null) {
+                    actualOrders.first().execute(this, delta);
+                }
+                //TODO remove playScreen == null after testing
+                if (playScreen != null) {
                     if (!isEnemy() && readyToRecon(delta)) {
                         recon();
                         sendReport("JUST RECON");
                     }
+                }
             }
+
+//            switch (state) {
+//                case DEFAULT:
+//                    if (actualOrders.first() != null) {
+//                        actualOrders.first().execute(this, delta);
+//                    }
+//                    if (!isEnemy() && readyToRecon(delta)) {
+//                        recon();
+//                        sendReport("JUST RECON");
+//                    }
+//            }
         }
 
+    }
+
+    public void fight(float delta) {
+        fight.strike(this, delta);
     }
 
     public void feed(float delta) {
@@ -521,9 +553,9 @@ public abstract class Force extends Image {
                 }
                 if (!hex.enemiesOf(this).isEmpty()) {
                     if (hex.hasBattle) {
-                        joinBattle(hex);
+                        joinFight(hex);
                     } else {
-                        startBattle(hex);
+                        startFight(hex);
                     }
                 }
             }
@@ -540,6 +572,14 @@ public abstract class Force extends Image {
     }
 
     public abstract void rest(float f);
+
+    public abstract void restoreMorale(float delta);
+
+    public void resumeFight() {
+        if (fight != null) {
+            fight.restoreForce(this);
+        }
+    }
 
 
     public void move(float delta) {
@@ -564,6 +604,39 @@ public abstract class Force extends Image {
     public abstract void eat(float delta);
 
     public abstract Stock changeStockDescending(Stock stock, int mode);
+
+    public abstract Strength sufferLosses(double factor);
+
+    public abstract Strength getFired(double factor);
+
+    public abstract Strength getFired(double factor, boolean onPursuit);
+
+    public abstract void changeSpirit(double xp, double morale, double fatigue);
+
+    public abstract void getCharged(double morale);
+
+    public void changeSpiritAscending(int soldiers, double xp, double morale, double fatigue) {
+        if (superForce != null) {
+            int superSoldiers = superForce.strength.soldiers();
+            double ratio = soldiers / (superSoldiers + 1.0);
+            superForce.spirit.change(xp * ratio, morale * ratio, fatigue * ratio);
+            if (superForce.spirit.morale < 0) {
+                superForce.isDisordered = true;
+            }
+            if (superForce.spirit.morale > 0.3) {
+                superForce.isDisordered = false;
+                superForce.resumeFight();
+            }
+            superForce.changeSpiritAscending(superSoldiers, xp * ratio, morale * ratio, fatigue * ratio);
+        }
+    }
+
+    public void changeStrengthAscending(Strength strth) {
+        if (superForce != null) {
+            superForce.strength.change(strth);
+            superForce.changeStrengthAscending(strth);
+        }
+    }
 
     public void reduceFoodAscending(double food) {
         strength.food -= food;
@@ -700,4 +773,6 @@ public abstract class Force extends Image {
             return true;
         }
     }
+
+    public abstract String detailedInfo();
 }

@@ -7,13 +7,14 @@ import static by.pavka.march.military.Force.INF;
 import by.pavka.march.characteristic.Strength;
 
 public enum HQType implements Unitable {
-    TROOP(3, 3, CAV) {
+    TROOP(3, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
         }
     },
-    INFANTRY_REGIMENT_HQ(1, 3, CAV) {
+    // fire 0.02
+    INFANTRY_REGIMENT_HQ(1, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength(0, 0, 50, 0, 0, 0.02, 0.1,
@@ -33,7 +34,8 @@ public enum HQType implements Unitable {
             return true;
         }
     },
-    CAVALRY_REGIMENT_HQ(1, 3, CAV) {
+    // fire 0.02
+    CAVALRY_REGIMENT_HQ(1, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength(0, 0, 50, 0, 0, 0.02, 0.1,
@@ -53,7 +55,7 @@ public enum HQType implements Unitable {
             return true;
         }
     },
-    ARTILLERY_REGIMENT_HQ(1, 3, CAV) {
+    ARTILLERY_REGIMENT_HQ(1, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength(0, 0, 50, 0, 0, 0.02, 0.1,
@@ -72,7 +74,8 @@ public enum HQType implements Unitable {
             return true;
         }
     },
-    INFANTRY_BRIGADE_HQ(2, 3, CAV) {
+    // fire 0.02
+    INFANTRY_BRIGADE_HQ(2, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength(0, 0, 50, 0, 0, 0.02, 0.1,
@@ -92,7 +95,8 @@ public enum HQType implements Unitable {
             return true;
         }
     },
-    CAVALRY_BRIGADE_HQ(2, 3, CAV) {
+    // fire 0.02
+    CAVALRY_BRIGADE_HQ(2, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength(0, 0, 50, 0, 0, 0.02, 0.1,
@@ -112,7 +116,8 @@ public enum HQType implements Unitable {
             return true;
         }
     },
-    DIVISION_HQ(3, 3, CAV) {
+    // fire 0.02
+    DIVISION_HQ(3, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength(0, 0, 50, 0, 0, 0.02, 0.1,
@@ -132,25 +137,25 @@ public enum HQType implements Unitable {
             return true;
         }
     },
-    CAVALRY_DIVISION_HQ(3, 3, CAV) {
+    CAVALRY_DIVISION_HQ(3, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
         }
     },
-    CORPS_HQ(4, 3, CAV) {
+    CORPS_HQ(4, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
         }
     },
-    CAVALRY_CORPS_HQ(4, 3, CAV) {
+    CAVALRY_CORPS_HQ(4, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
         }
     },
-    ARMY_HQ(5, 3, CAV) {
+    ARMY_HQ(5, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
@@ -163,17 +168,17 @@ public enum HQType implements Unitable {
     };
 
     private int level;
-    private int fightRank;
+//    private int fightRank;
     private String type;
 
-    HQType(int level, int rank, String type) {
+    HQType(int level, String type) {
         this.level = level;
-        fightRank = rank;
+//        fightRank = rank;
         this.type = type;
     }
 
     public int fightRank() {
-        return fightRank;
+        return 4 + level / 2;
     }
 
     @Override

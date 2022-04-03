@@ -1,7 +1,12 @@
 package by.pavka.march.military;
 
+import by.pavka.march.BuonaparteGame;
+
 public class MainTest {
     public static void main(String[] args) {
+        BuonaparteGame game = BuonaparteGame.getGame();
+//        game.setScreen(new TestScreen(game, new Configurator(game, FRANCE, MARENGO)));
+
 
 //        Formation formation = new Formation();
 //        FormationValidator validator = new FormationValidator() {

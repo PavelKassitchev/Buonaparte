@@ -13,7 +13,7 @@ public enum UnitType implements Unitable {
     INFANTRY(1, INF) {
         @Override
         public Strength getInitialStrength() {
-            return new Strength(840, 0, 0, 0, 0, 1, 1,
+            return new Strength(840, 0, 0, 0, 0, 1.00, 1,
                     120, 1, 5, 1, 0.5, 3, 2);
         }
 
@@ -39,7 +39,7 @@ public enum UnitType implements Unitable {
             return new Strength();
         }
     },
-    GUARD_INFANTRY(1, INF) {
+    GUARD_INFANTRY(2, INF) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
@@ -76,8 +76,8 @@ public enum UnitType implements Unitable {
             return new Strength();
         }
     },
-
-    CAVALRY(1, CAV) {
+// fire 0.08
+    CAVALRY(3, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength(0, 0, 200, 0, 0, 0.08, 0.4,
@@ -94,36 +94,36 @@ public enum UnitType implements Unitable {
             return 6.0f;
         }
     },
-    HEAVY_CAVALRY(1, CAV) {
+    HEAVY_CAVALRY(2, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
         }
     },
-    LIGHT_CAVALRY(2, CAV) {
+    LIGHT_CAVALRY(4, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
         }
     },
-    IRREGULAR_CAVALRY(2, CAV) {
+    IRREGULAR_CAVALRY(4, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
         }
     },
-    GUARD_CAVALRY(1, CAV) {
+    GUARD_CAVALRY(3, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
         }
     },
-
-    ARTILLERY(1, ART) {
+// fire 3.3
+    ARTILLERY(2, ART) {
         @Override
         public Strength getInitialStrength() {
-            return new Strength(0, 0, 0, 120, 0, 3, 0.01,
-                    80, 0.2, 5, 0.4, 1.5, 1.4, 3.6);
+            return new Strength(0, 0, 0, 120, 0, 3.3, 0.01,
+                    80, 0.1, 5, 0.4, 1.5, 1.4, 3.6);
         }
 
         @Override
@@ -142,34 +142,35 @@ public enum UnitType implements Unitable {
             return new Strength();
         }
     },
-    HORSE_ARTILLERY(1, CAV) {
+    HORSE_ARTILLERY(2, CAV) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
         }
     },
-    HEAVY_ARTILLERY(1, ART) {
+    HEAVY_ARTILLERY(3, ART) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
         }
     },
-    GUARD_ARTILLERY(1, ART) {
+    GUARD_ARTILLERY(3, ART) {
         @Override
         public Strength getInitialStrength() {
             return new Strength();
         }
     },
 
-    SUPPLY(3,SUP) {
+    SUPPLY(5,SUP) {
         @Override
         public Strength getInitialStrength() {
-            return new Strength();
+            return new Strength(0, 0, 0, 0, 64, 0.02, 0.01,
+                    300, 0.01, 28, 0.5, 0.02, 20, 8);
         }
     };
 
-    public static final double GUNNER_PER_CANNON = 15.0;
-    public static final double WAGONER_PER_WAGON = 2.0;
+    public static final int GUNNER_PER_CANNON = 15;
+    public static final int WAGONER_PER_WAGON = 2;
 
     private int fightRank;
     private String type;

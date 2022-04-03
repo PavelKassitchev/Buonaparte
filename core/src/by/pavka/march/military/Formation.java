@@ -44,6 +44,16 @@ public class Formation extends Force {
         }
     }
 
+    @Override
+    public void restoreMorale(float delta) {
+        for (Force force : subForces) {
+            force.restoreMorale(delta);
+        }
+        if (spirit.morale > Force.REORDER_MORALE) {
+            isDisordered = false;
+        }
+    }
+
     public Formation(Formation headForce, TextureRegion region) {
         super(region, 20000, 6000);
         this.headForce = headForce;
@@ -92,12 +102,12 @@ public class Formation extends Force {
     }
 
     @Override
-    public void startBattle(Hex hex) {
+    public void startFight(Hex hex) {
         //TODO
     }
 
     @Override
-    public void joinBattle(Hex hex) {
+    public void joinFight(Hex hex) {
         //TODO
     }
 
@@ -152,6 +162,64 @@ public class Formation extends Force {
     public Stock changeStockDescending(Stock stock, int mode) {
         //TODO
         return null;
+    }
+
+    @Override
+    public Strength sufferLosses(double factor) {
+        Strength start = new Strength(strength);
+        for (Force f : subForces) {
+            f.sufferLosses(factor);
+        }
+        Strength end = new Strength(strength);
+        return start.plus(end.reverse());
+    }
+
+    @Override
+    public Strength getFired(double factor) {
+        Strength start = new Strength(strength);
+        for (Force f : subForces) {
+            f.getFired(factor);
+        }
+        Strength end = new Strength(strength);
+        return start.plus(end.reverse());
+    }
+
+    @Override
+    public Strength getFired(double factor, boolean onPursuit) {
+        Strength start = new Strength(strength);
+        for (Force f : subForces) {
+            f.getFired(factor);
+        }
+        Strength end = new Strength(strength);
+        return start.plus(end.reverse());
+    }
+
+    @Override
+    public void changeSpirit(double xp, double morale, double fatigue) {
+        for (Force f : subForces) {
+            f.changeSpirit(xp,morale, fatigue);
+        }
+        if (spirit.morale < 0) {
+            isDisordered = true;
+//            System.out.println(getName() + " is disordered");
+        }
+        if (spirit.morale > 0.3) {
+            isDisordered = false;
+//            joinFight();
+        }
+    }
+
+    @Override
+    public void getCharged(double morale) {
+        for (Force f : subForces) {
+            f.getCharged(morale);
+        }
+        if (spirit.morale < 0) {
+            isDisordered = true;
+        }
+//        if (spirit.morale > Force.REORDER_MORALE) {
+//            isDisordered = false;
+//        }
     }
 
     @Override
@@ -237,6 +305,16 @@ public class Formation extends Force {
         return type;
     }
 
+    @Override
+    public String detailedInfo() {
+        StringBuilder sb = new StringBuilder(getName() + " total soldiers " + strength.soldiers() + " total fire " + strength.fire +
+                '\n');
+        for (Force f : subForces) {
+           sb.append(f.detailedInfo()).append('\n');
+        }
+       return sb.toString();
+    }
+
     public boolean remove(Force force) {
         structureChanged = true;
         return subForces.removeValue(force, true);
@@ -275,7 +353,7 @@ public class Formation extends Force {
                 }
                 force.hex = null;
 //                force.actualOrders.clear();
-                System.out.println("Force is attached");
+//                System.out.println("Force is attached");
             }
             Strength s = force.strength;
             changeStrength(s);

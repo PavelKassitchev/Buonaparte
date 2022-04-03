@@ -46,6 +46,7 @@ import by.pavka.march.map.Path;
 import by.pavka.march.military.Courier;
 import by.pavka.march.military.Force;
 import by.pavka.march.military.Formation;
+import by.pavka.march.military.UnitType;
 import by.pavka.march.order.FollowOrder;
 import by.pavka.march.structure.ForceButton;
 import by.pavka.march.structure.ForceNode;
@@ -217,7 +218,8 @@ public class PlayScreen extends GestureDetector implements Screen {
     private void setLabelInfo(Label label, Force force) {
         String text = String.format("%d soldiers \n  infantry: %d\n  cavalry: %d\n  guns: %d\n  wagons: %d" +
                         "\nmorale-%.1f\nfatigue-%.1f\nxp-%.1f\nfood-%.2f\nammo-%.2f\nspeed-%.1f", force.visualStrength.soldiers(), force.visualStrength.infantry,
-                force.visualStrength.cavalry, force.visualStrength.artillery / 15, force.visualStrength.supply, force.visualSpirit.morale,
+                force.visualStrength.cavalry, force.visualStrength.artillery / UnitType.GUNNER_PER_CANNON,
+                force.visualStrength.supply / UnitType.WAGONER_PER_WAGON, force.visualSpirit.morale,
                 force.visualSpirit.fatigue, force.visualSpirit.xp, force.visualStrength.food, force.visualStrength.ammo, force.speed);
         label.setText(text);
     }
@@ -465,7 +467,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     }
 
     public void setForceInfo(Force force) {
-        String info = String.format("1 Force\n%d Soldiers", force.visualStrength.soldiers());
+        String info = String.format("1 Forces\n%d Soldiers", force.visualStrength.soldiers());
         forceButton.setText(info);
     }
 

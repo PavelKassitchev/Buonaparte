@@ -1,7 +1,6 @@
 package by.pavka.march;
 
 import static by.pavka.march.configuration.Campaign.MARENGO;
-import static by.pavka.march.configuration.Nation.AUSTRIA;
 import static by.pavka.march.configuration.Nation.FRANCE;
 
 import com.badlogic.gdx.Gdx;
@@ -17,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import by.pavka.march.configuration.Configurator;
-import by.pavka.march.configuration.Nation;
 
 public class MenuScreen implements Screen {
     private BuonaparteGame game;
@@ -54,8 +52,10 @@ public class MenuScreen implements Screen {
         options.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.nation = Nation.AUSTRIA;
-                game.setScreen(new PlayScreen(game, new HexGestureListener(), new Configurator(game, AUSTRIA, MARENGO)));
+//                game.nation = Nation.AUSTRIA;
+//                game.setScreen(new PlayScreen(game, new HexGestureListener(), new Configurator(game, AUSTRIA, MARENGO)));
+                game.setScreen(new TestScreen(game, new Configurator(game, FRANCE, MARENGO)));
+
             }
         });
         table.add(options).fillX().uniformX();

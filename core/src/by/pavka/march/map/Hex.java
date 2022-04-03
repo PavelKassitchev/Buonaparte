@@ -66,6 +66,11 @@ public class Hex extends Group {
         setDebug(true);
     }
 
+    public Hex() {
+        //Just for testing
+        forces = new Array<>();
+    }
+
     public float getRelX() {
         return (col + 0.2f) * tiledLayer.getTileWidth() * 0.75f + tiledLayer.getTileWidth() * 0.375f;
     }

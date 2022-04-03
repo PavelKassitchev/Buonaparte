@@ -15,7 +15,7 @@ public class HQ extends Unit {
 
     public HQ(Unitable type) {
         super(type);
-//        this.type = (HQType)type;
+        this.type = (HQType)type;
     }
 
     @Override
@@ -26,5 +26,10 @@ public class HQ extends Unit {
     @Override
     public boolean isDetachable() {
         return false;
+    }
+
+    @Override
+    public String getName() {
+        return superForce.nation + " " + type;
     }
 }

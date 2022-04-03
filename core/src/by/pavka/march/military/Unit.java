@@ -14,11 +14,12 @@ import by.pavka.march.characteristic.Spirit;
 import by.pavka.march.characteristic.Stock;
 import by.pavka.march.characteristic.Strength;
 import by.pavka.march.configuration.Configurator;
+import by.pavka.march.fight.Fight;
 import by.pavka.march.map.Hex;
 import by.pavka.march.order.OrderList;
 
 public class Unit extends Force {
-    Quality quality;
+    public Quality quality;
     Unitable unitType;
 
 
@@ -35,6 +36,26 @@ public class Unit extends Force {
         spirit.fatigue -= f;
         if (spirit.fatigue < 0) {
             spirit.fatigue = 0;
+        }
+    }
+
+    @Override
+    public void restoreMorale(float delta) {
+        float duration = delta * HOURS_IN_SECOND;
+        double moraleChange;
+        if (spirit.morale < MIN_MORALE) {
+            moraleChange = MIN_MORALE - spirit.morale;
+        } else {
+            moraleChange = duration * (1 + spirit.xp - spirit.morale) * MORALE_RESTORE_HOUR;
+        }
+        changeSpirit(0, moraleChange, 0);
+        if (spirit.morale > Force.REORDER_MORALE && isDisordered) {
+            isDisordered = false;
+            Fight f = findHyperForce().fight;
+            if (f != null) {
+                System.out.println(getName() + " RESTORED!");
+                f.include(this);
+            }
         }
     }
 
@@ -61,12 +82,12 @@ public class Unit extends Force {
     }
 
     @Override
-    public void startBattle(Hex hex) {
+    public void startFight(Hex hex) {
         //TODO
     }
 
     @Override
-    public void joinBattle(Hex hex) {
+    public void joinFight(Hex hex) {
         //TODO
     }
 
@@ -162,6 +183,65 @@ public class Unit extends Force {
     }
 
     @Override
+    public Strength sufferLosses(double factor) {
+        Strength s = strength.sufferLosses(factor);
+//        System.out.println(getName() + " suffer factor " + factor + " lost " + s.soldiers() + " going to change morale by " +
+//                (-3 * s.soldiers() / (strength.soldiers() + 1.0)) + " current morale " + spirit.morale);
+        changeSpirit(0, -3 * s.soldiers() / (strength.soldiers() + 1.0), 0);
+        changeStrengthAscending(s.reverse());
+        return s;
+    }
+
+    @Override
+    public Strength getFired(double factor) {
+        if (!isDisordered) {
+            Strength s = strength.sufferLosses(factor);
+            changeSpirit(0, -3 * s.soldiers() / (strength.soldiers() + 1.0), 0);
+//            getCharged(-3 * s.soldiers() / (strength.soldiers() + 1.0));
+            changeStrengthAscending(s.reverse());
+            return s;
+        } else {
+            return Strength.EMPTY_STRENGTH;
+        }
+    }
+
+    @Override
+    public Strength getFired(double factor, boolean onPursuit) {
+        if (onPursuit) {
+            Strength s = strength.sufferLosses(factor);
+            changeSpirit(0, -3 * s.soldiers() / (strength.soldiers() + 1.0), 0);
+//            getCharged(-3 * s.soldiers() / (strength.soldiers() + 1.0));
+            changeStrengthAscending(s.reverse());
+            return s;
+        } else {
+            return getFired(factor);
+        }
+    }
+
+    @Override
+    public void changeSpirit(double xp, double morale, double fatigue) {
+        spirit.change(xp, morale, fatigue);
+        changeSpiritAscending(strength.soldiers(), xp, morale, fatigue);
+    }
+
+    @Override
+    public void getCharged(double morale) {
+        if (!isDisordered) {
+            spirit.change(0, morale, 0);
+            changeSpiritAscending(strength.soldiers(), 0, morale, 0);
+            if (spirit.morale < 0) {
+                isDisordered = true;
+                System.out.println(getName() + " Disordered");
+                Fight f = findHyperForce().fight;
+                if (f != null) {
+                    f.getPursued(this);
+                    f.exclude(this);
+                }
+            }
+        }
+    }
+
+    @Override
     public Stock emptyStock() {
         double food = strength.food;
         double ammo = strength.ammo;
@@ -242,6 +322,11 @@ public class Unit extends Force {
         return unitType;
     }
 
+    @Override
+    public String detailedInfo() {
+        return getName() +  " soldiers " + strength.soldiers() + " fire " + strength.fire + '\n';
+    }
+
     public Stock changeStockAscending(Stock stock, int mode) {
         Stock initial = new Stock(stock);
         Stock remaining = strength.changeStock(stock, mode);
@@ -252,7 +337,7 @@ public class Unit extends Force {
     }
 
     public Strength changeStrength(int soldiers) {
-        Strength strength = this.strength.change(soldiers, quality.unitType);
+        Strength strength = this.strength.change(soldiers, (UnitType)unitType);
         if (superForce != null) {
             superForce.changeStrength(strength);
         }

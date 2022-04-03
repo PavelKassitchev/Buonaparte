@@ -9,4 +9,5 @@ public interface Unitable {
     String image();
     int getLevel();
     String getTroopType();
+    int fightRank();
 }
