@@ -24,6 +24,7 @@ import by.pavka.march.characteristic.Strength;
 import by.pavka.march.configuration.Nation;
 import by.pavka.march.fight.Fight;
 import by.pavka.march.fight.impl.Battle;
+import by.pavka.march.map.Direction;
 import by.pavka.march.map.Hex;
 import by.pavka.march.map.Path;
 import by.pavka.march.order.Order;
@@ -171,8 +172,9 @@ public abstract class Force extends Image {
 
     public abstract String image();
 
-    public void startFight(Hex hex) {
-        new Battle(hex, this.nation);
+    public void startFight(Hex hex, Direction direction) {
+        fight = new Battle(hex, this.nation, direction);
+        System.out.println("This fight is " + fight + " direction = " + direction);
     }
 
     public abstract void joinFight(Hex hex);
@@ -199,7 +201,12 @@ public abstract class Force extends Image {
     public float findCommandDistance() {
 
 //        return findReportDistance(findHyperForce().remoteHeadForce);
-        return findReportDistance(playScreen.headForce);
+        //TODO remove playScreen check
+        if (playScreen != null) {
+            return findReportDistance(playScreen.headForce);
+        } else {
+            return 0;
+        }
     }
 
 
@@ -441,6 +448,7 @@ public abstract class Force extends Image {
             restoreMorale(delta);
             if (fight != null) {
                 fight(delta);
+                System.out.println("FIGHT!!!");
 //                if (!isDisordered) {
 //                    fight.affect(this, delta);
 //                }
@@ -457,16 +465,6 @@ public abstract class Force extends Image {
                 }
             }
 
-//            switch (state) {
-//                case DEFAULT:
-//                    if (actualOrders.first() != null) {
-//                        actualOrders.first().execute(this, delta);
-//                    }
-//                    if (!isEnemy() && readyToRecon(delta)) {
-//                        recon();
-//                        sendReport("JUST RECON");
-//                    }
-//            }
         }
 
     }
@@ -517,6 +515,7 @@ public abstract class Force extends Image {
         if (!forcePath.isEmpty()) {
             fatigue(delta * HOURS_IN_SECOND * marchConfig.fatigueFactor());
             Path path = forcePath.get(0);
+            Direction direction = path.direction;
             float timeToCross = Hex.SIZE * path.getCost() / (speed * marchConfig.speedFactor());
             if (start > timeToCross / HOURS_IN_SECOND) {
 //                if (getName().equals("II.Art.Bttr.") || getName().equals("IV.Cav.Div.")) {
@@ -555,7 +554,8 @@ public abstract class Force extends Image {
                     if (hex.hasBattle) {
                         joinFight(hex);
                     } else {
-                        startFight(hex);
+                        System.out.println("START FIGHT!!!!");
+                        startFight(hex, direction);
                     }
                 }
             }
@@ -575,11 +575,15 @@ public abstract class Force extends Image {
 
     public abstract void restoreMorale(float delta);
 
-    public void resumeFight() {
-        if (fight != null) {
-            fight.restoreForce(this);
-        }
-    }
+    public abstract void prepareForFight();
+
+    public abstract Strength desert();
+
+//    public void resumeFight() {
+//        if (fight != null) {
+//            fight.restoreForce(this);
+//        }
+//    }
 
 
     public void move(float delta) {
@@ -625,7 +629,7 @@ public abstract class Force extends Image {
             }
             if (superForce.spirit.morale > 0.3) {
                 superForce.isDisordered = false;
-                superForce.resumeFight();
+//                superForce.resumeFight();
             }
             superForce.changeSpiritAscending(superSoldiers, xp * ratio, morale * ratio, fatigue * ratio);
         }
@@ -775,4 +779,12 @@ public abstract class Force extends Image {
     }
 
     public abstract String detailedInfo();
+
+    public void retreat(Direction retreatDirection) {
+        actualOrders.clear();
+        //TODO remove check playScreen != null
+        if (playScreen != null) {
+            setRealHex(playScreen.hexGraph.getNeighbour(hex, retreatDirection));
+        }
+    }
 }

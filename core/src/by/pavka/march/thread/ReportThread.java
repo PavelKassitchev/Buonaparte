@@ -1,5 +1,7 @@
 package by.pavka.march.thread;
 
+import static by.pavka.march.military.Courier.playScreen;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectFloatMap;
@@ -68,7 +70,13 @@ public class ReportThread extends Thread {
         final ObjectMap<Force, Hex> delayedEnemies = new ObjectMap<Force, Hex>(force.visualEnemies);
 //        final ObjectSet<Hex> delayedArea = force.reconArea;
         final ObjectFloatMap<Hex> delayedMap = force.reconMap;
-        final float time = force.playScreen.time;
+        //TODO remove playScreen check
+        final float time;
+        if (playScreen != null) {
+            time = force.playScreen.time;
+        } else {
+            time = 0;
+        }
 
         final Force copy = force.copyForce();
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import by.pavka.march.characteristic.Strength;
 import by.pavka.march.configuration.Nation;
 import by.pavka.march.fight.Fight;
+import by.pavka.march.map.Direction;
 import by.pavka.march.map.Hex;
 import by.pavka.march.military.Force;
 
@@ -14,6 +15,8 @@ public class BattleConfigurator {
     public static final int FIRE_1_HOUR_EQUIVALENT = 80;
     public static final int CHARGE_1_HOUR_EQUIVALENT = 220;
     public static final int PURSUIT_1_EQUIVALENT = 200;
+    public float duration;
+    public Direction default2RetreatDirection;
 
     Fight fight;
     double battlefieldWidth = 2000;
@@ -22,6 +25,8 @@ public class BattleConfigurator {
     Array<Force> second = new Array<>();
     int firstSoldiers;
     int secondSoldiers;
+    final int initialFirst;
+    final int initialSecond;
     double firstLength;
     double secondLength;
     double firstFire;
@@ -37,10 +42,12 @@ public class BattleConfigurator {
     double firstDisorderedFire;
     double secondDisorderedFire;
 
-    public BattleConfigurator(Fight fight, Hex hex, Nation nation) {
+    public BattleConfigurator(Fight fight, Hex hex, Nation nation, Direction direction) {
         this.fight = fight;
         firstNation = nation;
+        default2RetreatDirection = direction;
         for (Force force : hex.getForces()) {
+            force.prepareForFight();
             if (force.nation == firstNation) {
                 first.add(force);
                 firstSoldiers += force.strength.soldiers();
@@ -58,6 +65,8 @@ public class BattleConfigurator {
             }
             force.fight = fight;
         }
+        initialFirst = firstSoldiers;
+        initialSecond = secondSoldiers;
         widthFactor = battlefieldWidth / (firstLength + secondLength);
         System.out.println("Initial first: " + first.get(0).detailedInfo() +
                 " Initial second:" + second.get(0).detailedInfo());
@@ -76,6 +85,12 @@ public class BattleConfigurator {
 //            + secondDisorderedFire + " Total Fire " + force.strength.fire);
             return widthFactor * firstFire * HOURS_IN_SECOND * delta
                     * FIRE_1_HOUR_EQUIVALENT / secondSoldiers;
+        }
+    }
+
+    public void affect(Force force, Strength s, boolean onPursuit) {
+        if (!onPursuit) {
+            affect(force, s);
         }
     }
 
@@ -119,6 +134,23 @@ public class BattleConfigurator {
         }
     }
 
+    public double getPostPursuitFactor(Force force) {
+        double factor;
+        if (force.nation == firstNation) {
+            factor = (0.1 + secondCharge / initialFirst - force.strength.charge / force.strength.soldiers())
+                    * FIRE_1_HOUR_EQUIVALENT / force.strength.soldiers();
+//            return secondCharge
+//                    * FIRE_1_HOUR_EQUIVALENT / initialFirst;
+        } else {
+            factor = (0.1 + firstCharge / initialSecond - force.strength.charge / force.strength.soldiers())
+                    * FIRE_1_HOUR_EQUIVALENT / force.strength.soldiers();
+//            return firstCharge
+//                    * FIRE_1_HOUR_EQUIVALENT / initialSecond;
+        }
+        System.out.println("PURSUIT " + factor);
+        return factor;
+    }
+
     public void exclude(Force force) {
         if (force.nation == firstNation) {
             firstSoldiers -= force.strength.soldiers();
@@ -130,7 +162,7 @@ public class BattleConfigurator {
             if (Double.isNaN(firstFire) || firstFire < 0) {
                 System.out.println("NAN or FFIRE " + firstFire + " " + force.getName() + " in fire " + force.strength.fire +
                         " First Soldiers " + firstSoldiers + " First Disordered " + firstDisordered);
-                System.exit(1);
+//                System.exit(1);
             }
             firstCharge -= force.strength.charge;
             firstRecon -= force.strength.recon;
@@ -144,7 +176,7 @@ public class BattleConfigurator {
             if (Double.isNaN(secondFire) || secondFire < 0) {
                 System.out.println("NAN or SFIRE " + secondFire + " " + force.getName() + " in fire " + force.strength.fire +
                         " Second Soldiers " + secondSoldiers + " Second Disordered " + secondDisordered);
-                System.exit(1);
+//                System.exit(1);
             }
             secondCharge -= force.strength.charge;
             secondRecon -= force.strength.recon;

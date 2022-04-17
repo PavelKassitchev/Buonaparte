@@ -49,13 +49,34 @@ public class Unit extends Force {
             moraleChange = duration * (1 + spirit.xp - spirit.morale) * MORALE_RESTORE_HOUR;
         }
         changeSpirit(0, moraleChange, 0);
+//        System.err.println(getName() + " morale " + spirit.morale);
         if (spirit.morale > Force.REORDER_MORALE && isDisordered) {
             isDisordered = false;
+            System.err.println(getName() + " RESTORED!");
             Fight f = findHyperForce().fight;
             if (f != null) {
-                System.out.println(getName() + " RESTORED!");
                 f.include(this);
+//                System.exit(1);
             }
+        }
+    }
+
+    @Override
+    public void prepareForFight() {
+        desert();
+        isDisordered = false;
+    }
+
+    @Override
+    public Strength desert() {
+        if (isDisordered) {
+            double factor = (1 - spirit.morale) * 0.04;
+            Strength s = strength.sufferLosses(factor);
+            changeStrengthAscending(s.reverse());
+            System.out.println("DESERTING... " + getName() + " deserted " + s.soldiers());
+            return s;
+        } else {
+            return Strength.EMPTY_STRENGTH;
         }
     }
 
@@ -81,10 +102,10 @@ public class Unit extends Force {
         return unitType.image();
     }
 
-    @Override
-    public void startFight(Hex hex) {
-        //TODO
-    }
+//    @Override
+//    public void startFight(Hex hex) {
+//        //TODO
+//    }
 
     @Override
     public void joinFight(Hex hex) {
@@ -194,7 +215,7 @@ public class Unit extends Force {
 
     @Override
     public Strength getFired(double factor) {
-        if (!isDisordered) {
+        if (!isDisordered && factor > 0) {
             Strength s = strength.sufferLosses(factor);
             changeSpirit(0, -3 * s.soldiers() / (strength.soldiers() + 1.0), 0);
 //            getCharged(-3 * s.soldiers() / (strength.soldiers() + 1.0));
@@ -207,7 +228,7 @@ public class Unit extends Force {
 
     @Override
     public Strength getFired(double factor, boolean onPursuit) {
-        if (onPursuit) {
+        if (onPursuit && factor > 0) {
             Strength s = strength.sufferLosses(factor);
             changeSpirit(0, -3 * s.soldiers() / (strength.soldiers() + 1.0), 0);
 //            getCharged(-3 * s.soldiers() / (strength.soldiers() + 1.0));

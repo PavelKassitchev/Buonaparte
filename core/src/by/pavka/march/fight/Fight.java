@@ -3,10 +3,8 @@ package by.pavka.march.fight;
 import by.pavka.march.military.Force;
 
 public interface Fight {
-    void affect(Force force, float delta);
-    FightResult result();
 
-    void restoreForce(Force force);
+    FightResult result();
 
     void strike(Force force, float delta);
 

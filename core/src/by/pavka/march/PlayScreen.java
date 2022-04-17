@@ -94,7 +94,7 @@ public class PlayScreen extends GestureDetector implements Screen {
     public ImageTextButton forceButton;
     public boolean dragged;
 
-    private HexGraph hexGraph;
+    public HexGraph hexGraph;
 
     public PlayScreen(BuonaparteGame game, GestureListener listener, Configurator configurator) {
         super(listener);

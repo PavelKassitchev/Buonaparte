@@ -1,6 +1,7 @@
 package by.pavka.march;
 
 import static by.pavka.march.configuration.Nation.FRANCE;
+import static by.pavka.march.map.Direction.SOUTHWEST;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -25,7 +26,7 @@ public class TestScreen extends Stage implements Screen {
         Gdx.input.setInputProcessor(this);
 
         TestConfigurator.prepareStage(this, hex);
-        battle = new Battle(hex, FRANCE);
+        battle = new Battle(hex, FRANCE, SOUTHWEST);
 
     }
 

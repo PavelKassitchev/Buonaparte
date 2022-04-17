@@ -48,10 +48,32 @@ public class Formation extends Force {
     public void restoreMorale(float delta) {
         for (Force force : subForces) {
             force.restoreMorale(delta);
+            if (force.spirit.morale > Force.REORDER_MORALE && force.isDisordered) {
+                force.isDisordered = false;
+            }
         }
         if (spirit.morale > Force.REORDER_MORALE) {
             isDisordered = false;
         }
+    }
+
+    @Override
+    public void prepareForFight() {
+        isDisordered = false;
+        for (Force f : subForces) {
+            f.prepareForFight();
+        }
+    }
+
+    @Override
+    public Strength desert() {
+//        Strength start = new Strength(strength);
+//        for (Force f : subForces) {
+//            f.desert();
+//        }
+//        Strength end = new Strength(strength);
+//        return start.plus(end.reverse());
+        return null;
     }
 
     public Formation(Formation headForce, TextureRegion region) {
@@ -101,10 +123,10 @@ public class Formation extends Force {
         return type.image();
     }
 
-    @Override
-    public void startFight(Hex hex) {
-        //TODO
-    }
+//    @Override
+//    public void startFight(Hex hex) {
+//        //TODO
+//    }
 
     @Override
     public void joinFight(Hex hex) {
@@ -197,7 +219,7 @@ public class Formation extends Force {
     @Override
     public void changeSpirit(double xp, double morale, double fatigue) {
         for (Force f : subForces) {
-            f.changeSpirit(xp,morale, fatigue);
+            f.changeSpirit(xp, morale, fatigue);
         }
         if (spirit.morale < 0) {
             isDisordered = true;
@@ -310,9 +332,9 @@ public class Formation extends Force {
         StringBuilder sb = new StringBuilder(getName() + " total soldiers " + strength.soldiers() + " total fire " + strength.fire +
                 '\n');
         for (Force f : subForces) {
-           sb.append(f.detailedInfo()).append('\n');
+            sb.append(f.detailedInfo()).append('\n');
         }
-       return sb.toString();
+        return sb.toString();
     }
 
     public boolean remove(Force force) {
@@ -408,7 +430,7 @@ public class Formation extends Force {
         visualStrength = new Strength(copy.strength);
         visualSpirit = new Spirit(copy.spirit);
         visualForces = new Array<>();
-        for (Force force : ((Formation)copy).subForces) {
+        for (Force force : ((Formation) copy).subForces) {
             visualForces.add(force);
             force.visualizeCopy(force);
         }

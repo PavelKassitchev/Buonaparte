@@ -68,6 +68,40 @@ public class TestConfigurator {
 //        stage.addActor(regiment1);
 
 //        stage.addActor(unit);
+
+        // Infantry vs Cavalry
+
+        Unit frenchInfantry = new Unit(UnitType.INFANTRY);
+        frenchInfantry.nation = FRANCE;
+        frenchInfantry.setName("French Inf");
+
+        Unit ausCavalry = new Unit(UnitType.CAVALRY);
+        ausCavalry.nation = AUSTRIA;
+        ausCavalry.setName("Austrian Cav");
+
+        Unit ausCavalry2 = new Unit(UnitType.CAVALRY);
+        ausCavalry2.nation = AUSTRIA;
+        ausCavalry2.setName("Austrian Cav2");
+
+        Unit ausCavalry3 = new Unit(UnitType.CAVALRY);
+        ausCavalry3.nation = AUSTRIA;
+        ausCavalry3.setName("Austrian Cav3");
+
+        Formation reg = new Formation(HQType.CAVALRY_REGIMENT_HQ);
+
+        reg.nation = AUSTRIA;
+        reg.setName("Austrian Reg");
+        reg.attach(ausCavalry, true);
+        reg.attach(ausCavalry2, true);
+        reg.attach(ausCavalry3, true);
+
+//        hex.addForce(frenchInfantry);
+//        stage.addActor(frenchInfantry);
+////        hex.addForce(ausCavalry);
+////        stage.addActor(ausCavalry);
+//        hex.addForce(reg);
+//        stage.addActor(reg);
+
       // TWO BATTALIONS
 
         Unit finf = new Unit(UnitType.INFANTRY);
@@ -388,7 +422,6 @@ public class TestConfigurator {
 
         hex.addForce(fdiv);
         stage.addActor(fdiv);
-
         hex.addForce(adiv);
         stage.addActor(adiv);
 

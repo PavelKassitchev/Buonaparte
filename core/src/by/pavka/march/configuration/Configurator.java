@@ -94,7 +94,7 @@ public class Configurator {
         un.setName("III.Inf.Bat.");
         formation1.attach(un, true);
         formation.attach(formation1, true);
-        headForce.attach(formation, true);
+//        headForce.attach(formation, true);
         Formation form = new Formation(game.getTextureRegion("fr_art"));
         form.setName("Reserve Art.");
         form.remoteHeadForce = headForce;
@@ -105,9 +105,11 @@ public class Configurator {
         anotherTestForce.nation = FRANCE;
         headForce.nation = FRANCE;
 
-        Force enemy = new Unit(game.getTextureRegion("hostile"));
+//        Force enemy = new Unit(game.getTextureRegion("hostile"));
+        Force enemy = new Unit(UnitType.INFANTRY);
         enemy.nation = AUSTRIA;
         enemy.setName("Enemy small");
+        enemy.spirit.xp = 1.2;
         Formation enemyHQ = new Formation(game.getTextureRegion("hostile"));
         enemyHQ.nation = AUSTRIA;
         enemyHQ.setName("Enemy HQ");
@@ -149,10 +151,8 @@ public class Configurator {
     private void addForce(Nation nation, int col, int row, PlayScreen playScreen) {
         TextureRegion region = null;
         if (this.nation == nation) {
-            System.out.println("NO");
             region = game.getTextureRegion("fr_inf");
         } else {
-            System.out.println("VOW!");
             region = game.getTextureRegion("hostile");
         }
         Force force = new Unit(region);

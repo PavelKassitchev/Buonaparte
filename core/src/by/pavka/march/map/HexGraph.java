@@ -77,6 +77,16 @@ public class HexGraph implements IndexedGraph<Hex> {
         return getNeighbours(one).contains(two, true) || one == two;
     }
 
+    public Hex getNeighbour(Hex hex, Direction direction) {
+        Hex neighbour = null;
+        for (Hex h : getNeighbours(hex)) {
+            if (findDirection(hex, h) == direction) {
+                neighbour = h;
+            }
+        }
+        return neighbour;
+    }
+
     public Array<Hex> getNeighbours(Hex hex) {
         Array<Hex> neighbours = new Array<Hex>();
         if (hex.col > 0) {

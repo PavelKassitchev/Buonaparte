@@ -11,7 +11,7 @@ public class Path extends Image implements Connection<Hex> {
     public Hex fromHex;
     public Hex toHex;
     float cost;
-    Direction direction;
+    public Direction direction;
 
     public Path(Hex fromHex, Hex toHex){
         this.fromHex = fromHex;
